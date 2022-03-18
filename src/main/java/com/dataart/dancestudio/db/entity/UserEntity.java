@@ -3,8 +3,6 @@ package com.dataart.dancestudio.db.entity;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.ZoneId;
-
 @Getter
 @Setter
 public class UserEntity {

@@ -22,4 +22,8 @@ public interface LessonMapper {
 
     List<LessonDto> fromEntities(Iterable<LessonEntity> entities);
 
+//    String input = "04:30 PM, Sat 5/12/2018";
+//    DateTimeFormatter f = DateTimeFormatter.ofPattern( "hh:mm a, EEE M/d/uuuu" , Locale.US );  // Specify locale to determine human language and cultural norms used in translating that input string.
+//    LocalDateTime ldt = LocalDateTime.parse( input , f );
+
 }

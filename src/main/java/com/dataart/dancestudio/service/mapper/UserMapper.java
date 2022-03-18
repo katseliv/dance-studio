@@ -15,8 +15,7 @@ public interface UserMapper {
 
     @Named(value = "timeZone")
     default String mapTimeZone(ZoneId zoneId) {
-
-        return ZoneId.systemDefault().toString();
+        return zoneId.getId();
     }
 
     @Mapping(target = "role.id", source = "roleId")

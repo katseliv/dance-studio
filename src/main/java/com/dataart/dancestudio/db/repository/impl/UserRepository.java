@@ -28,8 +28,11 @@ public class UserRepository implements Repository<UserEntity> {
         user.setEmail(result.getString("email"));
         user.setPhoneNumber(result.getString("phone_number"));
         user.setPassword(result.getString("password"));
-        user.setRole(result.getObject("role_id", RoleEntity.class));
-        user.setTimeZone(result.getObject("time_zone", ZoneId.class).toString());
+        RoleEntity role = new RoleEntity();
+        role.setId(result.getInt("role_id"));
+        user.setRole(role);
+        ZoneId zoneId = ZoneId.of(result.getString("time_zone"));
+        user.setTimeZone(zoneId.toString());
         user.setIsDeleted(result.getBoolean("is_deleted"));
         return user;
     };
