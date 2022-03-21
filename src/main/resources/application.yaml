@@ -4,7 +4,6 @@ server:
     context-path: /
 spring:
   datasource:
-    platform: postgres
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
