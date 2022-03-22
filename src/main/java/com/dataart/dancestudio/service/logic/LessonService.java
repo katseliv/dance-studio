@@ -1,6 +1,7 @@
 package com.dataart.dancestudio.service.logic;
 
 import com.dataart.dancestudio.service.model.LessonDto;
+import com.dataart.dancestudio.service.model.view.LessonViewDto;
 
 import java.util.List;
 
@@ -10,10 +11,12 @@ public interface LessonService {
 
     LessonDto getLessonById(int id);
 
+    LessonViewDto getLessonViewById(int id);
+
     void updateLessonById(LessonDto lessonDto, int id);
 
     void deleteLessonById(int id);
 
-    List<LessonDto> getAllLessons();
+    List<LessonViewDto> getAllLessons();
 
 }

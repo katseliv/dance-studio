@@ -4,10 +4,13 @@ server:
     context-path: /
 spring:
   datasource:
-    platform: postgres
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: postgres
   liquibase:
     change-log: classpath:db.migration.v1/changelog.yaml
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true

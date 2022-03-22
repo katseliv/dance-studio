@@ -1,11 +1,11 @@
-package com.dataart.dancestudio.db.entity;
+package com.dataart.dancestudio.service.model.view;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class RoomEntity {
+public class RoomViewDto {
 
     private final Integer id;
 
@@ -17,11 +17,11 @@ public class RoomEntity {
 
     private final Boolean isDeleted;
 
-    public static RoomEntityBuilder builder() {
-        return new RoomEntityBuilder();
+    public static RoomViewDtoBuilder builder() {
+        return new RoomViewDtoBuilder();
     }
 
-    public static class RoomEntityBuilder {
+    public static class RoomViewDtoBuilder {
 
         private Integer id;
 
@@ -31,43 +31,44 @@ public class RoomEntity {
 
         private Integer studioId;
 
-        private Boolean isDeleted;
+        private boolean isDeleted;
 
         public boolean isUsed = false;
 
-        public RoomEntityBuilder id(Integer id) {
+        public RoomViewDtoBuilder id(Integer id) {
             this.id = id;
             return this;
         }
 
-        public RoomEntityBuilder name(String name) {
+        public RoomViewDtoBuilder name(String name) {
             this.name = name;
             return this;
         }
 
-        public RoomEntityBuilder description(String description) {
+        public RoomViewDtoBuilder description(String description) {
             this.description = description;
             return this;
         }
 
-        public RoomEntityBuilder studioId(Integer studioId) {
+        public RoomViewDtoBuilder studioId(Integer studioId) {
             this.studioId = studioId;
             return this;
         }
 
-        public RoomEntityBuilder isDeleted(Boolean isDeleted) {
+        public RoomViewDtoBuilder isDeleted(Boolean isDeleted) {
             this.isDeleted = isDeleted;
             return this;
         }
 
-        public RoomEntity build(){
+        public RoomViewDto build(){
             if (!isUsed){
                 isUsed = true;
-                return new RoomEntity(id, name, description, studioId, isDeleted);
+                return new RoomViewDto(id, name, description, studioId, isDeleted);
             }
             throw new RuntimeException("Builder already built");
         }
 
     }
+
 
 }

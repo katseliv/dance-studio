@@ -3,7 +3,7 @@ package com.dataart.dancestudio.service.logic.impl;
 import com.dataart.dancestudio.db.repository.impl.DanceStyleRepository;
 import com.dataart.dancestudio.service.logic.DanceStyleService;
 import com.dataart.dancestudio.service.mapper.DanceStyleMapper;
-import com.dataart.dancestudio.service.model.DanceStyleDto;
+import com.dataart.dancestudio.service.model.view.DanceStyleViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ public class DanceStyleServiceImpl implements DanceStyleService {
     }
 
     @Override
-    public List<DanceStyleDto> getAllDanceStyles() {
+    public List<DanceStyleViewDto> getAllDanceStyles() {
         return mapper.fromEntities(repository.findAll());
     }
 

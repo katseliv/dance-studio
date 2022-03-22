@@ -1,11 +1,11 @@
-package com.dataart.dancestudio.db.entity;
+package com.dataart.dancestudio.service.model.view;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class DanceStyleEntity {
+public class DanceStyleViewDto {
 
     private final Integer id;
 
@@ -13,11 +13,11 @@ public class DanceStyleEntity {
 
     private final String description;
 
-    public static DanceStyleEntityBuilder builder() {
-        return new DanceStyleEntityBuilder();
+    public static DanceStyleViewDtoBuilder builder() {
+        return new DanceStyleViewDtoBuilder();
     }
 
-    public static class DanceStyleEntityBuilder {
+    public static class DanceStyleViewDtoBuilder {
 
         private Integer id;
 
@@ -27,28 +27,28 @@ public class DanceStyleEntity {
 
         private boolean isUsed = false;
 
-        public DanceStyleEntityBuilder() {
+        public DanceStyleViewDtoBuilder() {
         }
 
-        public DanceStyleEntityBuilder id(Integer id) {
+        public DanceStyleViewDtoBuilder id(Integer id) {
             this.id = id;
             return this;
         }
 
-        public DanceStyleEntityBuilder name(String name) {
+        public DanceStyleViewDtoBuilder name(String name) {
             this.name = name;
             return this;
         }
 
-        public DanceStyleEntityBuilder description(String description) {
+        public DanceStyleViewDtoBuilder description(String description) {
             this.description = description;
             return this;
         }
 
-        public DanceStyleEntity build() {
+        public DanceStyleViewDto build() {
             if (!isUsed) {
                 isUsed = true;
-                return new DanceStyleEntity(id, name, description);
+                return new DanceStyleViewDto(id, name, description);
             }
             throw new RuntimeException("Builder already built");
         }

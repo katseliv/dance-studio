@@ -1,33 +1,131 @@
 package com.dataart.dancestudio.service.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.ZoneId;
-
 @Getter
-@Setter
+@AllArgsConstructor
 public class UserDto {
 
-    private String username;
+    private final Integer id;
 
-    private String firstName;
+    private final String username;
 
-    private String lastName;
+    private final String firstName;
 
-    private MultipartFile multipartFile;
+    private final String lastName;
 
-    private String email;
+    private final MultipartFile multipartFile;
 
-    private String phoneNumber;
+    private final String email;
 
-    private String password;
+    private final String phoneNumber;
 
-    private Integer roleId;
+    private final String password;
 
-    private ZoneId timeZone;
+    private final Integer roleId;
 
-    private Boolean isDeleted;
+    private final String timeZone;
+
+    private final Boolean isDeleted;
+
+    public static UserDtoBuilder builder() {
+        return new UserDtoBuilder();
+    }
+
+    public static class UserDtoBuilder {
+
+        private Integer id;
+
+        private String username;
+
+        private String firstName;
+
+        private String lastName;
+
+        private MultipartFile multipartFile;
+
+        private String email;
+
+        private String phoneNumber;
+
+        private String password;
+
+        private Integer roleId;
+
+        private String timeZone;
+
+        private Boolean isDeleted;
+
+        private boolean isUsed;
+
+        public UserDtoBuilder() {
+        }
+
+        public UserDtoBuilder id(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public UserDtoBuilder username(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public UserDtoBuilder firstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public UserDtoBuilder lastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public UserDtoBuilder multipartFile(MultipartFile multipartFile) {
+            this.multipartFile = multipartFile;
+            return this;
+        }
+
+        public UserDtoBuilder email(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public UserDtoBuilder phoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
+
+        public UserDtoBuilder password(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public UserDtoBuilder roleId(Integer roleId) {
+            this.roleId = roleId;
+            return this;
+        }
+
+        public UserDtoBuilder timeZone(String timeZone) {
+            this.timeZone = timeZone;
+            return this;
+        }
+
+        public UserDtoBuilder isDeleted(Boolean isDeleted) {
+            this.isDeleted = isDeleted;
+            return this;
+        }
+
+        public UserDto build() {
+            if (!isUsed) {
+                isUsed = true;
+                return new UserDto(id, username, firstName, lastName, multipartFile, email, phoneNumber, password, roleId, timeZone, isDeleted);
+            }
+            throw new RuntimeException("Builder already built");
+        }
+
+    }
 
 }

@@ -15,13 +15,11 @@ public class DanceStyleRepository implements Repository<DanceStyleEntity> {
 
     private final JdbcTemplate jdbcTemplate;
 
-    RowMapper<DanceStyleEntity> rowMapper = (result, rowNumber) -> {
-        DanceStyleEntity danceStyle = new DanceStyleEntity();
-        danceStyle.setId(result.getInt("id"));
-        danceStyle.setName(result.getString("name"));
-        danceStyle.setDescription(result.getString("description"));
-        return danceStyle;
-    };
+    RowMapper<DanceStyleEntity> rowMapper = (result, rowNumber) -> DanceStyleEntity.builder()
+            .id(result.getInt("id"))
+            .name(result.getString("name"))
+            .description(result.getString("description"))
+            .build();
 
     @Autowired
     public DanceStyleRepository(JdbcTemplate jdbcTemplate) {

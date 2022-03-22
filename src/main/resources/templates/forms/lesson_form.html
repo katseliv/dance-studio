@@ -13,58 +13,53 @@
     <title>Create Lesson</title>
 </head>
 <body>
-
 <div class="container p-5 overflow-hidden">
-    <h1 class="h3 mb-5 fw-normal text-center">Create User</h1>
+    <h1 class="h3 mb-5 fw-normal text-center">Create Lesson</h1>
     <div class="container w-25">
-        <form th:action="@{/lessons/create}" th:object="${lesson}" enctype="multipart/form-data" method="post">
+        <form th:action="@{/lessons/create}" th:object="${lesson}" method="post">
             <div class="mb-3">
                 <label for="userTrainerId" class="form-label">Trainer</label>
-                <select th:field="${trainers}" class="form-select" aria-label="Default select example"
+                <select th:field="*{userTrainerId}" class="form-select" aria-label="Default select example"
                         id="userTrainerId">
                     <option th:value="0" selected>Choose one</option>
-                    <option th:each="trainer, iterStat : ${trainers}" th:value="${iterStat.index} + 1"
-                            th:utext="|${trainer.firstName } ${trainer.lastName}|">
+                    <option th:each="userTrainer : ${trainers}" th:value="${userTrainer.id}"
+                            th:utext="|${userTrainer.firstName} ${userTrainer.lastName}|">
                     </option>
                 </select>
             </div>
             <div class="mb-3">
                 <label for="danceStyleId" class="form-label">Dance Style</label>
-                <select th:field="${styles}" class="form-select" aria-label="Default select example" id="danceStyleId">
+                <select th:field="*{danceStyleId}" class="form-select" aria-label="Default select example" id="danceStyleId">
                     <option th:value="0" selected>Choose one</option>
-                    <option th:each="style, iterStat : ${styles}" th:value="${iterStat.index} + 1"
+                    <option th:each="style : ${styles}" th:value="${style.id}"
                             th:utext="${style.name}">
                     </option>
                 </select>
-<!--                "2021-08-08T20:38:25Z"-->
             </div>
             <div class="mb-3">
                 <label for="startDatetime" class="form-label">Datetime</label>
                 <input th:field="*{startDatetime}" class="form-control" type="datetime-local" id="startDatetime"
                        name="startDatetime">
             </div>
-            <!--            <div class="mb-3">-->
-            <!--                <label for="startDatetime" class="form-label">Time</label>-->
-            <!--                <input th:field="*{startDatetime}" class="form-control" id="startDatetime">-->
-            <!--            </div>-->
             <div class="mb-3">
                 <label for="duration" class="form-label">Duration</label>
                 <input th:field="*{duration}" class="form-control" id="duration">
             </div>
             <div class="mb-3">
                 <label for="roomId" class="form-label">Room</label>
-                <select th:field="${rooms}" class="form-select" aria-label="Default select example" id="roomId">
+                <select th:field="*{roomId}" class="form-select" aria-label="Default select example" id="roomId">
                     <option th:value="0" selected>Choose one</option>
-                    <option th:each="room, iterStat : ${rooms}" th:value="${iterStat.index} + 1"
+                    <option th:each="room : ${rooms}" th:value="${room.id}"
                             th:utext="${room.name}">
                     </option>
                 </select>
-                <!--                <input th:field="*{roomId}" type="email" class="form-control" id="roomId">-->
             </div>
-            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Submit</button>
+        </form>
+        <form th:action="@{/}" th:method="get">
+            <button type="submit" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
         </form>
     </div>
 </div>
-
 </body>
 </html>
