@@ -7,8 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Controller
 @RequestMapping("/users")
 public class UserController {
@@ -21,35 +19,45 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public String createUser(Model model, @ModelAttribute("user") UserDto userDto) {
+    public String createUser(@ModelAttribute("user") UserDto userDto) {
         service.createUser(userDto);
-        return "user_form";
+        return "redirect:/users";
     }
 
     @GetMapping("/create")
-    public String getUserForm(Model model) {
-        model.addAttribute("user", new UserDto());
-        return "user_form";
+    public String createUser(Model model) {
+        model.addAttribute("user", UserDto.builder().build());
+        return "forms/user_form";
     }
 
     @GetMapping("/{id}")
-    public UserDto getUser(@PathVariable int id) {
-        return service.getUserById(id);
+    public String getUser(Model model, @PathVariable int id) {
+        model.addAttribute("user", service.getUserById(id));
+        return "infos/user_info";
     }
 
     @PutMapping("/update/{id}")
-    public void updateUser(@RequestBody UserDto userDto, @PathVariable int id) {
+    public String updateUser(@ModelAttribute("user") UserDto userDto, @PathVariable int id) {
         service.updateUserById(userDto, id);
+        return "redirect:/users";
+    }
+
+    @GetMapping("/update/{id}")
+    public String updateUser(Model model, @PathVariable int id) {
+        model.addAttribute("user", service.getUserById(id));
+        return "forms/user_edit";
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deleteUser(@PathVariable int id) {
+    public String deleteUser(@PathVariable int id) {
         service.deleteUserById(id);
+        return "redirect:/users";
     }
 
-    @GetMapping("/")
-    public List<UserDto> getUsers(){
-        return service.getAllUsers();
+    @GetMapping
+    public String getUsers(Model model) {
+        model.addAttribute("users", service.getAllUsers());
+        return "lists/user_list";
     }
 
 }

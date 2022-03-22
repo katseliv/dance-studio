@@ -4,6 +4,7 @@ import com.dataart.dancestudio.db.repository.impl.UserRepository;
 import com.dataart.dancestudio.service.logic.UserService;
 import com.dataart.dancestudio.service.mapper.UserMapper;
 import com.dataart.dancestudio.service.model.UserDto;
+import com.dataart.dancestudio.service.model.view.UserViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
+    public List<UserViewDto> getAllUsers() {
         return mapper.fromEntities(repository.findAll());
     }
 

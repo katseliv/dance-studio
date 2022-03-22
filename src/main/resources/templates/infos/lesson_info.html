@@ -10,27 +10,24 @@
             integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
             crossorigin="anonymous"></script>
     <meta charset="UTF-8">
-    <title>Create User</title>
+    <title>Lesson</title>
 </head>
 <body>
-
 <div class="container p-5 overflow-hidden">
-    <h1 class="h3 mb-5 fw-normal text-center">Create User</h1>\
+    <h1 class="h3 mb-5 fw-normal text-center">Lesson</h1>
     <div class="container w-25">
-        <form th:action="@{/create}" th:object="${booking}" method="post">
-            <div class="mb-3">
-                <label for="user" class="form-label">User</label>
-                <input type="email" class="form-control" id="user">
-            </div>
-            <div class="mb-3">
-                <label for="lesson" class="form-label">Lesson</label>
-                <input type="email" class="form-control" id="lesson">
-            </div>
-            <button type="submit" class="btn btn-success">Submit</button>
+        <h5>Trainer First Name: </h5>
+        <p th:text="${lesson.trainerFirstName}"></p>
+        <h5>Trainer Last Name: </h5>
+        <p th:text="${lesson.trainerLastName}"></p>
+        <h5>Dance Style: </h5>
+        <p th:text="${lesson.danceStyleName}"></p>
+        <h5>Start Datetime: </h5>
+        <p th:utext="${#temporals.format(lesson.startDatetime, 'dd/MM/yyyy, HH:mm')}"></p>
+        <form th:action="@{/lessons}" th:method="get">
+            <button type="submit" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
         </form>
     </div>
 </div>
-
-
 </body>
 </html>

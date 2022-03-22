@@ -10,3 +10,7 @@ spring:
     password: postgres
   liquibase:
     change-log: classpath:db.migration.v1/changelog.yaml
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
