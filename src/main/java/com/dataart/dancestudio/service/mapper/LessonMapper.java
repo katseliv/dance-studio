@@ -23,7 +23,7 @@ public interface LessonMapper {
 
     @Named(value = "startDatetime")
     default LocalDateTime mapStartDatetime(String startDatetime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
         LocalDateTime localDateTime = LocalDateTime.parse(startDatetime, formatter);
         ZonedDateTime localDateTimeZoned = localDateTime.atZone(ZoneId.systemDefault());
