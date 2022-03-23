@@ -16,7 +16,7 @@
 <div class="container p-5 overflow-hidden">
     <h1 class="h3 mb-5 fw-normal text-center">Create Lesson</h1>
     <div class="container w-25">
-        <form th:action="@{/lessons/create}" th:object="${lesson}" method="post">
+        <form id="userForm" th:action="@{/lessons/create}" th:object="${lesson}" method="post">
             <div class="mb-3">
                 <label for="userTrainerId" class="form-label">Trainer</label>
                 <select th:field="*{userTrainerId}" class="form-select" aria-label="Default select example"
@@ -29,7 +29,8 @@
             </div>
             <div class="mb-3">
                 <label for="danceStyleId" class="form-label">Dance Style</label>
-                <select th:field="*{danceStyleId}" class="form-select" aria-label="Default select example" id="danceStyleId">
+                <select th:field="*{danceStyleId}" class="form-select" aria-label="Default select example"
+                        id="danceStyleId">
                     <option th:value="0" selected>Choose one</option>
                     <option th:each="style : ${styles}" th:value="${style.id}"
                             th:utext="${style.name}">
@@ -54,7 +55,9 @@
                     </option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Submit</button>
+            <input th:field="*{timeZone}" class="form-control" type="hidden" id="timeZone"
+                   name="timeZone">
+            <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-success w-100 mt-2">Submit</button>
         </form>
         <form th:action="@{/}" th:method="get">
             <button type="submit" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
@@ -62,4 +65,11 @@
     </div>
 </div>
 </body>
+<script>
+    function putTimeZone(){
+        let userForm = document.getElementById("userForm");
+        document.getElementById("timeZone").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        userForm.submit();
+    }
+</script>
 </html>

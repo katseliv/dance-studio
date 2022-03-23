@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -78,10 +79,23 @@ public class LessonRepository implements Repository<LessonEntity> {
 
     @Override
     public void update(LessonEntity lessonEntity, int id) {
-        String sql = "UPDATE dancestudio.lessons SET user_trainer_id = ?, dance_style_id = ?, start_datetime = ?, duration = ?, room_id = ?, is_deleted = ? WHERE id = ?";
-        jdbcTemplate.update(sql, lessonEntity.getUserTrainerId(), lessonEntity.getDanceStyleId(),
-                lessonEntity.getStartDatetime(), lessonEntity.getDuration(), lessonEntity.getRoomId(),
-                lessonEntity.getIsDeleted(), id);
+        LessonEntity lessonEntityFromDB = findById(id).orElse(null);
+        assert lessonEntityFromDB != null;
+        if (!entitiesIsEqual(lessonEntity, lessonEntityFromDB)) {
+            String sql = "UPDATE dancestudio.lessons SET user_trainer_id = ?, dance_style_id = ?, start_datetime = ?, " +
+                    "duration = ?, room_id = ?, is_deleted = ? WHERE id = ?";
+            jdbcTemplate.update(sql, lessonEntity.getUserTrainerId(), lessonEntity.getDanceStyleId(),
+                    lessonEntity.getStartDatetime(), lessonEntity.getDuration(), lessonEntity.getRoomId(),
+                    lessonEntity.getIsDeleted(), id);
+        }
+    }
+
+    private boolean entitiesIsEqual(LessonEntity lessonEntity, LessonEntity lessonEntityFromDB) {
+        return Objects.equals(lessonEntity.getUserTrainerId(), lessonEntityFromDB.getUserTrainerId()) &&
+                Objects.equals(lessonEntity.getDanceStyleId(), lessonEntityFromDB.getDanceStyleId()) &&
+                Objects.equals(lessonEntity.getStartDatetime(), lessonEntityFromDB.getStartDatetime()) &&
+                Objects.equals(lessonEntity.getDuration(), lessonEntityFromDB.getDuration()) &&
+                Objects.equals(lessonEntity.getRoomId(), lessonEntityFromDB.getRoomId());
     }
 
     @Override

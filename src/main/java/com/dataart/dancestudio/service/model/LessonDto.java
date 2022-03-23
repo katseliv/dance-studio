@@ -21,6 +21,8 @@ public class LessonDto {
 
     private final Boolean isDeleted;
 
+    private final String timeZone;
+
     public static LessonDtoBuilder builder() {
         return new LessonDtoBuilder();
     }
@@ -40,6 +42,8 @@ public class LessonDto {
         private Integer roomId;
 
         private Boolean isDeleted;
+
+        private String timeZone;
 
         private boolean isUsed = false;
 
@@ -81,10 +85,15 @@ public class LessonDto {
             return this;
         }
 
+        public LessonDtoBuilder timeZone(String timeZone) {
+            this.timeZone = timeZone;
+            return this;
+        }
+
         public LessonDto build() {
             if (!isUsed) {
                 isUsed = true;
-                return new LessonDto(id, userTrainerId, danceStyleId, startDatetime, duration, roomId, isDeleted);
+                return new LessonDto(id, userTrainerId, danceStyleId, startDatetime, duration, roomId, isDeleted, timeZone);
             }
             throw new RuntimeException("Builder already built");
         }

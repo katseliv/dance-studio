@@ -14,7 +14,7 @@
 </head>
 <body>
 <div class="container p-5 overflow-hidden">
-    <h1 class="h3 mb-5 fw-normal text-center">Create Lesson</h1>
+    <h1 class="h3 mb-5 fw-normal text-center">Edit Lesson</h1>
     <div class="container w-25">
         <form th:action="@{/lessons/update/{id}(id=${lesson.id})}" th:object="${lesson}" th:method="put">
             <div class="mb-3">
