@@ -9,7 +9,9 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -60,10 +62,30 @@ public class UserRepository implements Repository<UserEntity> {
 
     @Override
     public void update(UserEntity userEntity, int id) {
-        String sql = "UPDATE dancestudio.users SET username = ?, first_name = ?, last_name = ?, image = ?, email = ?, phone_number = ?, password = ?, role_id = ?, time_zone = ?, is_deleted = ? WHERE id = ?";
-        jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
-                userEntity.getImage(), userEntity.getEmail(), userEntity.getPhoneNumber(), userEntity.getPassword(),
-                2, userEntity.getTimeZone(), userEntity.getIsDeleted(), id);
+        UserEntity userEntityFromDB = findById(id).orElse(null);
+        assert userEntityFromDB != null;
+        if (!entitiesIsEqual(userEntity, userEntityFromDB)) {
+            if (userEntity.getImage().length != 0) {
+                String sql = "UPDATE dancestudio.users SET username = ?, first_name = ?, last_name = ?, image = ?, " +
+                        "email = ?, phone_number = ? WHERE id = ?";
+                jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
+                        userEntity.getImage(), userEntity.getEmail(), userEntity.getPhoneNumber(), id);
+            } else {
+                String sql = "UPDATE dancestudio.users SET username = ?, first_name = ?, last_name = ?, email = ?, " +
+                        "phone_number = ? WHERE id = ?";
+                jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
+                        userEntity.getEmail(), userEntity.getPhoneNumber(), id);
+            }
+        }
+    }
+
+    private boolean entitiesIsEqual(UserEntity userEntity, UserEntity userEntityFromDB) {
+        return Objects.equals(userEntity.getUsername(), userEntityFromDB.getUsername()) &&
+                Objects.equals(userEntity.getFirstName(), userEntityFromDB.getFirstName()) &&
+                Objects.equals(userEntity.getLastName(), userEntityFromDB.getLastName()) &&
+                Arrays.equals(userEntity.getImage(), new byte[0]) &&
+                Objects.equals(userEntity.getEmail(), userEntityFromDB.getEmail()) &&
+                Objects.equals(userEntity.getPhoneNumber(), userEntityFromDB.getPhoneNumber());
     }
 
     @Override

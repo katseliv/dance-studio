@@ -14,7 +14,7 @@
 </head>
 <body>
 <div class="container p-5 overflow-hidden">
-    <h1 class="h3 mb-5 fw-normal text-center">Create User</h1>
+    <h1 class="h3 mb-5 fw-normal text-center">Edit User</h1>
     <div class="container w-25">
         <form th:action="@{/users/update/{id}(id=${user.id})}" th:object="${user}" enctype="multipart/form-data" th:method="put">
             <div class="mb-3">
@@ -40,10 +40,6 @@
             <div class="mb-3">
                 <label for="phoneNumber" class="form-label">Phone Number</label>
                 <input th:field="*{phoneNumber}" th:placeholder="*{phoneNumber}" class="form-control" id="phoneNumber">
-            </div>
-            <div class="mb-3">
-                <label for="inputPassword" class="form-label">Password</label>
-                <input th:field="*{password}" type="password" class="form-control" id="inputPassword">
             </div>
             <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Edit</button>
         </form>
