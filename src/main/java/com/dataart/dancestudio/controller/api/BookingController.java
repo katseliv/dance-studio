@@ -1,50 +1,52 @@
 package com.dataart.dancestudio.controller.api;
 
-import com.dataart.dancestudio.service.logic.BookingService;
-import com.dataart.dancestudio.service.model.BookingDto;
+import com.dataart.dancestudio.service.BookingService;
+import com.dataart.dancestudio.model.dto.BookingDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-
 @Controller
 @RequestMapping("/bookings")
 public class BookingController {
 
-    private final BookingService service;
+    private final BookingService bookingService;
 
     @Autowired
-    public BookingController(BookingService service) {
-        this.service = service;
+    public BookingController(final BookingService bookingService) {
+        this.bookingService = bookingService;
     }
 
     @PostMapping("/create")
-    public String createBooking(Model model, @ModelAttribute("booking") BookingDto bookingDto) {
-        service.createBooking(bookingDto);
-        return "booking_form";
+    public String createBooking(final Model model, @ModelAttribute("booking") final BookingDto bookingDto) {
+        final int id = bookingService.createBooking(bookingDto);
+        model.addAttribute("booking", bookingService.getBookingById(id));
+        bookingService.createBooking(bookingDto);
+        return "infos/booking_info";
     }
 
     @GetMapping("/{id}")
-    public String getBooking(Model model, @PathVariable int id) {
-        model.addAttribute("booking", service.getBookingById(id));
-        return "booking_info";
+    public String getBooking(final Model model, @PathVariable final int id) {
+        model.addAttribute("booking", bookingService.getBookingById(id));
+        return "infos/booking_info";
     }
 
-    @PutMapping("/update/{id}")
-    public void updateBooking(@RequestBody BookingDto bookingDto, @PathVariable int id) {
-        service.updateBookingById(bookingDto, id);
+    @PutMapping("/{id}")
+    public String updateBooking(@RequestBody final BookingDto bookingDto, @PathVariable final int id) {
+        bookingService.updateBookingById(bookingDto, id);
+        return "infos/booking_info";
     }
 
-    @DeleteMapping("/delete/{id}")
-    public void deleteBooking(@PathVariable int id) {
-        service.deleteBookingById(id);
+    @DeleteMapping("/{id}")
+    public void deleteBooking(@PathVariable final int id) {
+        bookingService.deleteBookingById(id);
     }
 
-    @GetMapping("/")
-    public String getBookings(Model model){
-        model.addAttribute("bookings", service.getAllBookings());
-        return "booking_list";
+    @GetMapping("")
+    public String getBookings(final Model model){
+        model.addAttribute("bookings", bookingService.getAllBookings());
+        return "lists/booking_list";
     }
 
 }

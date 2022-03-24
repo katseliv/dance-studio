@@ -1,7 +1,7 @@
 package com.dataart.dancestudio.controller.api;
 
-import com.dataart.dancestudio.service.logic.UserService;
-import com.dataart.dancestudio.service.model.UserDto;
+import com.dataart.dancestudio.service.UserService;
+import com.dataart.dancestudio.model.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,52 +11,53 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserService service;
+    private final UserService userService;
 
     @Autowired
-    public UserController(UserService service) {
-        this.service = service;
+    public UserController(final UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping("/create")
-    public String createUser(@ModelAttribute("user") UserDto userDto) {
-        service.createUser(userDto);
-        return "redirect:/users";
+    public String createUser(final Model model, @ModelAttribute("user") final UserDto userDto) {
+        final int id = userService.createUser(userDto);
+        model.addAttribute("user", userService.getUserById(id));
+        return "infos/user_info";
     }
 
     @GetMapping("/create")
-    public String createUser(Model model) {
+    public String createUser(final Model model) {
         model.addAttribute("user", UserDto.builder().build());
         return "forms/user_form";
     }
 
     @GetMapping("/{id}")
-    public String getUser(Model model, @PathVariable int id) {
-        model.addAttribute("user", service.getUserById(id));
+    public String getUser(final Model model, @PathVariable final int id) {
+        model.addAttribute("user", userService.getUserById(id));
         return "infos/user_info";
     }
 
-    @PutMapping("/update/{id}")
-    public String updateUser(@ModelAttribute("user") UserDto userDto, @PathVariable int id) {
-        service.updateUserById(userDto, id);
-        return "redirect:/users";
+    @PutMapping("/{id}")
+    public String updateUser(@ModelAttribute("user") final UserDto userDto, @PathVariable final int id) {
+        userService.updateUserById(userDto, id);
+        return "infos/user_info";
     }
 
-    @GetMapping("/update/{id}")
-    public String updateUser(Model model, @PathVariable int id) {
-        model.addAttribute("user", service.getUserById(id));
+    @GetMapping("/{id}/update")
+    public String updateUser(final Model model, @PathVariable final int id) {
+        model.addAttribute("user", userService.getUserById(id));
         return "forms/user_edit";
     }
 
-    @DeleteMapping("/delete/{id}")
-    public String deleteUser(@PathVariable int id) {
-        service.deleteUserById(id);
+    @DeleteMapping("/{id}")
+    public String deleteUser(@PathVariable final int id) {
+        userService.deleteUserById(id);
         return "redirect:/users";
     }
 
     @GetMapping
-    public String getUsers(Model model) {
-        model.addAttribute("users", service.getAllUsers());
+    public String getUsers(final Model model) {
+        model.addAttribute("users", userService.getAllUsers());
         return "lists/user_list";
     }
 
