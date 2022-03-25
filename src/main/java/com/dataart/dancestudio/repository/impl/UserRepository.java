@@ -36,7 +36,6 @@ public class UserRepository implements Repository<UserEntity> {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-
     @Override
     public int save(final UserEntity userEntity) {
         final String sql = "INSERT INTO dancestudio.users(username, first_name, last_name, image, email, phone_number, " +
@@ -44,8 +43,7 @@ public class UserRepository implements Repository<UserEntity> {
 
         return jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
                 userEntity.getImage(), userEntity.getEmail(), userEntity.getPhoneNumber(), userEntity.getPassword(),
-                Role.USER.getId(),
-                userEntity.getTimeZone(), userEntity.getIsDeleted());
+                Role.USER.getId(), userEntity.getTimeZone(), userEntity.getIsDeleted());
     }
 
     @Override
@@ -62,8 +60,7 @@ public class UserRepository implements Repository<UserEntity> {
                 "email = ?, phone_number = ?, password = ?, role_id = ?, time_zone = ?, is_deleted = ? WHERE id = ?";
         jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
                 userEntity.getImage(), userEntity.getEmail(), userEntity.getPhoneNumber(), userEntity.getPassword(),
-                Role.USER.getId(),
-                userEntity.getTimeZone(), userEntity.getIsDeleted(), id);
+                Role.USER.getId(), userEntity.getTimeZone(), userEntity.getIsDeleted(), id);
     }
 
     @Override

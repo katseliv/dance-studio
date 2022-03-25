@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public
-class RoomRepository implements Repository<RoomEntity> {
+public class RoomRepository implements Repository<RoomEntity> {
 
     private final JdbcTemplate jdbcTemplate;
 
