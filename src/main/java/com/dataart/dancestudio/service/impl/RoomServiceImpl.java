@@ -22,8 +22,8 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<RoomViewDto> getAllRooms() {
-        return roomMapper.fromEntities(roomRepository.findAll());
+    public List<RoomViewDto> listRooms() {
+        return roomMapper.roomEntitiesToRoomViewDtoList(roomRepository.list());
     }
 
 }

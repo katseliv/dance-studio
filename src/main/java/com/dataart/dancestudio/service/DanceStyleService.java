@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface DanceStyleService {
 
-    List<DanceStyleViewDto> getAllDanceStyles();
+    List<DanceStyleViewDto> listDanceStyleViews();
 
 }

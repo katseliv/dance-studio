@@ -1,7 +1,7 @@
 package com.dataart.dancestudio.mapper;
 
-import com.dataart.dancestudio.model.entity.BookingEntity;
 import com.dataart.dancestudio.model.dto.BookingDto;
+import com.dataart.dancestudio.model.entity.BookingEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,12 +12,12 @@ public interface BookingMapper {
 
     @Mapping(target = "user.id", source = "userId")
     @Mapping(target = "lesson.id", source = "lessonId")
-    BookingEntity toEntity(BookingDto dto);
+    BookingEntity bookingDtoToBookingEntity(BookingDto dto);
 
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "lessonId", source = "lesson.id")
-    BookingDto fromEntity(BookingEntity entity);
+    BookingDto bookingEntityToBookingDto(BookingEntity entity);
 
-    List<BookingDto> fromEntities(Iterable<BookingEntity> entities);
+    List<BookingDto> bookingEntitiesToBookingDtoList(Iterable<BookingEntity> entities);
 
 }

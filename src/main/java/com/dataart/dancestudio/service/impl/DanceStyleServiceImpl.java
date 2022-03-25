@@ -22,8 +22,8 @@ public class DanceStyleServiceImpl implements DanceStyleService {
     }
 
     @Override
-    public List<DanceStyleViewDto> getAllDanceStyles() {
-        return danceStyleMapper.fromEntities(danceStyleRepository.findAll());
+    public List<DanceStyleViewDto> listDanceStyleViews() {
+        return danceStyleMapper.danceStyleEntitiesToDanceStyleViewDtoList(danceStyleRepository.list());
     }
 
 }

@@ -17,6 +17,6 @@ public interface LessonService {
 
     void deleteLessonById(int id);
 
-    List<LessonViewDto> getAllLessons();
+    List<LessonViewDto> listLessons();
 
 }

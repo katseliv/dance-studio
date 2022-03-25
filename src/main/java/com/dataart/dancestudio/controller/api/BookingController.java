@@ -45,7 +45,7 @@ public class BookingController {
 
     @GetMapping("")
     public String getBookings(final Model model){
-        model.addAttribute("bookings", bookingService.getAllBookings());
+        model.addAttribute("bookings", bookingService.listBookings());
         return "lists/booking_list";
     }
 

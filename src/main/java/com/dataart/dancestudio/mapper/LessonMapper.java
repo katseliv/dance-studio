@@ -17,30 +17,21 @@ import java.util.List;
 public interface LessonMapper {
 
     @Mapping(target = "isDeleted", defaultValue = "false")
-    @Mapping(target = "startDatetime", source = ".", qualifiedByName = "startDatetimeToEntity")
-    LessonEntity toEntity(LessonDto dto);
+    @Mapping(target = "startDatetime", source = ".", qualifiedByName = "startDatetime")
+    LessonEntity lessonDtoToLessonEntity(LessonDto dto);
 
-    @Named(value = "startDatetimeToEntity")
-    default LocalDateTime mapStartDatetimeToEntity(final LessonDto lessonDto) {
+    @Named(value = "startDatetime")
+    default LocalDateTime mapStartDatetime(final LessonDto lessonDto) {
         final LocalDateTime localDateTime = LocalDateTime.parse(lessonDto.getStartDatetime());
         final ZonedDateTime localDateTimeZoned = localDateTime.atZone(ZoneId.of(lessonDto.getTimeZone()));
         final ZonedDateTime utcZoned = localDateTimeZoned.withZoneSameInstant(ZoneId.of("UTC"));
         return utcZoned.toLocalDateTime();
     }
 
-    @Mapping(target = "startDatetime", source = "startDatetime", qualifiedByName = "startDatetimeFromEntity")
-    LessonDto fromEntity(LessonEntity entity);
+    LessonDto lessonEntityToLessonDto(LessonEntity entity);
 
-    @Mapping(target = "startDatetime", source = "startDatetime", qualifiedByName = "startDatetimeFromEntity")
-    LessonViewDto fromEntity(LessonViewEntity entity);
+    LessonViewDto lessonViewEntityToLessonViewDto(LessonViewEntity entity);
 
-    @Named(value = "startDatetimeFromEntity")
-    default LocalDateTime mapStartDatetimeFromEntity(final LocalDateTime startDatetime) {
-        final ZonedDateTime utcZoned = startDatetime.atZone(ZoneId.of("UTC"));
-        final ZonedDateTime localDateTimeZoned = utcZoned.withZoneSameInstant(ZoneId.systemDefault());
-        return localDateTimeZoned.toLocalDateTime();
-    }
-
-    List<LessonViewDto> fromEntities(Iterable<LessonViewEntity> entities);
+    List<LessonViewDto> lessonViewEntitiesToLessonViewDtoList(Iterable<LessonViewEntity> entities);
 
 }

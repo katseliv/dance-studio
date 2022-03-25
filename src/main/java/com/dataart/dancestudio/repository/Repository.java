@@ -13,6 +13,6 @@ public interface Repository<T> {
 
     void deleteById(int id);
 
-    List<T> findAll();
+    List<T> list();
 
 }

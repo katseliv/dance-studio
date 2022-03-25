@@ -1,5 +1,6 @@
 package com.dataart.dancestudio.repository.impl;
 
+import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +44,14 @@ public class UserRepository implements Repository<UserEntity> {
 
         return jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
                 userEntity.getImage(), userEntity.getEmail(), userEntity.getPhoneNumber(), userEntity.getPassword(),
-                2, //don't use magic numbers
+                Role.USER.getId(),
                 userEntity.getTimeZone(), userEntity.getIsDeleted());
     }
 
     @Override
     public Optional<UserEntity> findById(final int id) {
-        final String sql = "SELECT * FROM dancestudio.users WHERE id = ?";
+        final String sql = "SELECT id, username, first_name, last_name, image, email, phone_number, password, role_id, " +
+                "time_zone, is_deleted FROM dancestudio.users WHERE id = ?";
         final UserEntity user = jdbcTemplate.queryForObject(sql, rowMapper, id);
         return Optional.ofNullable(user);
     }
@@ -60,7 +62,7 @@ public class UserRepository implements Repository<UserEntity> {
                 "email = ?, phone_number = ?, password = ?, role_id = ?, time_zone = ?, is_deleted = ? WHERE id = ?";
         jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
                 userEntity.getImage(), userEntity.getEmail(), userEntity.getPhoneNumber(), userEntity.getPassword(),
-                2, //don't use magic numbers
+                Role.USER.getId(),
                 userEntity.getTimeZone(), userEntity.getIsDeleted(), id);
     }
 
@@ -71,8 +73,9 @@ public class UserRepository implements Repository<UserEntity> {
     }
 
     @Override
-    public List<UserEntity> findAll() {
-        final String sql = "SELECT * FROM dancestudio.users WHERE is_deleted != TRUE";
+    public List<UserEntity> list() {
+        final String sql = "SELECT id, username, first_name, last_name, image, email, phone_number, password, role_id, " +
+                "time_zone, is_deleted FROM dancestudio.users WHERE is_deleted != TRUE";
         return jdbcTemplate.query(sql, rowMapper);
     }
 

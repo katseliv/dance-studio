@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public int createUser(final UserDto userDto) {
         try {
-            return userRepository.save(userMapper.toEntity(userDto));
+            return userRepository.save(userMapper.userDtoToUserEntity(userDto));
         } catch (final IOException e) {
             log.error(e.getMessage());
         }
@@ -37,13 +37,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(final int id) {
-        return userMapper.fromEntity(userRepository.findById(id).orElseThrow());
+        return userMapper.userEntityToUserDto(userRepository.findById(id).orElseThrow());
     }
 
     @Override
     public void updateUserById(final UserDto userDto, final int id) {
         try {
-            userRepository.update(userMapper.toEntity(userDto), id);
+            userRepository.update(userMapper.userDtoToUserEntity(userDto), id);
         } catch (final IOException e) {
             log.error(e.getMessage());
         }
@@ -55,8 +55,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserViewDto> getAllUsers() {
-        return userMapper.fromEntities(userRepository.findAll());
+    public List<UserViewDto> listUsers() {
+        return userMapper.userEntitiesToUserViewDtoList(userRepository.list());
     }
 
 }

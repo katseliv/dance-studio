@@ -3,7 +3,6 @@ package com.dataart.dancestudio.repository.impl;
 import com.dataart.dancestudio.model.entity.LessonEntity;
 import com.dataart.dancestudio.model.entity.view.LessonViewEntity;
 import com.dataart.dancestudio.repository.Repository;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,10 +13,8 @@ import org.springframework.stereotype.Component;
 import java.sql.PreparedStatement;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-@Slf4j
 @Component
 public class LessonRepository implements Repository<LessonEntity> {
 
@@ -67,7 +64,8 @@ public class LessonRepository implements Repository<LessonEntity> {
 
     @Override
     public Optional<LessonEntity> findById(final int id) {
-        final String sql = "SELECT * FROM dancestudio.lessons WHERE id = ?";
+        final String sql = "SELECT id, user_trainer_id, dance_style_id, start_datetime, duration, room_id, is_deleted " +
+                "FROM dancestudio.lessons WHERE id = ?";
         final LessonEntity lesson = jdbcTemplate.queryForObject(sql, rowMapper, id);
         return Optional.ofNullable(lesson);
     }
@@ -83,22 +81,11 @@ public class LessonRepository implements Repository<LessonEntity> {
 
     @Override
     public void update(final LessonEntity lessonEntity, final int id) {
-        final LessonEntity lessonEntityFromDB = findById(id).orElseThrow();
-        if (!entitiesIsEqual(lessonEntity, lessonEntityFromDB)) {
-            final String sql = "UPDATE dancestudio.lessons SET user_trainer_id = ?, dance_style_id = ?, start_datetime = ?, " +
-                    "duration = ?, room_id = ?, is_deleted = ? WHERE id = ?";
-            jdbcTemplate.update(sql, lessonEntity.getUserTrainerId(), lessonEntity.getDanceStyleId(),
-                    lessonEntity.getStartDatetime(), lessonEntity.getDuration(), lessonEntity.getRoomId(),
-                    lessonEntity.getIsDeleted(), id);
-        }
-    }
-
-    private boolean entitiesIsEqual(final LessonEntity lessonEntity, final LessonEntity lessonEntityFromDB) {
-        return Objects.equals(lessonEntity.getUserTrainerId(), lessonEntityFromDB.getUserTrainerId()) &&
-                Objects.equals(lessonEntity.getDanceStyleId(), lessonEntityFromDB.getDanceStyleId()) &&
-                Objects.equals(lessonEntity.getStartDatetime(), lessonEntityFromDB.getStartDatetime()) &&
-                Objects.equals(lessonEntity.getDuration(), lessonEntityFromDB.getDuration()) &&
-                Objects.equals(lessonEntity.getRoomId(), lessonEntityFromDB.getRoomId());
+        final String sql = "UPDATE dancestudio.lessons SET user_trainer_id = ?, dance_style_id = ?, start_datetime = ?, " +
+                "duration = ?, room_id = ?, is_deleted = ? WHERE id = ?";
+        jdbcTemplate.update(sql, lessonEntity.getUserTrainerId(), lessonEntity.getDanceStyleId(),
+                lessonEntity.getStartDatetime(), lessonEntity.getDuration(), lessonEntity.getRoomId(),
+                lessonEntity.getIsDeleted(), id);
     }
 
     @Override
@@ -108,12 +95,13 @@ public class LessonRepository implements Repository<LessonEntity> {
     }
 
     @Override
-    public List<LessonEntity> findAll() {
-        final String sql = "SELECT * FROM dancestudio.lessons WHERE is_deleted != TRUE";
+    public List<LessonEntity> list() {
+        final String sql = "SELECT id, user_trainer_id, dance_style_id, start_datetime, duration, room_id, is_deleted " +
+                "FROM dancestudio.lessons WHERE is_deleted != TRUE";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public List<LessonViewEntity> findAllViews() {
+    public List<LessonViewEntity> listOfViews() {
         final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime FROM dancestudio.lessons l " +
                 "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +

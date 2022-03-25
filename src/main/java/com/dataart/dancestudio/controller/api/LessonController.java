@@ -68,9 +68,9 @@ public class LessonController {
     }
 
     private void prepareModel(final Model model){
-        final List<UserViewDto> users = userService.getAllUsers();
-        final List<DanceStyleViewDto> styles = danceStyleService.getAllDanceStyles();
-        final List<RoomViewDto> rooms = roomService.getAllRooms();
+        final List<UserViewDto> users = userService.listUsers();
+        final List<DanceStyleViewDto> styles = danceStyleService.listDanceStyleViews();
+        final List<RoomViewDto> rooms = roomService.listRooms();
         model.addAttribute("trainers", users);
         model.addAttribute("styles", styles);
         model.addAttribute("rooms", rooms);
@@ -84,7 +84,7 @@ public class LessonController {
 
     @GetMapping
     public String getLessons(final Model model) {
-        model.addAttribute("lessons", lessonService.getAllLessons());
+        model.addAttribute("lessons", lessonService.listLessons());
         return "lists/lesson_list";
     }
 

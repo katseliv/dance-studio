@@ -40,7 +40,7 @@ public class BookingRepository implements Repository<BookingEntity> {
 
     @Override
     public Optional<BookingEntity> findById(final int id) {
-        final String sql = "SELECT * FROM dancestudio.bookings WHERE id = ?";
+        final String sql = "SELECT id, user_id, lesson_id, is_deleted FROM dancestudio.bookings WHERE id = ?";
         final BookingEntity booking = jdbcTemplate.queryForObject(sql, rowMapper, id);
         return Optional.ofNullable(booking);
     }
@@ -59,8 +59,8 @@ public class BookingRepository implements Repository<BookingEntity> {
     }
 
     @Override
-    public List<BookingEntity> findAll() {
-        final String sql = "SELECT * FROM dancestudio.bookings";
+    public List<BookingEntity> list() {
+        final String sql = "SELECT id, user_id, lesson_id, is_deleted FROM dancestudio.bookings";
         return jdbcTemplate.query(sql, rowMapper);
     }
 

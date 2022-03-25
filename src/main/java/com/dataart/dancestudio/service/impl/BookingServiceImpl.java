@@ -23,17 +23,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public int createBooking(final BookingDto bookingDto) {
-        return bookingRepository.save(bookingMapper.toEntity(bookingDto));
+        return bookingRepository.save(bookingMapper.bookingDtoToBookingEntity(bookingDto));
     }
 
     @Override
     public BookingDto getBookingById(final int id) {
-        return bookingMapper.fromEntity(bookingRepository.findById(id).orElseThrow());
+        return bookingMapper.bookingEntityToBookingDto(bookingRepository.findById(id).orElseThrow());
     }
 
     @Override
     public void updateBookingById(final BookingDto bookingDto, final int id) {
-        bookingRepository.update(bookingMapper.toEntity(bookingDto), id);
+        bookingRepository.update(bookingMapper.bookingDtoToBookingEntity(bookingDto), id);
     }
 
     @Override
@@ -42,8 +42,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookings() {
-        return bookingMapper.fromEntities(bookingRepository.findAll());
+    public List<BookingDto> listBookings() {
+        return bookingMapper.bookingEntitiesToBookingDtoList(bookingRepository.list());
     }
 
 }

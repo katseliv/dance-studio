@@ -1,10 +1,10 @@
 package com.dataart.dancestudio.service.impl;
 
-import com.dataart.dancestudio.repository.impl.LessonRepository;
-import com.dataart.dancestudio.service.LessonService;
 import com.dataart.dancestudio.mapper.LessonMapper;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
+import com.dataart.dancestudio.repository.impl.LessonRepository;
+import com.dataart.dancestudio.service.LessonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,22 +24,25 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public int createLesson(final LessonDto lessonDto) {
-        return lessonRepository.save(lessonMapper.toEntity(lessonDto));
+        return lessonRepository.save(lessonMapper.lessonDtoToLessonEntity(lessonDto));
     }
 
     @Override
     public LessonDto getLessonById(final int id) {
-        return lessonMapper.fromEntity(lessonRepository.findById(id).orElseThrow());
+        return lessonMapper.lessonEntityToLessonDto(lessonRepository.findById(id).orElseThrow());
     }
 
     @Override
     public LessonViewDto getLessonViewById(final int id) {
-        return lessonMapper.fromEntity(lessonRepository.findViewById(id).orElseThrow());
+        return lessonMapper.lessonViewEntityToLessonViewDto(lessonRepository.findViewById(id).orElseThrow());
     }
 
     @Override
     public void updateLessonById(final LessonDto lessonDto, final int id) {
-        lessonRepository.update(lessonMapper.toEntity(lessonDto), id);
+        final LessonDto lessonDtoFromDB = getLessonById(id);
+        if (!lessonDto.equals(lessonDtoFromDB)) {
+            lessonRepository.update(lessonMapper.lessonDtoToLessonEntity(lessonDto), id);
+        }
     }
 
     @Override
@@ -48,8 +51,8 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public List<LessonViewDto> getAllLessons() {
-        return lessonMapper.fromEntities(lessonRepository.findAllViews());
+    public List<LessonViewDto> listLessons() {
+        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.listOfViews());
     }
 
 }

@@ -52,8 +52,8 @@ public class RoomViewDto {
             return this;
         }
 
-        public RoomViewDto build(){
-            if (!isUsed){
+        public RoomViewDto build() {
+            if (!isUsed) {
                 isUsed = true;
                 return new RoomViewDto(id, name, description, studioId, isDeleted);
             }

@@ -14,6 +14,6 @@ public interface BookingService {
 
     void deleteBookingById(int id);
 
-    List<BookingDto> getAllBookings();
+    List<BookingDto> listBookings();
 
 }

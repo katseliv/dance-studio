@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface RoomService {
 
-    List<RoomViewDto> getAllRooms();
+    List<RoomViewDto> listRooms();
 
 }
