@@ -43,7 +43,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> listBookings() {
-        return bookingMapper.bookingEntitiesToBookingDtoList(bookingRepository.list());
+        return bookingMapper.bookingEntitiesToBookingDtoList(bookingRepository.findAll());
     }
 
 }

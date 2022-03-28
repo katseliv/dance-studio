@@ -95,13 +95,13 @@ public class LessonRepository implements Repository<LessonEntity> {
     }
 
     @Override
-    public List<LessonEntity> list() {
+    public List<LessonEntity> findAll() {
         final String sql = "SELECT id, user_trainer_id, dance_style_id, start_datetime, duration, room_id, is_deleted " +
                 "FROM dancestudio.lessons WHERE is_deleted != TRUE";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public List<LessonViewEntity> listOfViews() {
+    public List<LessonViewEntity> findAllViews() {
         final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime FROM dancestudio.lessons l " +
                 "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +

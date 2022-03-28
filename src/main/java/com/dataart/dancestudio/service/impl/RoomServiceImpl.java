@@ -23,7 +23,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public List<RoomViewDto> listRooms() {
-        return roomMapper.roomEntitiesToRoomViewDtoList(roomRepository.list());
+        return roomMapper.roomEntitiesToRoomViewDtoList(roomRepository.findAll());
     }
 
 }

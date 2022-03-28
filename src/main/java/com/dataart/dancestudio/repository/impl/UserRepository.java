@@ -70,7 +70,7 @@ public class UserRepository implements Repository<UserEntity> {
     }
 
     @Override
-    public List<UserEntity> list() {
+    public List<UserEntity> findAll() {
         final String sql = "SELECT id, username, first_name, last_name, image, email, phone_number, password, role_id, " +
                 "time_zone, is_deleted FROM dancestudio.users WHERE is_deleted != TRUE";
         return jdbcTemplate.query(sql, rowMapper);

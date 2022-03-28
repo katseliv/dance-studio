@@ -59,7 +59,7 @@ public class BookingRepository implements Repository<BookingEntity> {
     }
 
     @Override
-    public List<BookingEntity> list() {
+    public List<BookingEntity> findAll() {
         final String sql = "SELECT id, user_id, lesson_id, is_deleted FROM dancestudio.bookings";
         return jdbcTemplate.query(sql, rowMapper);
     }

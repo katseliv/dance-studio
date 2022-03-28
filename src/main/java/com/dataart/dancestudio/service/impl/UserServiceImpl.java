@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserViewDto> listUsers() {
-        return userMapper.userEntitiesToUserViewDtoList(userRepository.list());
+        return userMapper.userEntitiesToUserViewDtoList(userRepository.findAll());
     }
 
 }
