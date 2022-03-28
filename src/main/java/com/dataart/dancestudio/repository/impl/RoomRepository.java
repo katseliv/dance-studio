@@ -50,7 +50,8 @@ public class RoomRepository implements Repository<RoomEntity> {
 
     @Override
     public List<RoomEntity> findAll() {
-        final String sql = "SELECT id, name, description, studio_id, is_deleted FROM dancestudio.rooms";
+        final String sql = "SELECT id, name, description, studio_id, is_deleted " +
+                "FROM dancestudio.rooms";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
