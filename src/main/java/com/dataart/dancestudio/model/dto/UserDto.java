@@ -1,10 +1,12 @@
 package com.dataart.dancestudio.model.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
+@EqualsAndHashCode
 @AllArgsConstructor
 public class UserDto {
 

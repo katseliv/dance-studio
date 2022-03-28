@@ -1,18 +1,17 @@
-package com.dataart.dancestudio.service.model;
+package com.dataart.dancestudio.model.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
+@EqualsAndHashCode
 @AllArgsConstructor
 public class BookingDto {
 
     private final Integer id;
-
     private final Integer userId;
-
     private final Integer lessonId;
-
     private final Boolean isDeleted;
 
     public static BookingDtoBuilder builder() {
@@ -22,11 +21,8 @@ public class BookingDto {
     public static class BookingDtoBuilder {
 
         private Integer id;
-
         private Integer userId;
-
         private Integer lessonId;
-
         private Boolean isDeleted;
 
         private boolean isUsed = false;
@@ -34,22 +30,22 @@ public class BookingDto {
         public BookingDtoBuilder() {
         }
 
-        public BookingDtoBuilder id(Integer id) {
+        public BookingDtoBuilder id(final Integer id) {
             this.id = id;
             return this;
         }
 
-        public BookingDtoBuilder userId(Integer userId) {
+        public BookingDtoBuilder userId(final Integer userId) {
             this.userId = userId;
             return this;
         }
 
-        public BookingDtoBuilder lessonId(Integer lessonId) {
+        public BookingDtoBuilder lessonId(final Integer lessonId) {
             this.lessonId = lessonId;
             return this;
         }
 
-        public BookingDtoBuilder isDeleted(Boolean isDeleted) {
+        public BookingDtoBuilder isDeleted(final Boolean isDeleted) {
             this.isDeleted = isDeleted;
             return this;
         }
