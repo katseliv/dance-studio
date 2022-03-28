@@ -66,7 +66,7 @@ public class LessonRepository implements Repository<LessonEntity> {
     @Override
     public Optional<LessonEntity> findById(final int id) {
         final String sql = "SELECT id, user_trainer_id, dance_style_id, start_datetime, duration, room_id, is_deleted " +
-                "FROM dancestudio.lessons WHERE id = ?";
+                "FROM dancestudio.lessons WHERE id = ? AND is_deleted != TRUE";
         final LessonEntity lesson = jdbcTemplate.queryForObject(sql, rowMapper, id);
         return Optional.ofNullable(lesson);
     }

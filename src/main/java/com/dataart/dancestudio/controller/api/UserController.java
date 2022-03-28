@@ -21,7 +21,7 @@ public class UserController {
     @PostMapping("/create")
     public String createUser(final Model model, @ModelAttribute("user") final UserDto userDto) {
         final int id = userService.createUser(userDto);
-        model.addAttribute("user", userService.getUserById(id));
+        model.addAttribute("user_view", userService.getUserViewById(id));
         return "infos/user_info";
     }
 
@@ -33,13 +33,14 @@ public class UserController {
 
     @GetMapping("/{id}")
     public String getUser(final Model model, @PathVariable final int id) {
-        model.addAttribute("user", userService.getUserById(id));
+        model.addAttribute("user_view", userService.getUserViewById(id));
         return "infos/user_info";
     }
 
     @PutMapping("/{id}")
-    public String updateUser(@ModelAttribute("user") final UserDto userDto, @PathVariable final int id) {
+    public String updateUser(final Model model, @ModelAttribute("user") final UserDto userDto, @PathVariable final int id) {
         userService.updateUserById(userDto, id);
+        model.addAttribute("user_view", userService.getUserViewById(id));
         return "infos/user_info";
     }
 

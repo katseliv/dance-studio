@@ -58,7 +58,7 @@ public class BookingRepository implements Repository<BookingEntity> {
     @Override
     public Optional<BookingEntity> findById(final int id) {
         final String sql = "SELECT id, user_id, lesson_id, is_deleted " +
-                "FROM dancestudio.bookings WHERE id = ?";
+                "FROM dancestudio.bookings WHERE id = ? AND is_deleted != TRUE";
         final BookingEntity booking = jdbcTemplate.queryForObject(sql, rowMapper, id);
         return Optional.ofNullable(booking);
     }
