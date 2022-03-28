@@ -1,4 +1,4 @@
-package com.dataart.dancestudio.service.model.view;
+package com.dataart.dancestudio.model.dto.view;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,13 +10,9 @@ import java.time.LocalDateTime;
 public class BookingViewDto {
 
     private final Integer id;
-
     private final String firstName;
-
     private final String lastName;
-
     private final String danceStyle;
-
     private final LocalDateTime startDatetime;
 
     public static BookingViewDtoBuilder builder() {
@@ -26,13 +22,9 @@ public class BookingViewDto {
     public static class BookingViewDtoBuilder {
 
         private Integer id;
-
         private String firstName;
-
         private String lastName;
-
         private String danceStyle;
-
         private LocalDateTime startDatetime;
 
         private boolean isUsed = false;
@@ -40,27 +32,27 @@ public class BookingViewDto {
         public BookingViewDtoBuilder() {
         }
 
-        public BookingViewDtoBuilder id(Integer id) {
+        public BookingViewDtoBuilder id(final Integer id) {
             this.id = id;
             return this;
         }
 
-        public BookingViewDtoBuilder firstName(String firstName) {
+        public BookingViewDtoBuilder firstName(final String firstName) {
             this.firstName = firstName;
             return this;
         }
 
-        public BookingViewDtoBuilder lastName(String lastName) {
+        public BookingViewDtoBuilder lastName(final String lastName) {
             this.lastName = lastName;
             return this;
         }
 
-        public BookingViewDtoBuilder danceStyle(String danceStyle) {
+        public BookingViewDtoBuilder danceStyle(final String danceStyle) {
             this.danceStyle = danceStyle;
             return this;
         }
 
-        public BookingViewDtoBuilder startDatetime(LocalDateTime startDatetime) {
+        public BookingViewDtoBuilder startDatetime(final LocalDateTime startDatetime) {
             this.startDatetime = startDatetime;
             return this;
         }

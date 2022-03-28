@@ -47,8 +47,9 @@ public class DanceStyleRepository implements Repository<DanceStyleEntity> {
     }
 
     @Override
-    public List<DanceStyleEntity> list() {
-        final String sql = "SELECT id, name, description FROM dancestudio.dance_styles";
+    public List<DanceStyleEntity> findAll() {
+        final String sql = "SELECT id, name, description " +
+                "FROM dancestudio.dance_styles";
         return jdbcTemplate.query(sql, rowMapper);
     }
 

@@ -11,6 +11,9 @@ public class UserViewDto {
     private final String username;
     private final String firstName;
     private final String lastName;
+    private final String image;
+    private final String email;
+    private final String phoneNumber;
 
     public static UserViewDtoBuilder builder() {
         return new UserViewDtoBuilder();
@@ -22,6 +25,9 @@ public class UserViewDto {
         private String username;
         private String firstName;
         private String lastName;
+        private String image;
+        private String email;
+        private String phoneNumber;
 
         private boolean isUsed;
 
@@ -48,10 +54,25 @@ public class UserViewDto {
             return this;
         }
 
+        public UserViewDtoBuilder image(final String image) {
+            this.image = image;
+            return this;
+        }
+
+        public UserViewDtoBuilder email(final String email) {
+            this.email = email;
+            return this;
+        }
+
+        public UserViewDtoBuilder phoneNumber(final String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
+
         public UserViewDto build() {
             if (!isUsed) {
                 isUsed = true;
-                return new UserViewDto(id, username, firstName, lastName);
+                return new UserViewDto(id, username, firstName, lastName, image, email, phoneNumber);
             }
             throw new RuntimeException("Builder already built");
         }

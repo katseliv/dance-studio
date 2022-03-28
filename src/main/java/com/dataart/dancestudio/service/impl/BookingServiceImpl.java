@@ -1,9 +1,10 @@
 package com.dataart.dancestudio.service.impl;
 
-import com.dataart.dancestudio.repository.impl.BookingRepository;
-import com.dataart.dancestudio.service.BookingService;
 import com.dataart.dancestudio.mapper.BookingMapper;
 import com.dataart.dancestudio.model.dto.BookingDto;
+import com.dataart.dancestudio.model.dto.view.BookingViewDto;
+import com.dataart.dancestudio.repository.impl.BookingRepository;
+import com.dataart.dancestudio.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,8 +33,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public BookingViewDto getBookingViewById(final int id) {
+        return bookingMapper.bookingViewEntityToBookingViewDto(bookingRepository.findViewById(id).orElseThrow());
+    }
+
+    @Override
     public void updateBookingById(final BookingDto bookingDto, final int id) {
-        bookingRepository.update(bookingMapper.bookingDtoToBookingEntity(bookingDto), id);
+        final BookingDto bookingDtoFromDB = getBookingById(id);
+        if (!bookingDto.equals(bookingDtoFromDB)) {
+            bookingRepository.update(bookingMapper.bookingDtoToBookingEntity(bookingDto), id);
+        }
     }
 
     @Override
@@ -42,8 +51,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> listBookings() {
-        return bookingMapper.bookingEntitiesToBookingDtoList(bookingRepository.list());
+    public List<BookingViewDto> listBookings() {
+        return bookingMapper.bookingViewEntitiesToBookingViewDtoList(bookingRepository.findAllViews());
     }
 
 }

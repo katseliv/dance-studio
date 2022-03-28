@@ -45,7 +45,8 @@ public class LessonRepository implements Repository<LessonEntity> {
 
     @Override
     public int save(final LessonEntity lessonEntity) {
-        final String sql = "INSERT INTO dancestudio.lessons(user_trainer_id, dance_style_id, start_datetime, duration, room_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO dancestudio.lessons(user_trainer_id, dance_style_id, start_datetime, duration, " +
+                "room_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?)";
         final KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -65,13 +66,14 @@ public class LessonRepository implements Repository<LessonEntity> {
     @Override
     public Optional<LessonEntity> findById(final int id) {
         final String sql = "SELECT id, user_trainer_id, dance_style_id, start_datetime, duration, room_id, is_deleted " +
-                "FROM dancestudio.lessons WHERE id = ?";
+                "FROM dancestudio.lessons WHERE id = ? AND is_deleted != TRUE";
         final LessonEntity lesson = jdbcTemplate.queryForObject(sql, rowMapper, id);
         return Optional.ofNullable(lesson);
     }
 
     public Optional<LessonViewEntity> findViewById(final int id) {
-        final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime FROM dancestudio.lessons l " +
+        final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
+                "FROM dancestudio.lessons l " +
                 "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
                 "WHERE l.id = ? AND l.is_deleted != TRUE";
@@ -95,14 +97,15 @@ public class LessonRepository implements Repository<LessonEntity> {
     }
 
     @Override
-    public List<LessonEntity> list() {
+    public List<LessonEntity> findAll() {
         final String sql = "SELECT id, user_trainer_id, dance_style_id, start_datetime, duration, room_id, is_deleted " +
                 "FROM dancestudio.lessons WHERE is_deleted != TRUE";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public List<LessonViewEntity> listOfViews() {
-        final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime FROM dancestudio.lessons l " +
+    public List<LessonViewEntity> findAllViews() {
+        final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
+                "FROM dancestudio.lessons l " +
                 "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
                 "WHERE l.is_deleted != TRUE";

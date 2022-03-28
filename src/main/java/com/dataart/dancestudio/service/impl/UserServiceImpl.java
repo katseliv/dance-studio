@@ -1,16 +1,17 @@
 package com.dataart.dancestudio.service.impl;
 
-import com.dataart.dancestudio.repository.impl.UserRepository;
-import com.dataart.dancestudio.service.UserService;
 import com.dataart.dancestudio.mapper.UserMapper;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
+import com.dataart.dancestudio.repository.impl.UserRepository;
+import com.dataart.dancestudio.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -41,12 +42,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserViewDto getUserViewById(final int id) {
+        return userMapper.userEntityToUserViewDto(userRepository.findById(id).orElseThrow());
+    }
+
+    @Override
     public void updateUserById(final UserDto userDto, final int id) {
         try {
-            userRepository.update(userMapper.userDtoToUserEntity(userDto), id);
+            if (!userDto.getMultipartFile().isEmpty()) {
+                userRepository.updatePicture(userMapper.userDtoToUserEntity(userDto), id);
+            } else {
+                final UserDto userDtoFromDB = getUserById(id);
+                if (!hasToBeUpdated(userDto, userDtoFromDB)) {
+                    userRepository.update(userMapper.userDtoToUserEntity(userDto), id);
+                }
+            }
         } catch (final IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    //TODO: think about naming
+    private boolean hasToBeUpdated(final UserDto userDto, final UserDto userDtoFromDB) {
+        return Objects.equals(userDto.getUsername(), userDtoFromDB.getUsername()) &&
+                Objects.equals(userDto.getFirstName(), userDtoFromDB.getFirstName()) &&
+                Objects.equals(userDto.getLastName(), userDtoFromDB.getLastName()) &&
+                Objects.equals(userDto.getEmail(), userDtoFromDB.getEmail()) &&
+                Objects.equals(userDto.getPhoneNumber(), userDtoFromDB.getPhoneNumber());
     }
 
     @Override
@@ -56,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserViewDto> listUsers() {
-        return userMapper.userEntitiesToUserViewDtoList(userRepository.list());
+        return userMapper.userEntitiesToUserViewDtoList(userRepository.findAll());
     }
 
 }

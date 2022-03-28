@@ -1,6 +1,7 @@
 package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.model.dto.BookingDto;
+import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 
 import java.util.List;
 
@@ -10,10 +11,12 @@ public interface BookingService {
 
     BookingDto getBookingById(int id);
 
+    BookingViewDto getBookingViewById(int id);
+
     void updateBookingById(BookingDto bookingDto, int id);
 
     void deleteBookingById(int id);
 
-    List<BookingDto> listBookings();
+    List<BookingViewDto> listBookings();
 
 }

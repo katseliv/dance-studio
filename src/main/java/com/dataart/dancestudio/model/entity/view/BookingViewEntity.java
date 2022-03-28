@@ -1,4 +1,4 @@
-package com.dataart.dancestudio.db.entity.view;
+package com.dataart.dancestudio.model.entity.view;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,13 +10,9 @@ import java.time.LocalDateTime;
 public class BookingViewEntity {
 
     private final Integer id;
-
     private final String firstName;
-
     private final String lastName;
-
     private final String danceStyle;
-
     private final LocalDateTime startDatetime;
 
     public static BookingViewEntityBuilder builder(){
@@ -26,13 +22,9 @@ public class BookingViewEntity {
     public static class BookingViewEntityBuilder {
 
         private Integer id;
-
         private String firstName;
-
         private String lastName;
-
         private String danceStyle;
-
         private LocalDateTime startDatetime;
 
         public boolean isUsed = false;
@@ -40,27 +32,27 @@ public class BookingViewEntity {
         public BookingViewEntityBuilder() {
         }
 
-        public BookingViewEntityBuilder id(Integer id){
+        public BookingViewEntityBuilder id(final Integer id){
             this.id = id;
             return this;
         }
 
-        public BookingViewEntityBuilder firstName(String firstName){
+        public BookingViewEntityBuilder firstName(final String firstName){
             this.firstName = firstName;
             return this;
         }
 
-        public BookingViewEntityBuilder lastName(String lastName){
+        public BookingViewEntityBuilder lastName(final String lastName){
             this.lastName = lastName;
             return this;
         }
 
-        public BookingViewEntityBuilder danceStyle(String danceStyle){
+        public BookingViewEntityBuilder danceStyle(final String danceStyle){
             this.danceStyle = danceStyle;
             return this;
         }
 
-        public BookingViewEntityBuilder startDatetime(LocalDateTime startDatetime){
+        public BookingViewEntityBuilder startDatetime(final LocalDateTime startDatetime){
             this.startDatetime = startDatetime;
             return this;
         }

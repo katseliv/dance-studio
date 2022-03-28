@@ -27,17 +27,17 @@
         </thead>
         <tbody>
         <tr th:each="user, iter : ${users}">
-            <th scope="row"><a th:href="@{/users/{id}(id=${user.id})}" th:text="${iter.index + 1}"></a></th>
+            <th scope="row"><a th:href="@{/users/__${user.id}__}" th:text="${iter.index + 1}"></a></th>
             <td th:text="${user.username}"></td>
             <td th:text="${user.firstName}"></td>
             <td th:text="${user.lastName}"></td>
             <td>
-                <form th:action="@{/users/update/{id}(id=${user.id})}" th:method="get">
+                <form th:action="@{/users/__${user.id}__/update}" th:method="get">
                     <button type="submit" class="btn btn-success">Edit</button>
                 </form>
             </td>
             <td>
-                <form th:action="@{/users/delete/{id}(id=${user.id})}" th:method="delete">
+                <form th:action="@{/users/__${user.id}__}" th:method="delete">
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </td>

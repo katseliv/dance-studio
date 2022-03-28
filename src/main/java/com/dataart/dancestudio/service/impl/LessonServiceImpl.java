@@ -52,7 +52,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public List<LessonViewDto> listLessons() {
-        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.listOfViews());
+        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllViews());
     }
 
 }

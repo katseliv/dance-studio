@@ -36,7 +36,7 @@ public class LessonController {
     @PostMapping("/create")
     public String createLesson(final Model model, @ModelAttribute("lesson") final LessonDto lessonDto) {
         final int id = lessonService.createLesson(lessonDto);
-        model.addAttribute("lesson", lessonService.getLessonViewById(id));
+        model.addAttribute("lesson_view", lessonService.getLessonViewById(id));
         return "infos/lesson_info";
     }
 
@@ -49,14 +49,14 @@ public class LessonController {
 
     @GetMapping("/{id}")
     public String getLesson(final Model model, @PathVariable final int id) {
-        model.addAttribute("lesson", lessonService.getLessonViewById(id));
+        model.addAttribute("lesson_view", lessonService.getLessonViewById(id));
         return "infos/lesson_info";
     }
 
     @PutMapping("/{id}")
     public String updateLesson(final Model model, @ModelAttribute("lesson") final LessonDto lessonDto, @PathVariable final int id) {
         lessonService.updateLessonById(lessonDto, id);
-        model.addAttribute("lesson", lessonService.getLessonViewById(id));
+        model.addAttribute("lesson_view", lessonService.getLessonViewById(id));
         return "infos/lesson_info";
     }
 

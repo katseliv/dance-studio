@@ -16,7 +16,7 @@
 <div class="container p-5 overflow-hidden">
     <h1 class="h3 mb-5 fw-normal text-center">Edit User</h1>
     <div class="container w-25">
-        <form th:action="@{/users/update/{id}(id=${user.id})}" th:object="${user}" enctype="multipart/form-data" th:method="put">
+        <form th:action="@{/users/__${user.id}__}" th:object="${user}" enctype="multipart/form-data" th:method="put">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input th:field="*{username}" th:placeholder="*{username}" class="form-control" id="username">
