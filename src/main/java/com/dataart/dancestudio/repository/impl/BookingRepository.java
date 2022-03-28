@@ -63,12 +63,12 @@ public class BookingRepository implements Repository<BookingEntity> {
     }
 
     public Optional<BookingViewEntity> findViewById(final int id) {
-        final String sql = "SELECT bookings.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
-                "FROM dancestudio.bookings " +
-                "JOIN dancestudio.users u ON u.id = bookings.user_id " +
-                "JOIN dancestudio.lessons l ON l.id = bookings.lesson_id " +
+        final String sql = "SELECT b.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
+                "FROM dancestudio.bookings b " +
+                "JOIN dancestudio.users u ON u.id = b.user_id " +
+                "JOIN dancestudio.lessons l ON l.id = b.lesson_id " +
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
-                "WHERE bookings.id = ? AND bookings.is_deleted != TRUE";
+                "WHERE b.id = ? AND b.is_deleted != TRUE";
         final BookingViewEntity booking = jdbcTemplate.queryForObject(sql, rowViewMapper, id);
         return Optional.ofNullable(booking);
     }
@@ -92,11 +92,11 @@ public class BookingRepository implements Repository<BookingEntity> {
     }
 
     public List<BookingViewEntity> findAllViews() {
-        final String sql = "SELECT bookings.id, first_name, last_name, name, start_datetime FROM dancestudio.bookings " +
-                "JOIN dancestudio.users u ON u.id = bookings.user_id " +
-                "JOIN dancestudio.lessons l ON l.id = bookings.lesson_id " +
+        final String sql = "SELECT b.id, u.first_name, u.last_name, ds.name, l.start_datetime FROM dancestudio.bookings b " +
+                "JOIN dancestudio.users u ON u.id = b.user_id " +
+                "JOIN dancestudio.lessons l ON l.id = b.lesson_id " +
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
-                "WHERE bookings.is_deleted != TRUE";
+                "WHERE b.is_deleted != TRUE";
         return jdbcTemplate.query(sql, rowViewMapper);
     }
 
