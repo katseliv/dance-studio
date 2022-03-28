@@ -1,13 +1,13 @@
 package com.dataart.dancestudio.controller.api;
 
-import com.dataart.dancestudio.service.logic.DanceStyleService;
-import com.dataart.dancestudio.service.logic.LessonService;
-import com.dataart.dancestudio.service.logic.RoomService;
-import com.dataart.dancestudio.service.logic.UserService;
-import com.dataart.dancestudio.service.model.*;
-import com.dataart.dancestudio.service.model.view.DanceStyleViewDto;
-import com.dataart.dancestudio.service.model.view.RoomViewDto;
-import com.dataart.dancestudio.service.model.view.UserViewDto;
+import com.dataart.dancestudio.service.DanceStyleService;
+import com.dataart.dancestudio.service.LessonService;
+import com.dataart.dancestudio.service.RoomService;
+import com.dataart.dancestudio.service.UserService;
+import com.dataart.dancestudio.model.dto.LessonDto;
+import com.dataart.dancestudio.model.dto.view.DanceStyleViewDto;
+import com.dataart.dancestudio.model.dto.view.RoomViewDto;
+import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,71 +19,72 @@ import java.util.List;
 @RequestMapping("/lessons")
 public class LessonController {
 
-    private final LessonService service;
+    private final LessonService lessonService;
     private final UserService userService;
     private final DanceStyleService danceStyleService;
     private final RoomService roomService;
 
     @Autowired
-    public LessonController(LessonService service, UserService userService,
-                            DanceStyleService danceStyleService, RoomService roomService) {
-        this.service = service;
+    public LessonController(final LessonService lessonService, final UserService userService,
+                            final DanceStyleService danceStyleService, final RoomService roomService) {
+        this.lessonService = lessonService;
         this.userService = userService;
         this.danceStyleService = danceStyleService;
         this.roomService = roomService;
     }
 
     @PostMapping("/create")
-    public String createLesson(@ModelAttribute("lesson") LessonDto lessonDto) {
-        service.createLesson(lessonDto);
-        return "redirect:/lessons";
+    public String createLesson(final Model model, @ModelAttribute("lesson") final LessonDto lessonDto) {
+        final int id = lessonService.createLesson(lessonDto);
+        model.addAttribute("lesson", lessonService.getLessonViewById(id));
+        return "infos/lesson_info";
     }
 
     @GetMapping("/create")
-    public String createLesson(Model model) {
-        List<UserViewDto> users = userService.getAllUsers();
-        List<DanceStyleViewDto> styles = danceStyleService.getAllDanceStyles();
-        List<RoomViewDto> rooms = roomService.getAllRooms();
-        model.addAttribute("trainers", users);
-        model.addAttribute("styles", styles);
-        model.addAttribute("rooms", rooms);
+    public String createLesson(final Model model) {
+        prepareModel(model);
         model.addAttribute("lesson", LessonDto.builder().build());
         return "forms/lesson_form";
     }
 
     @GetMapping("/{id}")
-    public String getLesson(Model model, @PathVariable int id) {
-        model.addAttribute("lesson", service.getLessonViewById(id));
+    public String getLesson(final Model model, @PathVariable final int id) {
+        model.addAttribute("lesson", lessonService.getLessonViewById(id));
         return "infos/lesson_info";
     }
 
-    @PutMapping("/update/{id}")
-    public String updateLesson(@ModelAttribute("lesson") LessonDto lessonDto, @PathVariable int id) {
-        service.updateLessonById(lessonDto, id);
-        return "redirect:/lessons";
+    @PutMapping("/{id}")
+    public String updateLesson(final Model model, @ModelAttribute("lesson") final LessonDto lessonDto, @PathVariable final int id) {
+        lessonService.updateLessonById(lessonDto, id);
+        model.addAttribute("lesson", lessonService.getLessonViewById(id));
+        return "infos/lesson_info";
     }
 
-    @GetMapping("/update/{id}")
-    public String updateLesson(Model model, @PathVariable int id) {
-        List<UserViewDto> users = userService.getAllUsers();
-        List<DanceStyleViewDto> styles = danceStyleService.getAllDanceStyles();
-        List<RoomViewDto> rooms = roomService.getAllRooms();
-        model.addAttribute("trainers", users);
-        model.addAttribute("styles", styles);
-        model.addAttribute("rooms", rooms);
-        model.addAttribute("lesson", service.getLessonById(id));
+    @GetMapping("/{id}/update")
+    public String updateLesson(final Model model, @PathVariable final int id) {
+        prepareModel(model);
+        model.addAttribute("lesson", lessonService.getLessonById(id));
         return "forms/lesson_edit";
     }
 
-    @DeleteMapping("/delete/{id}")
-    public String deleteLesson(@PathVariable int id) {
-        service.deleteLessonById(id);
+    private void prepareModel(final Model model){
+        final List<UserViewDto> users = userService.listUsers();
+        final List<DanceStyleViewDto> styles = danceStyleService.listDanceStyleViews();
+        final List<RoomViewDto> rooms = roomService.listRooms();
+        model.addAttribute("trainers", users);
+        model.addAttribute("styles", styles);
+        model.addAttribute("rooms", rooms);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteLesson(@PathVariable final int id) {
+        lessonService.deleteLessonById(id);
         return "redirect:/lessons";
     }
 
     @GetMapping
-    public String getLessons(Model model) {
-        model.addAttribute("lessons", service.getAllLessons());
+    public String getLessons(final Model model) {
+        model.addAttribute("lessons", lessonService.listLessons());
         return "lists/lesson_list";
     }
 

@@ -16,7 +16,7 @@
 <div class="container p-5 overflow-hidden">
     <h1 class="h3 mb-5 fw-normal text-center">Edit Booking</h1>
     <div class="container w-25">
-        <form th:action="@{/bookings/update/{id}(id=${booking.id})}" th:object="${booking}" enctype="multipart/form-data" th:method="put">
+        <form th:action="@{/bookings/__${booking.id}__}" th:object="${booking}" enctype="multipart/form-data" th:method="put">
             <div class="mb-3">
                 <label for="userId" class="form-label">User</label>
                 <select th:field="*{userId}" class="form-select" aria-label="Default select example" id="userId">

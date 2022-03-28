@@ -28,18 +28,18 @@
         </thead>
         <tbody>
         <tr th:each="lesson, iter : ${lessons}">
-            <th scope="row"><a th:href="@{/lessons/{id}(id=${lesson.id})}" th:text="${iter.index + 1}"></a></th>
+            <th scope="row"><a th:href="@{/lessons/__${lesson.id}__}" th:text="${iter.index + 1}"></a></th>
             <td th:text="${lesson.trainerFirstName}"></td>
             <td th:text="${lesson.trainerLastName}"></td>
             <td th:text="${lesson.danceStyleName}"></td>
             <td th:utext="${#temporals.format(lesson.startDatetime, 'dd/MM/yyyy, HH:mm')}"></td>
             <td>
-                <form th:action="@{/lessons/update/{id}(id=${lesson.id})}" th:method="get">
+                <form th:action="@{/lessons/__${lesson.id}__/update}" th:method="get">
                     <button type="submit" class="btn btn-success">Edit</button>
                 </form>
             </td>
             <td>
-                <form th:action="@{/lessons/delete/{id}(id=${lesson.id})}" th:method="delete">
+                <form th:action="@{/lessons/__${lesson.id}__}" th:method="delete">
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </td>

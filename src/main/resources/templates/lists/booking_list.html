@@ -27,17 +27,17 @@
         </thead>
         <tbody>
         <tr th:each="booking, iter : ${bookings}">
-            <th scope="row"><a th:href="@{/bookings/{id}(id=${booking.id})}" th:text="${iter.index + 1}"></a></th>
+            <th scope="row"><a th:href="@{/bookings/__${booking.id}__}" th:text="${iter.index + 1}"></a></th>
             <td th:text="${booking.firstName}"></td>
             <td th:text="${booking.lastName}"></td>
             <td th:utext="|${booking.danceStyle}, ${#temporals.format(booking.startDatetime, 'dd/MM/yyyy, HH:mm')}|"></td>
             <td>
-                <form th:action="@{/bookings/update/{id}(id=${booking.id})}" th:method="get">
+                <form th:action="@{/bookings/__${booking.id}__/update}" th:method="get">
                     <button type="submit" class="btn btn-success">Edit</button>
                 </form>
             </td>
             <td>
-                <form th:action="@{/bookings/delete/{id}(id=${booking.id})}" th:method="delete">
+                <form th:action="@{/bookings/__${booking.id}__}" th:method="delete">
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </td>
