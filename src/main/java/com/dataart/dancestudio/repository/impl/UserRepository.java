@@ -6,8 +6,11 @@ import com.dataart.dancestudio.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
+import java.sql.PreparedStatement;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
@@ -41,9 +44,23 @@ public class UserRepository implements Repository<UserEntity> {
         final String sql = "INSERT INTO dancestudio.users(username, first_name, last_name, image, email, phone_number, " +
                 "password, role_id, time_zone, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        return jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
-                userEntity.getImage(), userEntity.getEmail(), userEntity.getPhoneNumber(), userEntity.getPassword(),
-                Role.USER.getId(), userEntity.getTimeZone(), userEntity.getIsDeleted());
+        final KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            final PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
+            ps.setString(1, userEntity.getUsername());
+            ps.setString(2, userEntity.getFirstName());
+            ps.setString(3, userEntity.getLastName());
+            ps.setObject(4, userEntity.getImage());
+            ps.setString(5, userEntity.getEmail());
+            ps.setString(6, userEntity.getPhoneNumber());
+            ps.setString(7, userEntity.getPassword());
+            ps.setInt(8, Role.USER.getId());
+            ps.setObject(9, userEntity.getTimeZone());
+            ps.setBoolean(10, userEntity.getIsDeleted());
+            return ps;
+        }, keyHolder);
+
+        return Optional.ofNullable(keyHolder.getKey()).map(Number::intValue).orElseThrow();
     }
 
     @Override
@@ -72,7 +89,8 @@ public class UserRepository implements Repository<UserEntity> {
     @Override
     public List<UserEntity> findAll() {
         final String sql = "SELECT id, username, first_name, last_name, image, email, phone_number, password, role_id, " +
-                "time_zone, is_deleted FROM dancestudio.users WHERE is_deleted != TRUE";
+                "time_zone, is_deleted " +
+                "FROM dancestudio.users WHERE is_deleted != TRUE";
         return jdbcTemplate.query(sql, rowMapper);
     }
 

@@ -1,15 +1,15 @@
 package com.dataart.dancestudio.service.impl;
 
-import com.dataart.dancestudio.repository.impl.UserRepository;
-import com.dataart.dancestudio.service.UserService;
 import com.dataart.dancestudio.mapper.UserMapper;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
+import com.dataart.dancestudio.repository.impl.UserRepository;
+import com.dataart.dancestudio.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -43,7 +43,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUserById(final UserDto userDto, final int id) {
         try {
-            userRepository.update(userMapper.userDtoToUserEntity(userDto), id);
+            final UserDto userDtoFromDB = getUserById(id);
+            if (!userDto.equals(userDtoFromDB)) {
+                userRepository.update(userMapper.userDtoToUserEntity(userDto), id);
+            }
         } catch (final IOException e) {
             log.error(e.getMessage());
         }
