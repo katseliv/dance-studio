@@ -57,7 +57,8 @@ public class BookingRepository implements Repository<BookingEntity> {
 
     @Override
     public Optional<BookingEntity> findById(final int id) {
-        final String sql = "SELECT id, user_id, lesson_id, is_deleted FROM dancestudio.bookings WHERE id = ?";
+        final String sql = "SELECT id, user_id, lesson_id, is_deleted " +
+                "FROM dancestudio.bookings WHERE id = ?";
         final BookingEntity booking = jdbcTemplate.queryForObject(sql, rowMapper, id);
         return Optional.ofNullable(booking);
     }
@@ -87,12 +88,14 @@ public class BookingRepository implements Repository<BookingEntity> {
 
     @Override
     public List<BookingEntity> findAll() {
-        final String sql = "SELECT id, user_id, lesson_id, is_deleted FROM dancestudio.bookings WHERE is_deleted != TRUE";
+        final String sql = "SELECT id, user_id, lesson_id, is_deleted " +
+                "FROM dancestudio.bookings WHERE is_deleted != TRUE";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
     public List<BookingViewEntity> findAllViews() {
-        final String sql = "SELECT b.id, u.first_name, u.last_name, ds.name, l.start_datetime FROM dancestudio.bookings b " +
+        final String sql = "SELECT b.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
+                "FROM dancestudio.bookings b " +
                 "JOIN dancestudio.users u ON u.id = b.user_id " +
                 "JOIN dancestudio.lessons l ON l.id = b.lesson_id " +
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
