@@ -1,46 +1,91 @@
 package com.dataart.dancestudio.controller.api;
 
-import com.dataart.dancestudio.service.logic.LessonService;
-import com.dataart.dancestudio.service.model.LessonDto;
+import com.dataart.dancestudio.service.DanceStyleService;
+import com.dataart.dancestudio.service.LessonService;
+import com.dataart.dancestudio.service.RoomService;
+import com.dataart.dancestudio.service.UserService;
+import com.dataart.dancestudio.model.dto.LessonDto;
+import com.dataart.dancestudio.model.dto.view.DanceStyleViewDto;
+import com.dataart.dancestudio.model.dto.view.RoomViewDto;
+import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/lessons")
 public class LessonController {
 
-    private final LessonService service;
+    private final LessonService lessonService;
+    private final UserService userService;
+    private final DanceStyleService danceStyleService;
+    private final RoomService roomService;
 
     @Autowired
-    public LessonController(LessonService service) {
-        this.service = service;
+    public LessonController(final LessonService lessonService, final UserService userService,
+                            final DanceStyleService danceStyleService, final RoomService roomService) {
+        this.lessonService = lessonService;
+        this.userService = userService;
+        this.danceStyleService = danceStyleService;
+        this.roomService = roomService;
     }
 
     @PostMapping("/create")
-    public void createLesson(@RequestBody LessonDto lessonDto) {
-        service.createLesson(lessonDto);
+    public String createLesson(final Model model, @ModelAttribute("lesson") final LessonDto lessonDto) {
+        final int id = lessonService.createLesson(lessonDto);
+        model.addAttribute("lesson", lessonService.getLessonViewById(id));
+        return "infos/lesson_info";
+    }
+
+    @GetMapping("/create")
+    public String createLesson(final Model model) {
+        prepareModel(model);
+        model.addAttribute("lesson", LessonDto.builder().build());
+        return "forms/lesson_form";
     }
 
     @GetMapping("/{id}")
-    public LessonDto getLesson(@PathVariable int id) {
-        return service.getLessonById(id);
+    public String getLesson(final Model model, @PathVariable final int id) {
+        model.addAttribute("lesson", lessonService.getLessonViewById(id));
+        return "infos/lesson_info";
     }
 
-    @PutMapping("/update/{id}")
-    public void updateLesson(@RequestBody LessonDto lessonDto, @PathVariable int id) {
-        service.updateLessonById(lessonDto, id);
+    @PutMapping("/{id}")
+    public String updateLesson(final Model model, @ModelAttribute("lesson") final LessonDto lessonDto, @PathVariable final int id) {
+        lessonService.updateLessonById(lessonDto, id);
+        model.addAttribute("lesson", lessonService.getLessonViewById(id));
+        return "infos/lesson_info";
     }
 
-    @DeleteMapping("/delete/{id}")
-    public void deleteLesson(@PathVariable int id) {
-        service.deleteLessonById(id);
+    @GetMapping("/{id}/update")
+    public String updateLesson(final Model model, @PathVariable final int id) {
+        prepareModel(model);
+        model.addAttribute("lesson", lessonService.getLessonById(id));
+        return "forms/lesson_edit";
     }
 
-    @GetMapping("/")
-    public List<LessonDto> getLessons() {
-        return service.getAllLessons();
+    private void prepareModel(final Model model){
+        final List<UserViewDto> users = userService.listUsers();
+        final List<DanceStyleViewDto> styles = danceStyleService.listDanceStyleViews();
+        final List<RoomViewDto> rooms = roomService.listRooms();
+        model.addAttribute("trainers", users);
+        model.addAttribute("styles", styles);
+        model.addAttribute("rooms", rooms);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteLesson(@PathVariable final int id) {
+        lessonService.deleteLessonById(id);
+        return "redirect:/lessons";
+    }
+
+    @GetMapping
+    public String getLessons(final Model model) {
+        model.addAttribute("lessons", lessonService.listLessons());
+        return "lists/lesson_list";
     }
 
 }
