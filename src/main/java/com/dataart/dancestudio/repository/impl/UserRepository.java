@@ -12,9 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.PreparedStatement;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -85,17 +83,18 @@ public class UserRepository implements Repository<UserEntity> {
     @Override
     public void update(final UserEntity userEntity, final int id) {
         final String sql = "UPDATE dancestudio.users SET username = ?, first_name = ?, last_name = ?, " +
-                "email = ?, phone_number = ?, role_id = ?, is_deleted = ? WHERE id = ?";
+                "email = ?, phone_number = ?, role_id = ?, time_zone = ?, is_deleted = ? WHERE id = ?";
         jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
-                userEntity.getEmail(), userEntity.getPhoneNumber(), Role.USER.getId(), userEntity.getIsDeleted(), id);
+                userEntity.getEmail(), userEntity.getPhoneNumber(), Role.USER.getId(), userEntity.getTimeZone(),
+                userEntity.getIsDeleted(), id);
     }
 
-    public void updatePicture(final UserEntity userEntity, final int id) {
+    public void updateWithPicture(final UserEntity userEntity, final int id) {
         final String sql = "UPDATE dancestudio.users SET username = ?, first_name = ?, last_name = ?, image = ?, " +
-                "email = ?, phone_number = ?, role_id = ?, is_deleted = ? WHERE id = ?";
+                "email = ?, phone_number = ?, role_id = ?, time_zone = ?, is_deleted = ? WHERE id = ?";
         jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
                 userEntity.getImage(), userEntity.getEmail(), userEntity.getPhoneNumber(), Role.USER.getId(),
-                userEntity.getIsDeleted(), id);
+                userEntity.getTimeZone(), userEntity.getIsDeleted(), id);
     }
 
     @Override
