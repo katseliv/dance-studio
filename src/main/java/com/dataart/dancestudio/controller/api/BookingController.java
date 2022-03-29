@@ -32,7 +32,7 @@ public class BookingController {
     @PostMapping("/create")
     public String createBooking(final Model model, @ModelAttribute("booking") final BookingDto bookingDto) {
         final int id = bookingService.createBooking(bookingDto);
-        model.addAttribute("booking", bookingService.getBookingViewById(id));
+        model.addAttribute("booking_view", bookingService.getBookingViewById(id));
         return "infos/booking_info";
     }
 
@@ -45,14 +45,14 @@ public class BookingController {
 
     @GetMapping("/{id}")
     public String getBooking(final Model model, @PathVariable final int id) {
-        model.addAttribute("booking", bookingService.getBookingViewById(id));
+        model.addAttribute("booking_view", bookingService.getBookingViewById(id));
         return "infos/booking_info";
     }
 
     @PutMapping("/{id}")
     public String updateBooking(final Model model, @ModelAttribute("booking") final BookingDto bookingDto, @PathVariable final int id) {
         bookingService.updateBookingById(bookingDto, id);
-        model.addAttribute("booking", bookingService.getBookingViewById(id));
+        model.addAttribute("booking_view", bookingService.getBookingViewById(id));
         return "infos/booking_info";
     }
 
@@ -66,8 +66,8 @@ public class BookingController {
     private void prepareModel(final Model model){
         final List<UserViewDto> users = userService.listUsers();
         final List<LessonViewDto> lessons = lessonService.listLessons();
-        model.addAttribute("users", users);
-        model.addAttribute("lessons", lessons);
+        model.addAttribute("user_views", users);
+        model.addAttribute("lesson_views", lessons);
     }
 
     @DeleteMapping("/{id}")

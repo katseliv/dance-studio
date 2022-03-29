@@ -66,7 +66,7 @@ public class LessonRepository implements Repository<LessonEntity> {
     @Override
     public Optional<LessonEntity> findById(final int id) {
         final String sql = "SELECT id, user_trainer_id, dance_style_id, start_datetime, duration, room_id, is_deleted " +
-                "FROM dancestudio.lessons WHERE id = ?";
+                "FROM dancestudio.lessons WHERE id = ? AND is_deleted = FALSE";
         final LessonEntity lesson = jdbcTemplate.queryForObject(sql, rowMapper, id);
         return Optional.ofNullable(lesson);
     }
@@ -76,7 +76,7 @@ public class LessonRepository implements Repository<LessonEntity> {
                 "FROM dancestudio.lessons l " +
                 "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
-                "WHERE l.id = ? AND l.is_deleted != TRUE";
+                "WHERE l.id = ? AND l.is_deleted = FALSE";
         final LessonViewEntity lesson = jdbcTemplate.queryForObject(sql, rowViewMapper, id);
         return Optional.ofNullable(lesson);
     }
@@ -99,7 +99,7 @@ public class LessonRepository implements Repository<LessonEntity> {
     @Override
     public List<LessonEntity> findAll() {
         final String sql = "SELECT id, user_trainer_id, dance_style_id, start_datetime, duration, room_id, is_deleted " +
-                "FROM dancestudio.lessons WHERE is_deleted != TRUE";
+                "FROM dancestudio.lessons WHERE is_deleted = FALSE";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
@@ -108,7 +108,7 @@ public class LessonRepository implements Repository<LessonEntity> {
                 "FROM dancestudio.lessons l " +
                 "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
-                "WHERE l.is_deleted != TRUE";
+                "WHERE l.is_deleted = FALSE";
         return jdbcTemplate.query(sql, rowViewMapper);
     }
 

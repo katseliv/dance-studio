@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+            integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+            integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+            crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <title>Edit User</title>
+</head>
+<body>
+<div class="container p-5 overflow-hidden">
+    <h1 class="h3 mb-5 fw-normal text-center">Edit User</h1>
+    <div class="container w-25">
+        <form th:action="@{/users/__${user.id}__}" th:object="${user}" enctype="multipart/form-data" th:method="put">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input th:field="*{username}" th:placeholder="*{username}" class="form-control" id="username">
+            </div>
+            <div class="mb-3">
+                <label for="firstName" class="form-label">First Name</label>
+                <input th:field="*{firstName}" th:placeholder="*{firstName}" class="form-control" id="firstName">
+            </div>
+            <div class="mb-3">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input th:field="*{lastName}" th:placeholder="*{lastName}" class="form-control" id="lastName">
+            </div>
+            <div class="mb-3">
+                <label for="image" class="form-label">Image</label>
+                <input th:field="*{multipartFile}" th:placeholder="*{multipartFile}" class="form-control" type="file" id="image">
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input th:field="*{email}" th:placeholder="*{email}" type="email" class="form-control" id="email">
+            </div>
+            <div class="mb-3">
+                <label for="phoneNumber" class="form-label">Phone Number</label>
+                <input th:field="*{phoneNumber}" th:placeholder="*{phoneNumber}" class="form-control" id="phoneNumber">
+            </div>
+            <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Edit</button>
+        </form>
+        <form th:action="@{/users}" th:method="get">
+            <button type="submit" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
