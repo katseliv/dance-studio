@@ -32,7 +32,7 @@
             <td th:text="${lesson.trainerFirstName}"></td>
             <td th:text="${lesson.trainerLastName}"></td>
             <td th:text="${lesson.danceStyleName}"></td>
-            <td th:utext="${#temporals.format(lesson.startDatetime, 'dd/MM/yyyy, HH:mm')}"></td>
+            <td id="startDatetime" th:utext="${#temporals.format(lesson.startDatetime, 'dd/MM/yyyy, HH:mm')}"></td>
             <td>
                 <form th:action="@{/lessons/__${lesson.id}__/update}" th:method="get">
                     <button type="submit" class="btn btn-success">Edit</button>
@@ -46,9 +46,23 @@
         </tr>
         </tbody>
     </table>
-    <form th:action="@{/}" th:method="get">
-        <button type="submit" class="btn btn-primary">Return</button>
-    </form>
+    <div>
+        <form th:action="@{/operations}" th:method="get">
+            <button type="submit" class="btn btn-primary">Return</button>
+        </form>
+    </div>
+    <div>
+        <form th:action="@{/logout}">
+            <button type="submit" class="btn btn-danger">Logout</button>
+        </form>
+    </div>
 </div>
 </body>
+<script>
+    $(document).ready(function () {
+        var datetime = new Date().toLocaleString("en-US", Intl.DateTimeFormat().resolvedOptions().timeZone);
+        datetime = new Date(datetime);
+        $("#startDatetime").html(datetime);
+    });
+</script>
 </html>

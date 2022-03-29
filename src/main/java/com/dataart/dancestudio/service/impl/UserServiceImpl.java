@@ -7,6 +7,7 @@ import com.dataart.dancestudio.repository.impl.UserRepository;
 import com.dataart.dancestudio.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,11 +18,14 @@ import java.util.Objects;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(final UserRepository userRepository, final UserMapper userMapper) {
+    public UserServiceImpl(final PasswordEncoder passwordEncoder, final UserRepository userRepository,
+                           final UserMapper userMapper) {
+        this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.userMapper = userMapper;
     }
@@ -29,7 +33,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public int createUser(final UserDto userDto) {
         try {
-            return userRepository.save(userMapper.userDtoToUserEntity(userDto));
+            final String password = passwordEncoder.encode(userDto.getPassword());
+            return userRepository.save(userMapper.userDtoToUserEntityWithPassword(userDto, password));
         } catch (final IOException e) {
             log.error(e.getMessage());
         }

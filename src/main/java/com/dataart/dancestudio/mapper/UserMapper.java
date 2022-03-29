@@ -16,10 +16,13 @@ public interface UserMapper {
 
     @Mapping(target = "isDeleted", defaultValue = "false")
     @Mapping(target = "image", source = "multipartFile.bytes")
-    @Mapping(target = "timeZone", source = "timeZone", defaultExpression = "java(java.time.ZoneId.systemDefault().toString())")
     UserEntity userDtoToUserEntity(UserDto dto) throws IOException;
 
-    @Mapping(target = "timeZone", ignore = true)
+    @Mapping(target = "isDeleted", defaultValue = "false")
+    @Mapping(target = "image", source = "dto.multipartFile.bytes")
+    @Mapping(target = "password", source = "password")
+    UserEntity userDtoToUserEntityWithPassword(UserDto dto, String password) throws IOException;
+
     UserDto userEntityToUserDto(UserEntity entity);
 
     @Mapping(target = "image", qualifiedByName = "image")

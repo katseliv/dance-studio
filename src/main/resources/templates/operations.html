@@ -10,22 +10,29 @@
             integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
             crossorigin="anonymous"></script>
     <meta charset="UTF-8">
-    <title>Lesson</title>
+    <title>Dance Studio</title>
 </head>
 <body>
 <div class="container p-5 overflow-hidden">
-    <h1 class="h3 mb-5 fw-normal text-center">Lesson</h1>
+    <h1 class="h3 mb-5 fw-normal text-center"></h1>
     <div class="container w-25">
-        <h5>Trainer First Name: </h5>
-        <p th:text="${lesson_view.trainerFirstName}"></p>
-        <h5>Trainer Last Name: </h5>
-        <p th:text="${lesson_view.trainerLastName}"></p>
-        <h5>Dance Style: </h5>
-        <p th:text="${lesson_view.danceStyleName}"></p>
-        <h5>Start Datetime: </h5>
-        <p th:utext="${#temporals.format(lesson_view.startDatetime, 'dd/MM/yyyy, HH:mm')}"></p>
-        <form th:action="@{/lessons}" th:method="get">
-            <button type="submit" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
+        <form th:action="@{/users/create}">
+            <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Create User</button>
+        </form>
+        <form th:action="@{/lessons/create}">
+            <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Create Lesson</button>
+        </form>
+        <form th:action="@{/bookings/create}">
+            <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Create Booking</button>
+        </form>
+        <form th:action="@{/users}">
+            <button type="submit" class="btn btn-lg btn-primary w-100 mt-2">All Users</button>
+        </form>
+        <form th:action="@{/lessons}">
+            <button type="submit" class="btn btn-lg btn-primary w-100 mt-2">All Lessons</button>
+        </form>
+        <form th:action="@{/bookings}">
+            <button type="submit" class="btn btn-lg btn-primary w-100 mt-2">All Bookings</button>
         </form>
         <form th:action="@{/logout}">
             <button type="submit" class="btn btn-lg btn-danger w-100 mt-2">Logout</button>

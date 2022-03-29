@@ -44,8 +44,11 @@
         </tr>
         </tbody>
     </table>
-    <form th:action="@{/}" th:method="get">
+    <form th:action="@{/operations}" th:method="get">
         <button type="submit" class="btn btn-primary">Return</button>
+    </form>
+    <form th:action="@{/logout}">
+        <button type="submit" class="btn btn-danger">Logout</button>
     </form>
 </div>
 </body>
