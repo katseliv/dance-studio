@@ -67,7 +67,7 @@ public class UserRepository implements Repository<UserEntity> {
     public Optional<UserEntity> findById(final int id) {
         final String sql = "SELECT id, username, first_name, last_name, image, email, phone_number, password, role_id, " +
                 "time_zone, is_deleted " +
-                "FROM dancestudio.users WHERE id = ? AND is_deleted != TRUE";
+                "FROM dancestudio.users WHERE id = ? AND is_deleted = FALSE";
         final UserEntity user = jdbcTemplate.queryForObject(sql, rowMapper, id);
         return Optional.ofNullable(user);
     }
@@ -82,19 +82,19 @@ public class UserRepository implements Repository<UserEntity> {
 
     @Override
     public void update(final UserEntity userEntity, final int id) {
-        final String sql = "UPDATE dancestudio.users SET username = ?, first_name = ?, last_name = ?, " +
-                "email = ?, phone_number = ?, role_id = ?, time_zone = ?, is_deleted = ? WHERE id = ?";
-        jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
-                userEntity.getEmail(), userEntity.getPhoneNumber(), Role.USER.getId(), userEntity.getTimeZone(),
-                userEntity.getIsDeleted(), id);
-    }
-
-    public void updateWithPicture(final UserEntity userEntity, final int id) {
         final String sql = "UPDATE dancestudio.users SET username = ?, first_name = ?, last_name = ?, image = ?, " +
                 "email = ?, phone_number = ?, role_id = ?, time_zone = ?, is_deleted = ? WHERE id = ?";
         jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
                 userEntity.getImage(), userEntity.getEmail(), userEntity.getPhoneNumber(), Role.USER.getId(),
                 userEntity.getTimeZone(), userEntity.getIsDeleted(), id);
+    }
+
+    public void updateWithoutPicture(final UserEntity userEntity, final int id) {
+        final String sql = "UPDATE dancestudio.users SET username = ?, first_name = ?, last_name = ?, " +
+                "email = ?, phone_number = ?, role_id = ?, time_zone = ?, is_deleted = ? WHERE id = ?";
+        jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
+                userEntity.getEmail(), userEntity.getPhoneNumber(), Role.USER.getId(), userEntity.getTimeZone(),
+                userEntity.getIsDeleted(), id);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class UserRepository implements Repository<UserEntity> {
     public List<UserEntity> findAll() {
         final String sql = "SELECT id, username, first_name, last_name, image, email, phone_number, password, role_id, " +
                 "time_zone, is_deleted " +
-                "FROM dancestudio.users WHERE is_deleted != TRUE";
+                "FROM dancestudio.users WHERE is_deleted = FALSE";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
