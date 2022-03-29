@@ -12,9 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.PreparedStatement;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -69,7 +67,7 @@ public class UserRepository implements Repository<UserEntity> {
     public Optional<UserEntity> findById(final int id) {
         final String sql = "SELECT id, username, first_name, last_name, image, email, phone_number, password, role_id, " +
                 "time_zone, is_deleted " +
-                "FROM dancestudio.users WHERE id = ? AND is_deleted != TRUE";
+                "FROM dancestudio.users WHERE id = ? AND is_deleted = FALSE";
         final UserEntity user = jdbcTemplate.queryForObject(sql, rowMapper, id);
         return Optional.ofNullable(user);
     }
@@ -83,40 +81,13 @@ public class UserRepository implements Repository<UserEntity> {
                 userEntity.getIsDeleted(), id);
     }
 
-    public void updatePicture(final UserEntity userEntity, final int id) {
+    public void updateIncludingPicture(final UserEntity userEntity, final int id) {
         final String sql = "UPDATE dancestudio.users SET username = ?, first_name = ?, last_name = ?, image = ?, " +
                 "email = ?, phone_number = ?, role_id = ?, time_zone = ?, is_deleted = ? WHERE id = ?";
         jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
                 userEntity.getImage(), userEntity.getEmail(), userEntity.getPhoneNumber(), Role.USER.getId(),
                 userEntity.getTimeZone(), userEntity.getIsDeleted(), id);
     }
-
-//    public void update(final UserEntity userEntity, final int id) {
-//        final UserEntity userEntityFromDB = findById(id).orElse(null);
-//        assert userEntityFromDB != null;
-//        if (!entitiesIsEqual(userEntity, userEntityFromDB)) {
-//            if (userEntity.getImage().length != 0) {
-//                final String sql = "UPDATE dancestudio.users SET username = ?, first_name = ?, last_name = ?, image = ?, " +
-//                        "email = ?, phone_number = ? WHERE id = ?";
-//                jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
-//                        userEntity.getImage(), userEntity.getEmail(), userEntity.getPhoneNumber(), id);
-//            } else {
-//                final String sql = "UPDATE dancestudio.users SET username = ?, first_name = ?, last_name = ?, email = ?, " +
-//                        "phone_number = ? WHERE id = ?";
-//                jdbcTemplate.update(sql, userEntity.getUsername(), userEntity.getFirstName(), userEntity.getLastName(),
-//                        userEntity.getEmail(), userEntity.getPhoneNumber(), id);
-//            }
-//        }
-//    }
-//
-//    private boolean entitiesIsEqual(final UserEntity userEntity, final UserEntity userEntityFromDB) {
-//        return Objects.equals(userEntity.getUsername(), userEntityFromDB.getUsername()) &&
-//                Objects.equals(userEntity.getFirstName(), userEntityFromDB.getFirstName()) &&
-//                Objects.equals(userEntity.getLastName(), userEntityFromDB.getLastName()) &&
-//                Arrays.equals(userEntity.getImage(), new byte[0]) &&
-//                Objects.equals(userEntity.getEmail(), userEntityFromDB.getEmail()) &&
-//                Objects.equals(userEntity.getPhoneNumber(), userEntityFromDB.getPhoneNumber());
-//    }
 
     @Override
     public void deleteById(final int id) {
@@ -128,7 +99,7 @@ public class UserRepository implements Repository<UserEntity> {
     public List<UserEntity> findAll() {
         final String sql = "SELECT id, username, first_name, last_name, image, email, phone_number, password, role_id, " +
                 "time_zone, is_deleted " +
-                "FROM dancestudio.users WHERE is_deleted != TRUE";
+                "FROM dancestudio.users WHERE is_deleted = FALSE";
         return jdbcTemplate.query(sql, rowMapper);
     }
 

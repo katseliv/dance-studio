@@ -16,7 +16,6 @@ public interface UserMapper {
 
     @Mapping(target = "isDeleted", defaultValue = "false")
     @Mapping(target = "image", source = "multipartFile.bytes")
-    @Mapping(target = "timeZone", source = "timeZone", defaultExpression = "java(java.time.ZoneId.systemDefault().toString())")
     UserEntity userDtoToUserEntity(UserDto dto) throws IOException;
 
     @Mapping(target = "timeZone", ignore = true)
