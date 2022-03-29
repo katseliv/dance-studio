@@ -50,11 +50,11 @@ public class UserServiceImpl implements UserService {
     public void updateUserById(final UserDto userDto, final int id) {
         try {
             if (!userDto.getMultipartFile().isEmpty()) {
-                userRepository.updateIncludingPicture(userMapper.userDtoToUserEntity(userDto), id);
+                userRepository.update(userMapper.userDtoToUserEntity(userDto), id);
             } else {
                 final UserDto userDtoFromDB = getUserById(id);
                 if (!hasToBeUpdated(userDto, userDtoFromDB)) {
-                    userRepository.update(userMapper.userDtoToUserEntity(userDto), id);
+                    userRepository.updateWithoutPicture(userMapper.userDtoToUserEntity(userDto), id);
                 }
             }
         } catch (final IOException e) {
