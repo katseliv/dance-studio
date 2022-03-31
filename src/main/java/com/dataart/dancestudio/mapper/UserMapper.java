@@ -3,12 +3,12 @@ package com.dataart.dancestudio.mapper;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.entity.UserEntity;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -30,7 +30,7 @@ public interface UserMapper {
 
     @Named(value = "image")
     default String mapImage(final byte[] image) {
-        return Base64.encodeBase64String(image);
+        return Base64.getEncoder().encodeToString(image);
     }
 
     List<UserViewDto> userEntitiesToUserViewDtoList(Iterable<UserEntity> entities);
