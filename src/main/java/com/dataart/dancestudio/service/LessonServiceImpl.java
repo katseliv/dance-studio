@@ -1,10 +1,9 @@
-package com.dataart.dancestudio.service.impl;
+package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.mapper.LessonMapper;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
-import com.dataart.dancestudio.repository.impl.LessonRepository;
-import com.dataart.dancestudio.service.LessonService;
+import com.dataart.dancestudio.repository.LessonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +52,11 @@ public class LessonServiceImpl implements LessonService {
     @Override
     public List<LessonViewDto> listLessons() {
         return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllViews());
+    }
+
+    @Override
+    public List<LessonViewDto> listUserLessons(final int id) {
+        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllUserLessons(id));
     }
 
 }

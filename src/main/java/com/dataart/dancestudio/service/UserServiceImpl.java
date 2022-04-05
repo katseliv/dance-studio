@@ -1,10 +1,12 @@
-package com.dataart.dancestudio.service.impl;
+package com.dataart.dancestudio.service;
 
+import com.dataart.dancestudio.exception.UserAlreadyExistsException;
 import com.dataart.dancestudio.mapper.UserMapper;
+import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
+import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
-import com.dataart.dancestudio.repository.impl.UserRepository;
-import com.dataart.dancestudio.service.UserService;
+import com.dataart.dancestudio.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,14 +33,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int createUser(final UserDto userDto) {
-        try {
-            final String password = passwordEncoder.encode(userDto.getPassword());
-            return userRepository.save(userMapper.userDtoToUserEntityWithPassword(userDto, password));
-        } catch (final IOException e) {
-            log.error(e.getMessage());
+    public int createUser(final UserRegistrationDto userRegistrationDto) throws IOException, UserAlreadyExistsException {
+        if (!userRepository.userAlreadyExists(userRegistrationDto.getEmail())) {
+            final String password = passwordEncoder.encode(userRegistrationDto.getPassword());
+            return userRepository.save(userMapper.userRegistrationDtoToUserRegistrationEntityWithPassword(userRegistrationDto, password));
         }
-        return -1;
+        throw new UserAlreadyExistsException("User already exists in the database!");
     }
 
     @Override
@@ -49,6 +49,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserViewDto getUserViewById(final int id) {
         return userMapper.userEntityToUserViewDto(userRepository.findById(id).orElseThrow());
+    }
+
+    @Override
+    public int getUserIdByEmail(final String email) {
+        final UserDetailsDto userDetailsDto = userMapper.userDetailsEntityToUserDetailsDto(
+                userRepository.findByEmailIgnoreCase(email).orElseThrow()
+        );
+        return userDetailsDto.getId();
     }
 
     @Override
@@ -69,8 +77,7 @@ public class UserServiceImpl implements UserService {
 
     //TODO: think about naming
     private boolean hasToBeUpdated(final UserDto userDto, final UserDto userDtoFromDB) {
-        return Objects.equals(userDto.getUsername(), userDtoFromDB.getUsername()) &&
-                Objects.equals(userDto.getFirstName(), userDtoFromDB.getFirstName()) &&
+        return Objects.equals(userDto.getFirstName(), userDtoFromDB.getFirstName()) &&
                 Objects.equals(userDto.getLastName(), userDtoFromDB.getLastName()) &&
                 Objects.equals(userDto.getEmail(), userDtoFromDB.getEmail()) &&
                 Objects.equals(userDto.getPhoneNumber(), userDtoFromDB.getPhoneNumber());

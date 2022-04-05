@@ -29,10 +29,10 @@
         <p th:text="${user_view.email}"></p>
         <h5>Phone Number: </h5>
         <p th:text="${user_view.phoneNumber}"></p>
-        <form th:action="@{/users}" th:method="get">
-            <button type="submit" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
+        <form>
+            <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
         </form>
-        <form th:action="@{/logout}">
+        <form th:action="@{/users/logout}">
             <button type="submit" class="btn btn-lg btn-danger w-100 mt-2">Logout</button>
         </form>
     </div>

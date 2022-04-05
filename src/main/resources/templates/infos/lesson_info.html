@@ -24,10 +24,10 @@
         <p th:text="${lesson_view.danceStyleName}"></p>
         <h5>Start Datetime: </h5>
         <p th:utext="${#temporals.format(lesson_view.startDatetime, 'dd/MM/yyyy, HH:mm')}"></p>
-        <form th:action="@{/lessons}" th:method="get">
-            <button type="submit" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
+        <form>
+            <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
         </form>
-        <form th:action="@{/logout}">
+        <form th:action="@{/users/logout}">
             <button type="submit" class="btn btn-lg btn-danger w-100 mt-2">Logout</button>
         </form>
     </div>

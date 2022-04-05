@@ -1,4 +1,4 @@
-package com.dataart.dancestudio.controller.api;
+package com.dataart.dancestudio.controller;
 
 import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;

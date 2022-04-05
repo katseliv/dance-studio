@@ -1,7 +1,6 @@
-package com.dataart.dancestudio.repository.impl;
+package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.RoomEntity;
-import com.dataart.dancestudio.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

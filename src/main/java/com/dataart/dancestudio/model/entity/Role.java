@@ -2,15 +2,17 @@ package com.dataart.dancestudio.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Optional;
 
 @Getter
 @AllArgsConstructor
-public enum Role {
+public enum Role implements GrantedAuthority {
 
     ADMIN(1),
-    USER(2);
+    TRAINER(2),
+    USER(3);
 
     private final int id;
 
@@ -26,6 +28,11 @@ public enum Role {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public String getAuthority() {
+        return "ROLE_" + this.name().toUpperCase();
     }
 
 }

@@ -1,14 +1,18 @@
 package com.dataart.dancestudio.mapper;
 
+import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
+import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
+import com.dataart.dancestudio.model.entity.UserDetailsEntity;
 import com.dataart.dancestudio.model.entity.UserEntity;
+import com.dataart.dancestudio.model.entity.UserRegistrationEntity;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -21,7 +25,9 @@ public interface UserMapper {
     @Mapping(target = "isDeleted", defaultValue = "false")
     @Mapping(target = "image", source = "dto.multipartFile.bytes")
     @Mapping(target = "password", source = "password")
-    UserEntity userDtoToUserEntityWithPassword(UserDto dto, String password) throws IOException;
+    UserRegistrationEntity userRegistrationDtoToUserRegistrationEntityWithPassword(UserRegistrationDto dto, String password) throws IOException;
+
+    UserDetailsDto userDetailsEntityToUserDetailsDto(UserDetailsEntity userDetailsEntity);
 
     UserDto userEntityToUserDto(UserEntity entity);
 
@@ -30,7 +36,7 @@ public interface UserMapper {
 
     @Named(value = "image")
     default String mapImage(final byte[] image) {
-        return Base64.getEncoder().encodeToString(image);
+        return Base64.encodeBase64String(image);
     }
 
     List<UserViewDto> userEntitiesToUserViewDtoList(Iterable<UserEntity> entities);

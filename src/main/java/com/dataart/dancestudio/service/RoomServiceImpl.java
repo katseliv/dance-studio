@@ -1,7 +1,6 @@
-package com.dataart.dancestudio.service.impl;
+package com.dataart.dancestudio.service;
 
-import com.dataart.dancestudio.repository.impl.RoomRepository;
-import com.dataart.dancestudio.service.RoomService;
+import com.dataart.dancestudio.repository.RoomRepository;
 import com.dataart.dancestudio.mapper.RoomMapper;
 import com.dataart.dancestudio.model.dto.view.RoomViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
