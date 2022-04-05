@@ -1,12 +1,15 @@
 package com.dataart.dancestudio.test;
 
+import com.dataart.dancestudio.exception.UserAlreadyExistsException;
 import com.dataart.dancestudio.mapper.UserMapperImpl;
 import com.dataart.dancestudio.model.dto.UserDto;
+import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
-import com.dataart.dancestudio.repository.impl.UserRepository;
-import com.dataart.dancestudio.service.impl.UserServiceImpl;
+import com.dataart.dancestudio.model.entity.UserRegistrationEntity;
+import com.dataart.dancestudio.repository.UserRepository;
+import com.dataart.dancestudio.service.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +47,8 @@ public class UserServiceTest {
     @InjectMocks
     private UserServiceImpl userServiceImpl;
 
+    private UserRegistrationDto userRegistrationDto;
+    private UserRegistrationEntity userRegistrationEntity;
     private UserDto userDto;
     private UserEntity userEntity;
     private UserViewDto userViewDto;
@@ -68,7 +73,8 @@ public class UserServiceTest {
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
         when(bCryptPasswordEncoder.encode(password)).thenReturn(encodePassword);
 
-        userDto = UserDto.builder()
+
+        userRegistrationDto = UserRegistrationDto.builder()
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
@@ -80,7 +86,7 @@ public class UserServiceTest {
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
-        userEntity = UserEntity.builder()
+        userRegistrationEntity = UserRegistrationEntity.builder()
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
@@ -88,6 +94,29 @@ public class UserServiceTest {
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .password(encodePassword)
+                .roleId(Role.USER.getId())
+                .timeZone(timeZone)
+                .isDeleted(isDeleted)
+                .build();
+
+        userDto = UserDto.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .multipartFile(multipartFile)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .roleId(Role.USER.getId())
+                .timeZone(timeZone)
+                .isDeleted(isDeleted)
+                .build();
+        userEntity = UserEntity.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .image(multipartFile.getBytes())
+                .email(email)
+                .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
@@ -111,7 +140,6 @@ public class UserServiceTest {
                 .multipartFile(multipartFile)
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .password(encodePassword)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
@@ -123,7 +151,6 @@ public class UserServiceTest {
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .password(encodePassword)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
@@ -131,16 +158,16 @@ public class UserServiceTest {
     }
 
     @Test
-    public void createUser() throws IOException {
+    public void createUser() throws IOException, UserAlreadyExistsException {
         //given
-        when(userRepositoryMock.save(userEntity)).thenReturn(id);
+        when(userRepositoryMock.save(userRegistrationEntity)).thenReturn(id);
 
         // when
-        final int lessonId = userServiceImpl.createUser(userDto);
+        final int lessonId = userServiceImpl.createUser(userRegistrationDto);
 
         // then
-        verify(userMapperImpl, times(1))
-                .userDtoToUserEntityWithPassword(userDto, userEntity.getPassword());
+        verify(userMapperImpl, times(1)).userRegistrationDtoToUserRegistrationEntityWithPassword(
+                userRegistrationDto, userRegistrationEntity.getPassword());
         assertEquals(id, lessonId);
     }
 
@@ -153,7 +180,6 @@ public class UserServiceTest {
                 .lastName(lastName)
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .password(encodePassword)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
@@ -171,7 +197,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserViewById(){
+    public void getUserViewById() {
         //given
         when(userRepositoryMock.findById(id)).thenReturn(Optional.of(userEntity));
 
@@ -195,7 +221,6 @@ public class UserServiceTest {
                 .multipartFile(multipartFile)
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .password(encodePassword)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
@@ -207,7 +232,6 @@ public class UserServiceTest {
                 .image(new byte[]{1, 20, 30, 40})
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .password(encodePassword)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
