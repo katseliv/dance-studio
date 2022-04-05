@@ -1,4 +1,4 @@
-package com.dataart.dancestudio.controller.api;
+package com.dataart.dancestudio.controller;
 
 import com.dataart.dancestudio.service.DanceStyleService;
 import com.dataart.dancestudio.service.LessonService;

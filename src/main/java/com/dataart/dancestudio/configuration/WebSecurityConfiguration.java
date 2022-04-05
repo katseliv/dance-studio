@@ -1,7 +1,9 @@
-package com.dataart.dancestudio.security;
+package com.dataart.dancestudio.configuration;
 
-import com.dataart.dancestudio.repository.impl.UserRepository;
-import com.dataart.dancestudio.security.impl.UserDetailsServiceImpl;
+import com.dataart.dancestudio.handler.AuthenticationSuccessHandlerImpl;
+import com.dataart.dancestudio.mapper.UserMapper;
+import com.dataart.dancestudio.repository.UserRepository;
+import com.dataart.dancestudio.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,16 +15,19 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Autowired
-    public WebSecurityConfiguration(final UserRepository userRepository) {
+    public WebSecurityConfiguration(final UserRepository userRepository, final UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -40,7 +45,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public UserDetailsService userDetailsServiceBean() {
-        return new UserDetailsServiceImpl(userRepository);
+        return new UserDetailsServiceImpl(userRepository, userMapper);
     }
 
     @Bean
@@ -51,22 +56,28 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf()
-                .disable()
                 .formLogin()
-                .loginPage("/login")
-                .defaultSuccessUrl("/operations")
+                .loginPage("/users/login")
+                .usernameParameter("email")
+                .successHandler(new AuthenticationSuccessHandlerImpl())
                 .permitAll()
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/login", "/register")
+                .antMatchers("/", "/users/login", "/users/register")
                 .permitAll()
+                .antMatchers("/admins/**")
+                .hasRole("ADMIN")
+                .antMatchers("/trainers/**")
+                .hasRole("TRAINER")
+                .antMatchers("/users/**")
+                .hasRole("USER")
                 .anyRequest()
                 .authenticated()
 
                 .and()
                 .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
                 .permitAll()
                 .logoutSuccessUrl("/")
                 .deleteCookies("JSESSIONID")

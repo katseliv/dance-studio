@@ -1,8 +1,7 @@
-package com.dataart.dancestudio.repository.impl;
+package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.LessonEntity;
 import com.dataart.dancestudio.model.entity.view.LessonViewEntity;
-import com.dataart.dancestudio.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -110,6 +109,15 @@ public class LessonRepository implements Repository<LessonEntity> {
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
                 "WHERE l.is_deleted = FALSE";
         return jdbcTemplate.query(sql, rowViewMapper);
+    }
+
+    public List<LessonViewEntity> findAllUserLessons(final int id) {
+        final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
+                "FROM dancestudio.lessons l " +
+                "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
+                "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
+                "WHERE l.user_trainer_id = ? AND l.is_deleted = FALSE";
+        return jdbcTemplate.query(sql, rowViewMapper, id);
     }
 
 }

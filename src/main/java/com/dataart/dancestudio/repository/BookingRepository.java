@@ -1,8 +1,7 @@
-package com.dataart.dancestudio.repository.impl;
+package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.BookingEntity;
 import com.dataart.dancestudio.model.entity.view.BookingViewEntity;
-import com.dataart.dancestudio.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -101,6 +100,16 @@ public class BookingRepository implements Repository<BookingEntity> {
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
                 "WHERE b.is_deleted = FALSE";
         return jdbcTemplate.query(sql, rowViewMapper);
+    }
+
+    public List<BookingViewEntity> findAllUserBookings(final int id) {
+        final String sql = "SELECT b.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
+                "FROM dancestudio.bookings b " +
+                "JOIN dancestudio.users u ON u.id = b.user_id " +
+                "JOIN dancestudio.lessons l ON l.id = b.lesson_id " +
+                "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
+                "WHERE b.user_id = ? AND b.is_deleted = FALSE";
+        return jdbcTemplate.query(sql, rowViewMapper, id);
     }
 
 }

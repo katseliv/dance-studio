@@ -1,8 +1,10 @@
-package com.dataart.dancestudio.repository.impl;
+package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.entity.UserDetailsEntity;
 import com.dataart.dancestudio.model.entity.UserEntity;
-import com.dataart.dancestudio.repository.Repository;
+import com.dataart.dancestudio.model.entity.UserRegistrationEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -15,6 +17,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class UserRepository implements Repository<UserEntity> {
 
@@ -28,10 +31,17 @@ public class UserRepository implements Repository<UserEntity> {
             .image(result.getBytes("image"))
             .email(result.getString("email"))
             .phoneNumber(result.getString("phone_number"))
-            .password(result.getString("password"))
             .roleId(result.getInt("role_id"))
             .timeZone(ZoneId.of(result.getString("time_zone")).toString())
             .isDeleted(result.getBoolean("is_deleted"))
+            .build();
+
+    private final RowMapper<UserDetailsEntity> rowDetailsMapper = (result, rowNumber) -> UserDetailsEntity.builder()
+            .id(result.getInt("id"))
+            .email(result.getString("email"))
+            .roles(List.of(Role.of(result.getInt("role_id")).orElseThrow()))
+            .password(result.getString("password"))
+            .passwordConfirmation(result.getString("password"))
             .build();
 
     @Autowired
@@ -53,10 +63,32 @@ public class UserRepository implements Repository<UserEntity> {
             ps.setObject(4, userEntity.getImage());
             ps.setString(5, userEntity.getEmail());
             ps.setString(6, userEntity.getPhoneNumber());
-            ps.setString(7, userEntity.getPassword());
+            ps.setInt(7, Role.USER.getId());
+            ps.setObject(8, userEntity.getTimeZone());
+            ps.setBoolean(9, userEntity.getIsDeleted());
+            return ps;
+        }, keyHolder);
+
+        return Optional.ofNullable(keyHolder.getKey()).map(Number::intValue).orElseThrow();
+    }
+
+    public int save(final UserRegistrationEntity userRegistrationEntity) {
+        final String sql = "INSERT INTO dancestudio.users(username, first_name, last_name, image, email, phone_number, " +
+                "password, role_id, time_zone, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        final KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            final PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
+            ps.setString(1, userRegistrationEntity.getUsername());
+            ps.setString(2, userRegistrationEntity.getFirstName());
+            ps.setString(3, userRegistrationEntity.getLastName());
+            ps.setObject(4, userRegistrationEntity.getImage());
+            ps.setString(5, userRegistrationEntity.getEmail());
+            ps.setString(6, userRegistrationEntity.getPhoneNumber());
+            ps.setString(7, userRegistrationEntity.getPassword());
             ps.setInt(8, Role.USER.getId());
-            ps.setObject(9, userEntity.getTimeZone());
-            ps.setBoolean(10, userEntity.getIsDeleted());
+            ps.setObject(9, userRegistrationEntity.getTimeZone());
+            ps.setBoolean(10, userRegistrationEntity.getIsDeleted());
             return ps;
         }, keyHolder);
 
@@ -72,12 +104,20 @@ public class UserRepository implements Repository<UserEntity> {
         return Optional.ofNullable(user);
     }
 
-    public Optional<UserEntity> findByUsernameIgnoreCase(final String username){
-        final String sql = "SELECT id, username, first_name, last_name, image, email, phone_number, password, role_id, " +
-                "time_zone, is_deleted " +
-                "FROM dancestudio.users WHERE LOWER(username) = LOWER(?) AND is_deleted != TRUE";
-        final UserEntity user = jdbcTemplate.queryForObject(sql, rowMapper, username);
+    public Optional<UserDetailsEntity> findByEmailIgnoreCase(final String email) {
+        final String sql = "SELECT id, email, role_id, password " +
+                "FROM dancestudio.users WHERE LOWER(email) = LOWER(?)";
+        final UserDetailsEntity user = jdbcTemplate.queryForObject(sql, rowDetailsMapper, email);
         return Optional.ofNullable(user);
+    }
+
+    public boolean userAlreadyExists(final String email) {
+        final String sql = "SELECT id, email, role_id, password " +
+                "FROM dancestudio.users WHERE EXISTS (" +
+                "SELECT email, password " +
+                "FROM dancestudio.users WHERE LOWER(email) = LOWER(?))";
+        final List<UserDetailsEntity> userEntities = jdbcTemplate.query(sql, rowDetailsMapper, email);
+        return !userEntities.isEmpty();
     }
 
     @Override
