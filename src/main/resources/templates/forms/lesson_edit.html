@@ -21,24 +21,29 @@
                 <label for="userTrainerId" class="form-label">Trainer</label>
                 <select th:field="*{userTrainerId}" class="form-select" aria-label="Default select example"
                         id="userTrainerId">
-                    <option th:each="userTrainer : ${trainers}" th:if="${userTrainer.id} == *{userTrainerId}" th:value="${userTrainer.id}"
-                            th:utext="|${userTrainer.firstName} ${userTrainer.lastName}|" selected>
-                    <option th:each="userTrainer : ${trainers}" th:unless="${userTrainer.id} == *{userTrainerId}" th:value="${userTrainer.id}"
-                            th:utext="|${userTrainer.firstName} ${userTrainer.lastName}|">
+                    <option th:each="userTrainer : ${trainers}" th:if="${userTrainer.id} == *{userTrainerId}"
+                            th:value="${userTrainer.id}"
+                            th:text="|${userTrainer.firstName} ${userTrainer.lastName}|" selected>
+                    <option th:each="userTrainer : ${trainers}" th:unless="${userTrainer.id} == *{userTrainerId}"
+                            th:value="${userTrainer.id}"
+                            th:text="|${userTrainer.firstName} ${userTrainer.lastName}|">
                 </select>
             </div>
             <div class="mb-3">
                 <label for="danceStyleId" class="form-label">Dance Style</label>
-                <select th:field="*{danceStyleId}" class="form-select" aria-label="Default select example" id="danceStyleId">
+                <select th:field="*{danceStyleId}" class="form-select" aria-label="Default select example"
+                        id="danceStyleId">
                     <option th:each="style : ${styles}" th:if="${style.id} == *{danceStyleId}" th:value="${style.id}"
-                            th:utext="${style.name}" selected>
-                    <option th:each="style : ${styles}" th:unless="${style.id} == *{danceStyleId}" th:value="${style.id}"
-                            th:utext="${style.name}">
+                            th:text="${style.name}" selected>
+                    <option th:each="style : ${styles}" th:unless="${style.id} == *{danceStyleId}"
+                            th:value="${style.id}"
+                            th:text="${style.name}">
                 </select>
             </div>
             <div class="mb-3">
                 <label for="startDatetime" class="form-label">Datetime</label>
-                <input th:field="*{startDatetime}" th:placeholder="*{startDatetime}" class="form-control" type="datetime-local" id="startDatetime"
+                <input th:field="*{startDatetime}" th:placeholder="*{startDatetime}" class="form-control"
+                       type="datetime-local" id="startDatetime"
                        name="startDatetime">
             </div>
             <div class="mb-3">
@@ -49,17 +54,15 @@
                 <label for="roomId" class="form-label">Room</label>
                 <select th:field="*{roomId}" class="form-select" aria-label="Default select example" id="roomId">
                     <option th:each="room : ${rooms}" th:if="${room.id} == *{roomId}" th:value="${room.id}"
-                            th:utext="${room.name}" selected>
+                            th:text="${room.name}" selected>
                     <option th:each="room : ${rooms}" th:unless="${room.id} == *{roomId}" th:value="${room.id}"
-                            th:utext="${room.name}">
+                            th:text="${room.name}">
                 </select>
             </div>
             <input th:field="*{timeZone}" class="form-control" type="hidden" id="timeZone" name="timeZone">
             <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-success w-100 mt-2">Edit</button>
         </form>
-        <form>
-            <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
-        </form>
+        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
         <form th:action="@{/users/logout}">
             <button type="submit" class="btn btn-lg btn-danger w-100 mt-2">Logout</button>
         </form>
@@ -67,7 +70,7 @@
 </div>
 </body>
 <script>
-    function putTimeZone(){
+    function putTimeZone() {
         let lessonForm = document.getElementById("lessonForm");
         document.getElementById("timeZone").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
         lessonForm.submit();

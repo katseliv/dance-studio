@@ -23,7 +23,7 @@
                         id="userTrainerId">
                     <option th:value="0" selected>Choose one</option>
                     <option th:each="userTrainer : ${trainers}" th:value="${userTrainer.id}"
-                            th:utext="|${userTrainer.firstName} ${userTrainer.lastName}|">
+                            th:text="|${userTrainer.firstName} ${userTrainer.lastName}|">
                     </option>
                 </select>
             </div>
@@ -33,7 +33,7 @@
                         id="danceStyleId">
                     <option th:value="0" selected>Choose one</option>
                     <option th:each="style : ${styles}" th:value="${style.id}"
-                            th:utext="${style.name}">
+                            th:text="${style.name}">
                     </option>
                 </select>
             </div>
@@ -51,7 +51,7 @@
                 <select th:field="*{roomId}" class="form-select" aria-label="Default select example" id="roomId">
                     <option th:value="0" selected>Choose one</option>
                     <option th:each="room : ${rooms}" th:value="${room.id}"
-                            th:utext="${room.name}">
+                            th:text="${room.name}">
                     </option>
                 </select>
             </div>
@@ -59,9 +59,7 @@
                    name="timeZone">
             <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-success w-100 mt-2">Submit</button>
         </form>
-        <form>
-            <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
-        </form>
+        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
         <form th:action="@{/users/logout}">
             <button type="submit" class="btn btn-lg btn-danger w-100 mt-2">Logout</button>
         </form>
@@ -69,7 +67,7 @@
 </div>
 </body>
 <script>
-    function putTimeZone(){
+    function putTimeZone() {
         let lessonForm = document.getElementById("lessonForm");
         document.getElementById("timeZone").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
         lessonForm.submit();

@@ -30,7 +30,7 @@
             <th scope="row"><a th:href="@{/bookings/__${booking.id}__}" th:text="${iter.index + 1}"></a></th>
             <td th:text="${booking.firstName}"></td>
             <td th:text="${booking.lastName}"></td>
-            <td th:utext="|${booking.danceStyle}, ${#temporals.format(booking.startDatetime, 'dd/MM/yyyy, HH:mm')}|"></td>
+            <td th:text="|${booking.danceStyle}, ${#temporals.format(booking.startDatetime, 'dd/MM/yyyy, HH:mm')}|"></td>
             <td>
                 <form th:action="@{/bookings/__${booking.id}__/update}" th:method="get">
                     <button type="submit" class="btn btn-success">Edit</button>
@@ -46,9 +46,7 @@
     </table>
     <div class="row">
         <div class="col-md-1">
-            <form>
-                <button type="button" onclick="history.go(-1)" class="btn btn-primary">Return</button>
-            </form>
+            <button type="button" onclick="history.go(-1)" class="btn btn-primary">Return</button>
         </div>
         <div class="col-md-1">
             <form th:action="@{/users/logout}">

@@ -63,13 +63,6 @@ public class BookingController {
         return "forms/booking_edit";
     }
 
-    private void prepareModel(final Model model){
-        final List<UserViewDto> users = userService.listUsers();
-        final List<LessonViewDto> lessons = lessonService.listLessons();
-        model.addAttribute("user_views", users);
-        model.addAttribute("lesson_views", lessons);
-    }
-
     @DeleteMapping("/{id}")
     public String deleteBooking(@PathVariable final int id) {
         bookingService.deleteBookingById(id);
@@ -77,9 +70,16 @@ public class BookingController {
     }
 
     @GetMapping
-    public String getBookings(final Model model){
+    public String getBookings(final Model model) {
         model.addAttribute("bookings", bookingService.listBookings());
         return "lists/booking_list";
+    }
+
+    private void prepareModel(final Model model) {
+        final List<UserViewDto> users = userService.listUsers();
+        final List<LessonViewDto> lessons = lessonService.listLessons();
+        model.addAttribute("user_views", users);
+        model.addAttribute("lesson_views", lessons);
     }
 
 }

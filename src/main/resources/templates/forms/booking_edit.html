@@ -16,34 +16,38 @@
 <div class="container p-5 overflow-hidden">
     <h1 class="h3 mb-5 fw-normal text-center">Edit Booking</h1>
     <div class="container w-25">
-        <form th:action="@{/bookings/__${booking.id}__}" th:object="${booking}" enctype="multipart/form-data" th:method="put">
+        <form th:action="@{/bookings/__${booking.id}__}" th:object="${booking}" enctype="multipart/form-data"
+              th:method="put">
             <div class="mb-3">
                 <label for="userId" class="form-label">User</label>
                 <select th:field="*{userId}" class="form-select" aria-label="Default select example" id="userId">
-                    <option th:each="user_view : ${user_views}" th:if="${user_view.id} == *{userId}" th:value="${user_view.id}"
-                            th:utext="|${user_view.firstName} ${user_view.lastName}|" selected>
+                    <option th:each="user_view : ${user_views}" th:if="${user_view.id} == *{userId}"
+                            th:value="${user_view.id}"
+                            th:text="|${user_view.firstName} ${user_view.lastName}|" selected>
                     </option>
-                    <option th:each="user_view : ${user_views}" th:unless="${user_view.id} == *{userId}" th:value="${user_view.id}"
-                            th:utext="|${user_view.firstName} ${user_view.lastName}|">
+                    <option th:each="user_view : ${user_views}" th:unless="${user_view.id} == *{userId}"
+                            th:value="${user_view.id}"
+                            th:text="|${user_view.firstName} ${user_view.lastName}|">
                     </option>
                 </select>
             </div>
             <div class="mb-3">
                 <label for="lessonId" class="form-label">Lesson</label>
                 <select th:field="*{lessonId}" class="form-select" aria-label="Default select example" id="lessonId">
-                    <option th:each="lesson_view : ${lesson_views}" th:if="${lesson_view.id} == *{lessonId}" th:value="${lesson_view.id}"
-                            th:utext="|${lesson_view.trainerFirstName} ${lesson_view.trainerLastName},
-                            ${lesson_view.danceStyleName}, ${#temporals.format(lesson_view.startDatetime, 'dd/MM/yyyy, HH:mm')}|" selected>
-                    <option th:each="lesson_view : ${lesson_views}" th:unless="${lesson_view.id} == *{lessonId}" th:value="${lesson_view.id}"
-                            th:utext="|${lesson_view.trainerFirstName} ${lesson_view.trainerLastName},
+                    <option th:each="lesson_view : ${lesson_views}" th:if="${lesson_view.id} == *{lessonId}"
+                            th:value="${lesson_view.id}"
+                            th:text="|${lesson_view.trainerFirstName} ${lesson_view.trainerLastName},
+                            ${lesson_view.danceStyleName}, ${#temporals.format(lesson_view.startDatetime, 'dd/MM/yyyy, HH:mm')}|"
+                            selected>
+                    <option th:each="lesson_view : ${lesson_views}" th:unless="${lesson_view.id} == *{lessonId}"
+                            th:value="${lesson_view.id}"
+                            th:text="|${lesson_view.trainerFirstName} ${lesson_view.trainerLastName},
                             ${lesson_view.danceStyleName}, ${#temporals.format(lesson_view.startDatetime, 'dd/MM/yyyy, HH:mm')}|">
                 </select>
             </div>
             <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Edit</button>
         </form>
-        <form>
-            <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
-        </form>
+        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
         <form th:action="@{/users/logout}">
             <button type="submit" class="btn btn-lg btn-danger w-100 mt-2">Logout</button>
         </form>

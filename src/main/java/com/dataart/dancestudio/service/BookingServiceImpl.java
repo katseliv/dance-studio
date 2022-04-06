@@ -56,7 +56,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingViewDto> listUserBookings(final int id) {
-        return bookingMapper.bookingViewEntitiesToBookingViewDtoList(bookingRepository.findAllUserBookings(id));
+        return bookingMapper.bookingViewEntitiesToBookingViewDtoList(bookingRepository.findAllUserBookingViews(id));
     }
 
 }

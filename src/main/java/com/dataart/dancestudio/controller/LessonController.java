@@ -68,7 +68,7 @@ public class LessonController {
     }
 
     private void prepareModel(final Model model){
-        final List<UserViewDto> users = userService.listUsers();
+        final List<UserViewDto> users = userService.listTrainers();
         final List<DanceStyleViewDto> styles = danceStyleService.listDanceStyleViews();
         final List<RoomViewDto> rooms = roomService.listRooms();
         model.addAttribute("trainers", users);
