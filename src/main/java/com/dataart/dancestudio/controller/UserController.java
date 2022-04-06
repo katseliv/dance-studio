@@ -6,7 +6,7 @@ import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.service.BookingService;
 import com.dataart.dancestudio.service.UserService;
-import com.dataart.dancestudio.utils.ContextFacade;
+import com.dataart.dancestudio.utils.SecurityContextFacade;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -27,22 +27,22 @@ public class UserController {
 
     private final UserService userService;
     private final BookingService bookingService;
-    private final ContextFacade contextFacade;
+    private final SecurityContextFacade securityContextFacade;
     protected AuthenticationManager authenticationManager;
 
     @Autowired
     public UserController(final UserService userService, final BookingService bookingService,
-                          final ContextFacade contextFacade, final AuthenticationManager authenticationManager) {
+                          final SecurityContextFacade securityContextFacade, final AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.bookingService = bookingService;
-        this.contextFacade = contextFacade;
+        this.securityContextFacade = securityContextFacade;
         this.authenticationManager = authenticationManager;
     }
 
     @GetMapping("/login")
     public String loginUser(final Model model) {
         if (isAuthenticated()) {
-            return "redirect:/users/operations";
+            return "redirect:/operations";
         }
         model.addAttribute("user", UserDetailsDto.builder().build());
         return "login";
@@ -54,7 +54,7 @@ public class UserController {
         final UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(userRegistrationDto.getEmail(), userRegistrationDto.getPassword());
         final Authentication auth = authenticationManager.authenticate(token);
-        final SecurityContext securityContext = contextFacade.getContext();
+        final SecurityContext securityContext = securityContextFacade.getContext();
         securityContext.setAuthentication(auth);
         return "redirect:/users/" + id;
     }
@@ -62,25 +62,10 @@ public class UserController {
     @GetMapping("/register")
     public String registerUser(final Model model) {
         if (isAuthenticated()) {
-            return "redirect:/users/operations";
+            return "redirect:/operations";
         }
         model.addAttribute("user", UserRegistrationDto.builder().build());
         return "registration";
-    }
-
-    private boolean isAuthenticated() {
-        final Authentication authentication = contextFacade.getContext().getAuthentication();
-        if (authentication == null || AnonymousAuthenticationToken.class.isAssignableFrom(authentication.getClass())) {
-            return false;
-        }
-        return authentication.isAuthenticated();
-    }
-
-    @GetMapping("/operations")
-    public String getUserOperations(final Model model) {
-        final String email = contextFacade.getContext().getAuthentication().getName();
-        model.addAttribute("id", userService.getUserIdByEmail(email));
-        return "operations/user_operations";
     }
 
     @PostMapping("/create")
@@ -115,7 +100,7 @@ public class UserController {
         return "forms/user_edit";
     }
 
-    @DeleteMapping("/{id}") //admin
+    @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable final int id) {
         userService.deleteUserById(id);
         return "redirect:/users";
@@ -131,6 +116,11 @@ public class UserController {
     public String getUserBookings(final Model model, @PathVariable final int id) {
         model.addAttribute("bookings", bookingService.listUserBookings(id));
         return "lists/booking_list";
+    }
+
+    private boolean isAuthenticated() {
+        final Authentication authentication = securityContextFacade.getContext().getAuthentication();
+        return authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
     }
 
 }

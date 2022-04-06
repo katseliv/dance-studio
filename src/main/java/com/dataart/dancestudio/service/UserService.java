@@ -24,4 +24,6 @@ public interface UserService {
 
     List<UserViewDto> listUsers();
 
+    List<UserViewDto> listTrainers();
+
 }

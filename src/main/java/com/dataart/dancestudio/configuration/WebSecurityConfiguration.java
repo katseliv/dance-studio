@@ -1,12 +1,12 @@
 package com.dataart.dancestudio.configuration;
 
-import com.dataart.dancestudio.handler.AuthenticationSuccessHandlerImpl;
 import com.dataart.dancestudio.mapper.UserMapper;
-import com.dataart.dancestudio.repository.UserRepository;
+import com.dataart.dancestudio.repository.UserRepositoryImpl;
 import com.dataart.dancestudio.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,20 +21,18 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final UserRepository userRepository;
+    private final UserRepositoryImpl userRepositoryImpl;
     private final UserMapper userMapper;
 
     @Autowired
-    public WebSecurityConfiguration(final UserRepository userRepository, final UserMapper userMapper) {
-        this.userRepository = userRepository;
+    public WebSecurityConfiguration(final UserRepositoryImpl userRepositoryImpl, final UserMapper userMapper) {
+        this.userRepositoryImpl = userRepositoryImpl;
         this.userMapper = userMapper;
     }
 
     @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-        auth.parentAuthenticationManager(authenticationManagerBean())
-                .userDetailsService(userDetailsServiceBean())
-                .passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsServiceBean()).passwordEncoder(passwordEncoder());
     }
 
     @Bean
@@ -45,7 +43,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public UserDetailsService userDetailsServiceBean() {
-        return new UserDetailsServiceImpl(userRepository, userMapper);
+        return new UserDetailsServiceImpl(userRepositoryImpl, userMapper);
     }
 
     @Bean
@@ -56,32 +54,42 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                .csrf()
+                .disable()
                 .formLogin()
                 .loginPage("/users/login")
                 .usernameParameter("email")
-                .successHandler(new AuthenticationSuccessHandlerImpl())
+                .defaultSuccessUrl("/operations")
+                .failureUrl("/users/login?error")
                 .permitAll()
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/users/login", "/users/register")
-                .permitAll()
-                .antMatchers("/admins/**")
-                .hasRole("ADMIN")
-                .antMatchers("/trainers/**")
-                .hasRole("TRAINER")
-                .antMatchers("/users/**")
-                .hasRole("USER")
-                .anyRequest()
-                .authenticated()
+                .antMatchers("/", "/operations", "/users/login", "/users/register").permitAll()
+
+                .antMatchers("/users/**", "/trainers/**", "/bookings/**", "/lessons/**").hasRole("ADMIN")
+                .antMatchers("/trainers/**").hasRole("TRAINER")
+
+                .antMatchers("/bookings/create").hasAnyRole("TRAINER", "USER")
+                .antMatchers(HttpMethod.GET, "/users/*", "/users/*/update", "users/*/bookings",
+                        "/bookings/*", "/bookings/*/update", "/lessons/*").hasAnyRole("TRAINER", "USER")
+                .antMatchers(HttpMethod.PUT, "/users/*", "/bookings/*").hasAnyRole("TRAINER", "USER")
+                .antMatchers(HttpMethod.DELETE, "/bookings/*").hasAnyRole("TRAINER", "USER")
+
+                .antMatchers("/lessons/create").hasAnyRole("TRAINER")
+                .antMatchers(HttpMethod.GET, "/lessons/*/update").hasAnyRole("TRAINER")
+                .antMatchers(HttpMethod.PUT, "/lessons/*").hasAnyRole("TRAINER")
+                .antMatchers(HttpMethod.DELETE, "/lessons/*").hasAnyRole("TRAINER")
+
+                .anyRequest().authenticated()
+
 
                 .and()
                 .logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
                 .permitAll()
                 .logoutSuccessUrl("/")
-                .deleteCookies("JSESSIONID")
-        ;
+                .deleteCookies("JSESSIONID");
     }
 
 }

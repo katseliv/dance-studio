@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int createUser(final UserRegistrationDto userRegistrationDto) throws IOException, UserAlreadyExistsException {
-        if (!userRepository.userAlreadyExists(userRegistrationDto.getEmail())) {
+        if (userRepository.findByEmail(userRegistrationDto.getEmail()).isEmpty()) {
             final String password = passwordEncoder.encode(userRegistrationDto.getPassword());
             return userRepository.save(userMapper.userRegistrationDtoToUserRegistrationEntityWithPassword(userRegistrationDto, password));
         }
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public int getUserIdByEmail(final String email) {
         final UserDetailsDto userDetailsDto = userMapper.userDetailsEntityToUserDetailsDto(
-                userRepository.findByEmailIgnoreCase(email).orElseThrow()
+                userRepository.findByEmail(email).orElseThrow()
         );
         return userDetailsDto.getId();
     }
@@ -75,14 +75,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    //TODO: think about naming
-    private boolean hasToBeUpdated(final UserDto userDto, final UserDto userDtoFromDB) {
-        return Objects.equals(userDto.getFirstName(), userDtoFromDB.getFirstName()) &&
-                Objects.equals(userDto.getLastName(), userDtoFromDB.getLastName()) &&
-                Objects.equals(userDto.getEmail(), userDtoFromDB.getEmail()) &&
-                Objects.equals(userDto.getPhoneNumber(), userDtoFromDB.getPhoneNumber());
-    }
-
     @Override
     public void deleteUserById(final int id) {
         userRepository.deleteById(id);
@@ -91,6 +83,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserViewDto> listUsers() {
         return userMapper.userEntitiesToUserViewDtoList(userRepository.findAll());
+    }
+
+    @Override
+    public List<UserViewDto> listTrainers() {
+        return userMapper.userEntitiesToUserViewDtoList(userRepository.findAllTrainers());
+    }
+
+    //TODO: think about naming
+    private boolean hasToBeUpdated(final UserDto userDto, final UserDto userDtoFromDB) {
+        return Objects.equals(userDto.getFirstName(), userDtoFromDB.getFirstName()) &&
+                Objects.equals(userDto.getLastName(), userDtoFromDB.getLastName()) &&
+                Objects.equals(userDto.getEmail(), userDtoFromDB.getEmail()) &&
+                Objects.equals(userDto.getPhoneNumber(), userDtoFromDB.getPhoneNumber());
     }
 
 }

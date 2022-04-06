@@ -22,7 +22,7 @@
                 <select th:field="*{userId}" class="form-select" aria-label="Default select example" id="userId">
                     <option th:value="0" selected>Choose one</option>
                     <option th:each="user_view : ${user_views}" th:value="${user_view.id}"
-                            th:utext="|${user_view.firstName} ${user_view.lastName}|">
+                            th:text="|${user_view.firstName} ${user_view.lastName}|">
                     </option>
                 </select>
             </div>
@@ -31,16 +31,14 @@
                 <select th:field="*{lessonId}" class="form-select" aria-label="Default select example" id="lessonId">
                     <option th:value="0" selected>Choose one</option>
                     <option th:each="lesson_view : ${lesson_views}" th:value="${lesson_view.id}"
-                            th:utext="|${lesson_view.trainerFirstName} ${lesson_view.trainerLastName},
+                            th:text="|${lesson_view.trainerFirstName} ${lesson_view.trainerLastName},
                             ${lesson_view.danceStyleName}, ${#temporals.format(lesson_view.startDatetime, 'dd/MM/yyyy, HH:mm')}|">
                     </option>
                 </select>
             </div>
             <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Submit</button>
         </form>
-        <form>
-            <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
-        </form>
+        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
         <form th:action="@{/users/logout}">
             <button type="submit" class="btn btn-lg btn-danger w-100 mt-2">Logout</button>
         </form>
