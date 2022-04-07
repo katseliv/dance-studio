@@ -12,6 +12,7 @@
     <meta charset="UTF-8">
     <title>Edit Lesson</title>
 </head>
+<header th:insert="header :: header"></header>
 <body>
 <div class="container p-5 overflow-hidden">
     <h1 class="h3 mb-5 fw-normal text-center">Edit Lesson</h1>
@@ -61,10 +62,6 @@
             </div>
             <input th:field="*{timeZone}" class="form-control" type="hidden" id="timeZone" name="timeZone">
             <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-success w-100 mt-2">Edit</button>
-        </form>
-        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
-        <form th:action="@{/users/logout}">
-            <button type="submit" class="btn btn-lg btn-danger w-100 mt-2">Logout</button>
         </form>
     </div>
 </div>

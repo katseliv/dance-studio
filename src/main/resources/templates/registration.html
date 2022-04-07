@@ -12,6 +12,17 @@
     <meta charset="UTF-8">
     <title>Registration</title>
 </head>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03"
+                    aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/}">Dance Studio</a>
+        </div>
+    </nav>
+</header>
 <body>
 <div class="container p-5 overflow-hidden">
     <h1 class="h3 mb-5 fw-normal text-center">Registration</h1>
@@ -45,6 +56,13 @@
             <div class="mb-3">
                 <label for="inputPassword" class="form-label">Password</label>
                 <input th:field="*{password}" type="password" class="form-control" id="inputPassword">
+            </div>
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input th:field="*{passwordConfirmation}" type="password" class="form-control" id="confirmPassword">
+            </div>
+            <div class="mb-3 text-center text-danger">
+                <p th:if="${error} != null" th:text="${error}"></p>
             </div>
             <input th:field="*{timeZone}" class="form-control" type="hidden" id="timeZone"
                    name="timeZone">

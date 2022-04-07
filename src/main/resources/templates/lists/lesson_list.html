@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -12,6 +12,7 @@
     <meta charset="UTF-8">
     <title>Lessons</title>
 </head>
+<header th:insert="header :: header"></header>
 <body>
 <div class="container p-5 overflow-hidden">
     <table class="table">
@@ -23,7 +24,7 @@
             <th scope="col">Dance Style</th>
             <th scope="col">Start Datetime</th>
             <th scope="col"></th>
-            <th scope="col"></th>
+            <th sec:authorize="hasRole('ADMIN') or hasRole('TRAINER')" scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -34,25 +35,24 @@
             <td th:text="${lesson.danceStyleName}"></td>
             <td id="startDatetime" th:text="${#temporals.format(lesson.startDatetime, 'dd/MM/yyyy, HH:mm')}"></td>
             <td>
-                <form th:action="@{/lessons/__${lesson.id}__/update}" th:method="get">
-                    <button type="submit" class="btn btn-success">Edit</button>
+                <form th:action="@{/bookings/create}" th:object="${booking}" th:method="post">
+                    <input type="hidden" th:value="${session.userId}" th:attr="name='userId'"/>
+                    <input type="hidden" th:value="${lesson.id}" th:attr="name='lessonId'"/>
+                    <button type="submit" class="btn btn-outline-success">Book</button>
                 </form>
             </td>
-            <td>
+            <td sec:authorize="hasRole('ADMIN') or hasRole('TRAINER')">
                 <form th:action="@{/lessons/__${lesson.id}__}" th:method="delete">
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
                 </form>
             </td>
         </tr>
         </tbody>
     </table>
-    <div class="row">
-        <div class="col-md-1">
-            <button type="button" onclick="history.go(-1)" class="btn btn-primary">Return</button>
-        </div>
-        <div class="col-md-1">
-            <form th:action="@{/users/logout}">
-                <button type="submit" class="btn btn-danger">Logout</button>
+    <div sec:authorize="hasRole('ADMIN') or hasRole('TRAINER')" class="row">
+        <div class="col">
+            <form th:action="@{/lessons/create}">
+                <button type="submit" class="btn btn-success">Create new lesson</button>
             </form>
         </div>
     </div>
@@ -60,7 +60,7 @@
 </body>
 <script>
     $(document).ready(function () {
-        var datetime = new Date().toLocaleString("en-US", Intl.DateTimeFormat().resolvedOptions().timeZone);
+        let datetime = new Date().toLocaleString("en-US", Intl.DateTimeFormat().resolvedOptions().timeZone);
         datetime = new Date(datetime);
         $("#startDatetime").html(datetime);
     });

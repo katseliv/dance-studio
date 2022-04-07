@@ -12,6 +12,7 @@
     <meta charset="UTF-8">
     <title>Bookings</title>
 </head>
+<header th:insert="header :: header"></header>
 <body>
 <div class="container p-5 overflow-hidden">
     <table class="table">
@@ -22,7 +23,6 @@
             <th scope="col">User Last Name</th>
             <th scope="col">Lesson Information</th>
             <th scope="col"></th>
-            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -32,28 +32,13 @@
             <td th:text="${booking.lastName}"></td>
             <td th:text="|${booking.danceStyle}, ${#temporals.format(booking.startDatetime, 'dd/MM/yyyy, HH:mm')}|"></td>
             <td>
-                <form th:action="@{/bookings/__${booking.id}__/update}" th:method="get">
-                    <button type="submit" class="btn btn-success">Edit</button>
-                </form>
-            </td>
-            <td>
                 <form th:action="@{/bookings/__${booking.id}__}" th:method="delete">
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
                 </form>
             </td>
         </tr>
         </tbody>
     </table>
-    <div class="row">
-        <div class="col-md-1">
-            <button type="button" onclick="history.go(-1)" class="btn btn-primary">Return</button>
-        </div>
-        <div class="col-md-1">
-            <form th:action="@{/users/logout}">
-                <button type="submit" class="btn btn-danger">Logout</button>
-            </form>
-        </div>
-    </div>
 </div>
 </body>
 </html>

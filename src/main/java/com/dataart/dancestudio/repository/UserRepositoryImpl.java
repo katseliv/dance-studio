@@ -37,9 +37,8 @@ public class UserRepositoryImpl implements UserRepository {
     private final RowMapper<UserDetailsEntity> rowDetailsMapper = (result, rowNumber) -> UserDetailsEntity.builder()
             .id(result.getInt("id"))
             .email(result.getString("email"))
-            .roles(List.of(Role.of(result.getInt("role_id")).orElseThrow()))
+            .roles(List.of(Role.of(result.getInt("role_id")).orElse(Role.USER)))
             .password(result.getString("password"))
-            .passwordConfirmation(result.getString("password"))
             .build();
 
     @Autowired
@@ -84,8 +83,14 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<UserDetailsEntity> findByEmail(final String email) {
         final String sql = "SELECT id, email, role_id, password " +
                 "FROM dancestudio.users WHERE LOWER(email) = LOWER(?)";
-        final UserDetailsEntity user = jdbcTemplate.queryForObject(sql, rowDetailsMapper, email);
-        return Optional.ofNullable(user);
+
+        final List<UserDetailsEntity> userDetailsEntities = jdbcTemplate.query(sql, rowDetailsMapper, email);
+
+        if (userDetailsEntities.size() <= 1) {
+            return userDetailsEntities.stream().findFirst();
+        }
+
+        throw new RuntimeException("More than one email!");
     }
 
     @Override

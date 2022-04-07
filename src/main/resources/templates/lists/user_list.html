@@ -12,6 +12,7 @@
     <meta charset="UTF-8">
     <title>Users</title>
 </head>
+<header th:insert="header :: header"></header>
 <body>
 <div class="container p-5 overflow-hidden">
     <table class="table">
@@ -45,12 +46,9 @@
         </tbody>
     </table>
     <div class="row">
-        <div class="col-md-1">
-            <button type="button" onclick="history.go(-1)" class="btn btn-primary">Return</button>
-        </div>
-        <div class="col-md-1">
-            <form th:action="@{/users/logout}">
-                <button type="submit" class="btn btn-danger">Logout</button>
+        <div class="col">
+            <form th:action="@{/users/create}">
+                <button type="submit" class="btn btn-success">Create new user</button>
             </form>
         </div>
     </div>

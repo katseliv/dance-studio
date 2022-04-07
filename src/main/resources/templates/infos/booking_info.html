@@ -12,6 +12,7 @@
     <meta charset="UTF-8">
     <title>Booking</title>
 </head>
+<header th:insert="header :: header"></header>
 <body>
 <div class="container p-5 overflow-hidden">
     <h1 class="h3 mb-5 fw-normal text-center">Booking</h1>
@@ -24,9 +25,8 @@
         <p th:text="${booking_view.danceStyle}"></p>
         <h5>Start Datetime: </h5>
         <p th:text="${#temporals.format(booking_view.startDatetime, 'dd/MM/yyyy, HH:mm')}"></p>
-        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
-        <form th:action="@{/users/logout}">
-            <button type="submit" class="btn btn-lg btn-danger w-100 mt-2">Logout</button>
+        <form th:action="@{/bookings/__${booking_view.id}__/update}" th:method="get">
+            <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Edit</button>
         </form>
     </div>
 </div>

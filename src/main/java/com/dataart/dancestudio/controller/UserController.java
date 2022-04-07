@@ -7,7 +7,6 @@ import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.service.BookingService;
 import com.dataart.dancestudio.service.UserService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,8 +18,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Objects;
 
-@Slf4j
 @Controller
 @RequestMapping("/users")
 public class UserController {
@@ -42,14 +41,19 @@ public class UserController {
     @GetMapping("/login")
     public String loginUser(final Model model) {
         if (isAuthenticated()) {
-            return "redirect:/operations";
+            return "redirect:/home";
         }
         model.addAttribute("user", UserDetailsDto.builder().build());
         return "login";
     }
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute("user") final UserRegistrationDto userRegistrationDto) throws IOException, UserAlreadyExistsException {
+    public String registerUser(final Model model, @ModelAttribute("user") final UserRegistrationDto userRegistrationDto) throws IOException, UserAlreadyExistsException {
+        if (!Objects.equals(userRegistrationDto.getPassword(), userRegistrationDto.getPasswordConfirmation())) {
+            model.addAttribute("user", userRegistrationDto);
+            model.addAttribute("error", "Password wasn't confirmed");
+            return "registration";
+        }
         final int id = userService.createUser(userRegistrationDto);
         final UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(userRegistrationDto.getEmail(), userRegistrationDto.getPassword());
@@ -62,7 +66,7 @@ public class UserController {
     @GetMapping("/register")
     public String registerUser(final Model model) {
         if (isAuthenticated()) {
-            return "redirect:/operations";
+            return "redirect:/home";
         }
         model.addAttribute("user", UserRegistrationDto.builder().build());
         return "registration";
@@ -108,6 +112,9 @@ public class UserController {
 
     @GetMapping
     public String getUsers(final Model model) {
+        final Authentication authentication = securityContextFacade.getContext().getAuthentication();
+        final String email = authentication.getName();
+        model.addAttribute("id", userService.getUserIdByEmail(email));
         model.addAttribute("users", userService.listUsers());
         return "lists/user_list";
     }

@@ -18,6 +18,7 @@ public class UserRegistrationDto {
     private final String email;
     private final String phoneNumber;
     private final String password;
+    private final String passwordConfirmation;
     private final Integer roleId;
     private final String timeZone;
     private final Boolean isDeleted;
@@ -36,6 +37,7 @@ public class UserRegistrationDto {
         private String email;
         private String phoneNumber;
         private String password;
+        private String passwordConfirmation;
         private Integer roleId;
         private String timeZone;
         private Boolean isDeleted;
@@ -85,6 +87,11 @@ public class UserRegistrationDto {
             return this;
         }
 
+        public UserRegistrationDtoBuilder passwordConfirmation(final String passwordConfirmation) {
+            this.passwordConfirmation = passwordConfirmation;
+            return this;
+        }
+
         public UserRegistrationDtoBuilder roleId(final Integer roleId) {
             this.roleId = roleId;
             return this;
@@ -103,7 +110,8 @@ public class UserRegistrationDto {
         public UserRegistrationDto build() {
             if (!isUsed) {
                 isUsed = true;
-                return new UserRegistrationDto(id, username, firstName, lastName, multipartFile, email, phoneNumber, password, roleId, timeZone, isDeleted);
+                return new UserRegistrationDto(id, username, firstName, lastName, multipartFile, email, phoneNumber, password,
+                        passwordConfirmation, roleId, timeZone, isDeleted);
             }
             throw new RuntimeException("Builder already built");
         }
