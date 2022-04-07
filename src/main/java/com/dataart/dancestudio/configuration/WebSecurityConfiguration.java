@@ -59,30 +59,23 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/users/login")
                 .usernameParameter("email")
-                .defaultSuccessUrl("/operations")
+                .defaultSuccessUrl("/home")
                 .failureUrl("/users/login?error")
                 .permitAll()
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/operations", "/users/login", "/users/register").permitAll()
+                .antMatchers("/", "/users/login", "/users/register").permitAll()
 
-                .antMatchers("/users/**", "/trainers/**", "/bookings/**", "/lessons/**").hasRole("ADMIN")
-                .antMatchers("/trainers/**").hasRole("TRAINER")
+                .antMatchers("/users", "/users/", "/users/create", "/bookings", "/bookings/").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/users/{id}").hasRole("ADMIN")
 
-                .antMatchers("/bookings/create").hasAnyRole("TRAINER", "USER")
-                .antMatchers(HttpMethod.GET, "/users/*", "/users/*/update", "users/*/bookings",
-                        "/bookings/*", "/bookings/*/update", "/lessons/*").hasAnyRole("TRAINER", "USER")
-                .antMatchers(HttpMethod.PUT, "/users/*", "/bookings/*").hasAnyRole("TRAINER", "USER")
-                .antMatchers(HttpMethod.DELETE, "/bookings/*").hasAnyRole("TRAINER", "USER")
-
-                .antMatchers("/lessons/create").hasAnyRole("TRAINER")
-                .antMatchers(HttpMethod.GET, "/lessons/*/update").hasAnyRole("TRAINER")
-                .antMatchers(HttpMethod.PUT, "/lessons/*").hasAnyRole("TRAINER")
-                .antMatchers(HttpMethod.DELETE, "/lessons/*").hasAnyRole("TRAINER")
+                .antMatchers("/lessons/create").not().hasRole("USER")
+                .antMatchers(HttpMethod.PUT, "/lessons/{id}").not().hasRole("USER")
+                .antMatchers(HttpMethod.DELETE, "/lessons/{id}").not().hasRole("USER")
+                .antMatchers("/trainers/{id}/lessons").not().hasRole("USER")
 
                 .anyRequest().authenticated()
-
 
                 .and()
                 .logout()

@@ -1,13 +1,14 @@
 package com.dataart.dancestudio.controller;
 
-import com.dataart.dancestudio.service.DanceStyleService;
-import com.dataart.dancestudio.service.LessonService;
-import com.dataart.dancestudio.service.RoomService;
-import com.dataart.dancestudio.service.UserService;
+import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.DanceStyleViewDto;
 import com.dataart.dancestudio.model.dto.view.RoomViewDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
+import com.dataart.dancestudio.service.DanceStyleService;
+import com.dataart.dancestudio.service.LessonService;
+import com.dataart.dancestudio.service.RoomService;
+import com.dataart.dancestudio.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -67,15 +68,6 @@ public class LessonController {
         return "forms/lesson_edit";
     }
 
-    private void prepareModel(final Model model){
-        final List<UserViewDto> users = userService.listTrainers();
-        final List<DanceStyleViewDto> styles = danceStyleService.listDanceStyleViews();
-        final List<RoomViewDto> rooms = roomService.listRooms();
-        model.addAttribute("trainers", users);
-        model.addAttribute("styles", styles);
-        model.addAttribute("rooms", rooms);
-    }
-
     @DeleteMapping("/{id}")
     public String deleteLesson(@PathVariable final int id) {
         lessonService.deleteLessonById(id);
@@ -84,8 +76,18 @@ public class LessonController {
 
     @GetMapping
     public String getLessons(final Model model) {
+        model.addAttribute("booking", BookingDto.builder().build());
         model.addAttribute("lessons", lessonService.listLessons());
         return "lists/lesson_list";
+    }
+
+    private void prepareModel(final Model model) {
+        final List<UserViewDto> users = userService.listTrainers();
+        final List<DanceStyleViewDto> styles = danceStyleService.listDanceStyleViews();
+        final List<RoomViewDto> rooms = roomService.listRooms();
+        model.addAttribute("trainers", users);
+        model.addAttribute("styles", styles);
+        model.addAttribute("rooms", rooms);
     }
 
 }

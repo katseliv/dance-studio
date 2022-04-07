@@ -18,7 +18,6 @@ public class UserDetailsEntity implements UserDetails {
     private final String email;
     private final List<Role> roles;
     private final String password;
-    private final String passwordConfirmation;
 
     public static UserRegistrationDtoBuilder builder() {
         return new UserRegistrationDtoBuilder();
@@ -60,7 +59,6 @@ public class UserDetailsEntity implements UserDetails {
         private String email;
         private List<Role> roles;
         private String password;
-        private String passwordConfirmation;
 
         private boolean isUsed = false;
 
@@ -87,15 +85,10 @@ public class UserDetailsEntity implements UserDetails {
             return this;
         }
 
-        public UserRegistrationDtoBuilder passwordConfirmation(final String passwordConfirmation) {
-            this.passwordConfirmation = passwordConfirmation;
-            return this;
-        }
-
         public UserDetailsEntity build() {
             if (!isUsed) {
                 isUsed = true;
-                return new UserDetailsEntity(id, email, roles, password, passwordConfirmation);
+                return new UserDetailsEntity(id, email, roles, password);
             }
             throw new RuntimeException("Builder already built");
         }

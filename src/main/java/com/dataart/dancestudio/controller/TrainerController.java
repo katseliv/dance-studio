@@ -1,8 +1,6 @@
 package com.dataart.dancestudio.controller;
 
 import com.dataart.dancestudio.service.LessonService;
-import com.dataart.dancestudio.service.UserService;
-import com.dataart.dancestudio.utils.SecurityContextFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
