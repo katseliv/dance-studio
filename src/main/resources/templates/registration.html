@@ -10,14 +10,24 @@
             integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
             crossorigin="anonymous"></script>
     <meta charset="UTF-8">
-    <title>Create User</title>
+    <title>Registration</title>
 </head>
-<header th:insert="header :: header"></header>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03"
+                    aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/}">Dance Studio</a>
+        </div>
+    </nav>
+</header>
 <body>
 <div class="container p-5 overflow-hidden">
-    <h1 class="h3 mb-5 fw-normal text-center">Create User</h1>
+    <h1 class="h3 mb-5 fw-normal text-center">Registration</h1>
     <div class="container w-25">
-        <form id="userForm" th:action="@{/users/create}" th:object="${user}" enctype="multipart/form-data"
+        <form id="userForm" th:action="@{/users/register}" th:object="${user}" enctype="multipart/form-data"
               th:method="post">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
@@ -47,10 +57,18 @@
                 <label for="inputPassword" class="form-label">Password</label>
                 <input th:field="*{password}" type="password" class="form-control" id="inputPassword">
             </div>
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input th:field="*{passwordConfirmation}" type="password" class="form-control" id="confirmPassword">
+            </div>
+            <div class="mb-3 text-center text-danger">
+                <p th:if="${error} != null" th:text="${error}"></p>
+            </div>
             <input th:field="*{timeZone}" class="form-control" type="hidden" id="timeZone"
                    name="timeZone">
             <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-success w-100 mt-2">Submit</button>
         </form>
+        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
     </div>
 </div>
 </body>

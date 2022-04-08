@@ -1,9 +1,8 @@
-package com.dataart.dancestudio.service.impl;
+package com.dataart.dancestudio.service;
 
-import com.dataart.dancestudio.repository.impl.DanceStyleRepository;
-import com.dataart.dancestudio.service.DanceStyleService;
 import com.dataart.dancestudio.mapper.DanceStyleMapper;
 import com.dataart.dancestudio.model.dto.view.DanceStyleViewDto;
+import com.dataart.dancestudio.repository.DanceStyleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

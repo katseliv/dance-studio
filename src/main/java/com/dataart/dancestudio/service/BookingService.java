@@ -19,4 +19,6 @@ public interface BookingService {
 
     List<BookingViewDto> listBookings();
 
+    List<BookingViewDto> listUserBookings(int id);
+
 }

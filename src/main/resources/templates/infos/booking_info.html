@@ -12,20 +12,21 @@
     <meta charset="UTF-8">
     <title>Booking</title>
 </head>
+<header th:insert="header :: header"></header>
 <body>
 <div class="container p-5 overflow-hidden">
     <h1 class="h3 mb-5 fw-normal text-center">Booking</h1>
     <div class="container w-25">
         <h5>User First Name: </h5>
-        <p th:utext="${booking_view.firstName}"></p>
+        <p th:text="${booking_view.firstName}"></p>
         <h5>User Last Name: </h5>
-        <p th:utext="${booking_view.lastName}"></p>
+        <p th:text="${booking_view.lastName}"></p>
         <h5>Dance Style: </h5>
-        <p th:utext="${booking_view.danceStyle}"></p>
+        <p th:text="${booking_view.danceStyle}"></p>
         <h5>Start Datetime: </h5>
-        <p th:utext="${#temporals.format(booking_view.startDatetime, 'dd/MM/yyyy, HH:mm')}"></p>
-        <form th:action="@{/bookings}" th:method="get">
-            <button type="submit" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
+        <p th:text="${#temporals.format(booking_view.startDatetime, 'dd/MM/yyyy, HH:mm')}"></p>
+        <form th:action="@{/bookings/__${booking_view.id}__/update}" th:method="get">
+            <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Edit</button>
         </form>
     </div>
 </div>

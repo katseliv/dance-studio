@@ -1,8 +1,7 @@
-package com.dataart.dancestudio.repository.impl;
+package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.BookingEntity;
 import com.dataart.dancestudio.model.entity.view.BookingViewEntity;
-import com.dataart.dancestudio.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class BookingRepository implements Repository<BookingEntity> {
+public class BookingRepositoryImpl implements BookingRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -36,7 +35,7 @@ public class BookingRepository implements Repository<BookingEntity> {
             .build();
 
     @Autowired
-    public BookingRepository(final JdbcTemplate jdbcTemplate) {
+    public BookingRepositoryImpl(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -63,6 +62,7 @@ public class BookingRepository implements Repository<BookingEntity> {
         return Optional.ofNullable(booking);
     }
 
+    @Override
     public Optional<BookingViewEntity> findViewById(final int id) {
         final String sql = "SELECT b.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
                 "FROM dancestudio.bookings b " +
@@ -93,6 +93,7 @@ public class BookingRepository implements Repository<BookingEntity> {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
+    @Override
     public List<BookingViewEntity> findAllViews() {
         final String sql = "SELECT b.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
                 "FROM dancestudio.bookings b " +
@@ -101,6 +102,17 @@ public class BookingRepository implements Repository<BookingEntity> {
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
                 "WHERE b.is_deleted = FALSE";
         return jdbcTemplate.query(sql, rowViewMapper);
+    }
+
+    @Override
+    public List<BookingViewEntity> findAllUserBookingViews(final int id) {
+        final String sql = "SELECT b.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
+                "FROM dancestudio.bookings b " +
+                "JOIN dancestudio.users u ON u.id = b.user_id " +
+                "JOIN dancestudio.lessons l ON l.id = b.lesson_id " +
+                "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
+                "WHERE b.user_id = ? AND b.is_deleted = FALSE";
+        return jdbcTemplate.query(sql, rowViewMapper, id);
     }
 
 }

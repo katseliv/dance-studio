@@ -10,3 +10,19 @@ databaseChangeLog:
         - sqlFile:
             path: PDS-001-202203161422.sql
             relativeToChangelogFile: true
+  - changeSet:
+      id: PDS-001-202203291308
+      author: EkaterinaSelivanova
+      comment: Change Password Column Type
+      changes:
+        - sqlFile:
+            path: PDS-001-202203291308.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: PDS-001-202204041528
+      author: EkaterinaSelivanova
+      comment: Make Email Column Unique
+      changes:
+        - sqlFile:
+            path: PDS-001-202204041528.sql
+            relativeToChangelogFile: true

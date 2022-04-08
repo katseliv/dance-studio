@@ -12,6 +12,7 @@
     <meta charset="UTF-8">
     <title>Bookings</title>
 </head>
+<header th:insert="header :: header"></header>
 <body>
 <div class="container p-5 overflow-hidden">
     <table class="table">
@@ -22,7 +23,6 @@
             <th scope="col">User Last Name</th>
             <th scope="col">Lesson Information</th>
             <th scope="col"></th>
-            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -30,23 +30,15 @@
             <th scope="row"><a th:href="@{/bookings/__${booking.id}__}" th:text="${iter.index + 1}"></a></th>
             <td th:text="${booking.firstName}"></td>
             <td th:text="${booking.lastName}"></td>
-            <td th:utext="|${booking.danceStyle}, ${#temporals.format(booking.startDatetime, 'dd/MM/yyyy, HH:mm')}|"></td>
-            <td>
-                <form th:action="@{/bookings/__${booking.id}__/update}" th:method="get">
-                    <button type="submit" class="btn btn-success">Edit</button>
-                </form>
-            </td>
+            <td th:text="|${booking.danceStyle}, ${#temporals.format(booking.startDatetime, 'dd/MM/yyyy, HH:mm')}|"></td>
             <td>
                 <form th:action="@{/bookings/__${booking.id}__}" th:method="delete">
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
                 </form>
             </td>
         </tr>
         </tbody>
     </table>
-    <form th:action="@{/}" th:method="get">
-        <button type="submit" class="btn btn-primary">Return</button>
-    </form>
 </div>
 </body>
 </html>

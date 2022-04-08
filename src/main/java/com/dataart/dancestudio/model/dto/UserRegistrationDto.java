@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
-public class UserDto {
+public class UserRegistrationDto {
 
     private final Integer id;
     private final String username;
@@ -17,15 +17,17 @@ public class UserDto {
     private final MultipartFile multipartFile;
     private final String email;
     private final String phoneNumber;
+    private final String password;
+    private final String passwordConfirmation;
     private final Integer roleId;
     private final String timeZone;
     private final Boolean isDeleted;
 
-    public static UserDtoBuilder builder() {
-        return new UserDtoBuilder();
+    public static UserRegistrationDtoBuilder builder() {
+        return new UserRegistrationDtoBuilder();
     }
 
-    public static class UserDtoBuilder {
+    public static class UserRegistrationDtoBuilder {
 
         private Integer id;
         private String username;
@@ -34,69 +36,82 @@ public class UserDto {
         private MultipartFile multipartFile;
         private String email;
         private String phoneNumber;
+        private String password;
+        private String passwordConfirmation;
         private Integer roleId;
         private String timeZone;
         private Boolean isDeleted;
 
         private boolean isUsed;
 
-        public UserDtoBuilder() {
+        public UserRegistrationDtoBuilder() {
         }
 
-        public UserDtoBuilder id(final Integer id) {
+        public UserRegistrationDtoBuilder id(final Integer id) {
             this.id = id;
             return this;
         }
 
-        public UserDtoBuilder username(final String username) {
+        public UserRegistrationDtoBuilder username(final String username) {
             this.username = username;
             return this;
         }
 
-        public UserDtoBuilder firstName(final String firstName) {
+        public UserRegistrationDtoBuilder firstName(final String firstName) {
             this.firstName = firstName;
             return this;
         }
 
-        public UserDtoBuilder lastName(final String lastName) {
+        public UserRegistrationDtoBuilder lastName(final String lastName) {
             this.lastName = lastName;
             return this;
         }
 
-        public UserDtoBuilder multipartFile(final MultipartFile multipartFile) {
+        public UserRegistrationDtoBuilder multipartFile(final MultipartFile multipartFile) {
             this.multipartFile = multipartFile;
             return this;
         }
 
-        public UserDtoBuilder email(final String email) {
+        public UserRegistrationDtoBuilder email(final String email) {
             this.email = email;
             return this;
         }
 
-        public UserDtoBuilder phoneNumber(final String phoneNumber) {
+        public UserRegistrationDtoBuilder phoneNumber(final String phoneNumber) {
             this.phoneNumber = phoneNumber;
             return this;
         }
 
-        public UserDtoBuilder roleId(final Integer roleId) {
+        public UserRegistrationDtoBuilder password(final String password) {
+            this.password = password;
+            return this;
+        }
+
+        public UserRegistrationDtoBuilder passwordConfirmation(final String passwordConfirmation) {
+            this.passwordConfirmation = passwordConfirmation;
+            return this;
+        }
+
+        public UserRegistrationDtoBuilder roleId(final Integer roleId) {
             this.roleId = roleId;
             return this;
         }
 
-        public UserDtoBuilder timeZone(final String timeZone) {
+        public UserRegistrationDtoBuilder timeZone(final String timeZone) {
             this.timeZone = timeZone;
             return this;
         }
 
-        public UserDtoBuilder isDeleted(final Boolean isDeleted) {
+        public UserRegistrationDtoBuilder isDeleted(final Boolean isDeleted) {
             this.isDeleted = isDeleted;
             return this;
         }
 
-        public UserDto build() {
+        public UserRegistrationDto build() {
             if (!isUsed) {
                 isUsed = true;
-                return new UserDto(id, username, firstName, lastName, multipartFile, email, phoneNumber, roleId, timeZone, isDeleted);
+                return new UserRegistrationDto(id, username, firstName, lastName, multipartFile, email, phoneNumber, password,
+                        passwordConfirmation, roleId, timeZone, isDeleted);
             }
             throw new RuntimeException("Builder already built");
         }

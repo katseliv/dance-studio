@@ -1,7 +1,7 @@
-package com.dataart.dancestudio.repository.impl;
+package com.dataart.dancestudio.repository;
 
+import com.dataart.dancestudio.exception.NotImplementedYetException;
 import com.dataart.dancestudio.model.entity.RoomEntity;
-import com.dataart.dancestudio.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class RoomRepository implements Repository<RoomEntity> {
+public class RoomRepositoryImpl implements RoomRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -24,28 +24,28 @@ public class RoomRepository implements Repository<RoomEntity> {
             .build();
 
     @Autowired
-    public RoomRepository(final JdbcTemplate jdbcTemplate) {
+    public RoomRepositoryImpl(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public int save(final RoomEntity roomEntity) {
-        return -1;
+        throw new NotImplementedYetException("Such method wasn't implemented");
     }
 
     @Override
     public Optional<RoomEntity> findById(final int id) {
-        return Optional.empty();
+        throw new NotImplementedYetException("Such method wasn't implemented");
     }
 
     @Override
     public void update(final RoomEntity roomEntity, final int id) {
-
+        throw new NotImplementedYetException("Such method wasn't implemented");
     }
 
     @Override
     public void deleteById(final int id) {
-
+        throw new NotImplementedYetException("Such method wasn't implemented");
     }
 
     @Override

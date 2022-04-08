@@ -1,8 +1,7 @@
-package com.dataart.dancestudio.repository.impl;
+package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.LessonEntity;
 import com.dataart.dancestudio.model.entity.view.LessonViewEntity;
-import com.dataart.dancestudio.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class LessonRepository implements Repository<LessonEntity> {
+public class LessonRepositoryImpl implements LessonRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -39,7 +38,7 @@ public class LessonRepository implements Repository<LessonEntity> {
             .build();
 
     @Autowired
-    public LessonRepository(final JdbcTemplate jdbcTemplate) {
+    public LessonRepositoryImpl(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -71,6 +70,7 @@ public class LessonRepository implements Repository<LessonEntity> {
         return Optional.ofNullable(lesson);
     }
 
+    @Override
     public Optional<LessonViewEntity> findViewById(final int id) {
         final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
                 "FROM dancestudio.lessons l " +
@@ -103,6 +103,7 @@ public class LessonRepository implements Repository<LessonEntity> {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
+    @Override
     public List<LessonViewEntity> findAllViews() {
         final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
                 "FROM dancestudio.lessons l " +
@@ -110,6 +111,16 @@ public class LessonRepository implements Repository<LessonEntity> {
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
                 "WHERE l.is_deleted = FALSE";
         return jdbcTemplate.query(sql, rowViewMapper);
+    }
+
+    @Override
+    public List<LessonViewEntity> findAllUserLessonViews(final int userId) {
+        final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
+                "FROM dancestudio.lessons l " +
+                "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
+                "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
+                "WHERE l.user_trainer_id = ? AND l.is_deleted = FALSE";
+        return jdbcTemplate.query(sql, rowViewMapper, userId);
     }
 
 }
