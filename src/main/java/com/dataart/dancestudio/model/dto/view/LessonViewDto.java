@@ -1,11 +1,13 @@
 package com.dataart.dancestudio.model.dto.view;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@EqualsAndHashCode
 @AllArgsConstructor
 public class LessonViewDto {
 
