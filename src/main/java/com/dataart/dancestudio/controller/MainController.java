@@ -2,6 +2,7 @@ package com.dataart.dancestudio.controller;
 
 import com.dataart.dancestudio.service.UserService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,9 @@ public class MainController {
 
     @GetMapping("/")
     public String index() {
+        if (isAuthenticated()) {
+            return "redirect:/home";
+        }
         return "index";
     }
 
@@ -34,6 +38,11 @@ public class MainController {
         session.setAttribute("userId", userId);
         session.setAttribute("roleId", userService.getUserById(userId).getRoleId());
         return "home";
+    }
+
+    private boolean isAuthenticated() {
+        final Authentication authentication = securityContextFacade.getContext().getAuthentication();
+        return authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
     }
 
 }

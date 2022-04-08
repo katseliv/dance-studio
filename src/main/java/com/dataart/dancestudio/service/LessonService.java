@@ -19,6 +19,6 @@ public interface LessonService {
 
     List<LessonViewDto> listLessons();
 
-    List<LessonViewDto> listUserLessons(int id);
+    List<LessonViewDto> listUserLessons(int userId);
 
 }

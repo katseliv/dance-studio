@@ -126,12 +126,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<UserEntity> findAllTrainers() {
+    public List<UserEntity> findAllByRole(final Role role) {
         final String sql = "SELECT id, username, first_name, last_name, image, email, phone_number, password, role_id, " +
                 "time_zone, is_deleted " +
                 "FROM dancestudio.users WHERE role_id = ? AND is_deleted = FALSE";
-        final int trainerId = 2;
-        return jdbcTemplate.query(sql, rowMapper, trainerId);
+        return jdbcTemplate.query(sql, rowMapper, role.getId());
     }
 
 }

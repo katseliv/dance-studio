@@ -6,6 +6,7 @@ import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
+import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserViewDto> listTrainers() {
-        return userMapper.userEntitiesToUserViewDtoList(userRepository.findAllTrainers());
+        return userMapper.userEntitiesToUserViewDtoList(userRepository.findAllByRole(Role.TRAINER));
     }
 
     //TODO: think about naming
