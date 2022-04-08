@@ -1,5 +1,6 @@
 package com.dataart.dancestudio.repository;
 
+import com.dataart.dancestudio.exception.NotImplementedYetException;
 import com.dataart.dancestudio.model.entity.RoomEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,22 +30,22 @@ public class RoomRepositoryImpl implements RoomRepository {
 
     @Override
     public int save(final RoomEntity roomEntity) {
-        return -1;
+        throw new NotImplementedYetException("Such method wasn't implemented");
     }
 
     @Override
     public Optional<RoomEntity> findById(final int id) {
-        return Optional.empty();
+        throw new NotImplementedYetException("Such method wasn't implemented");
     }
 
     @Override
     public void update(final RoomEntity roomEntity, final int id) {
-
+        throw new NotImplementedYetException("Such method wasn't implemented");
     }
 
     @Override
     public void deleteById(final int id) {
-
+        throw new NotImplementedYetException("Such method wasn't implemented");
     }
 
     @Override

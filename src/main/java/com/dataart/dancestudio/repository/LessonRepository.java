@@ -12,6 +12,6 @@ public interface LessonRepository extends Repository<LessonEntity> {
 
     List<LessonViewEntity> findAllViews();
 
-    List<LessonViewEntity> findAllUserLessonViews(final int id);
+    List<LessonViewEntity> findAllUserLessonViews(final int userId);
 
 }

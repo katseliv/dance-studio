@@ -114,13 +114,13 @@ public class LessonRepositoryImpl implements LessonRepository {
     }
 
     @Override
-    public List<LessonViewEntity> findAllUserLessonViews(final int id) {
+    public List<LessonViewEntity> findAllUserLessonViews(final int userId) {
         final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
                 "FROM dancestudio.lessons l " +
                 "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
                 "WHERE l.user_trainer_id = ? AND l.is_deleted = FALSE";
-        return jdbcTemplate.query(sql, rowViewMapper, id);
+        return jdbcTemplate.query(sql, rowViewMapper, userId);
     }
 
 }

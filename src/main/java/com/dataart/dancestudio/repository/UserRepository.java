@@ -1,5 +1,7 @@
 package com.dataart.dancestudio.repository;
 
+import com.dataart.dancestudio.exception.NotImplementedYetException;
+import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.model.entity.UserDetailsEntity;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.model.entity.UserRegistrationEntity;
@@ -11,7 +13,7 @@ public interface UserRepository extends Repository<UserEntity> {
 
     @Override
     default int save(final UserEntity userEntity) {
-        return -1;
+        throw new NotImplementedYetException("Such method wasn't implemented");
     }
 
     int save(final UserRegistrationEntity userRegistrationEntity);
@@ -20,6 +22,6 @@ public interface UserRepository extends Repository<UserEntity> {
 
     void updateWithoutPicture(final UserEntity userEntity, final int id);
 
-    List<UserEntity> findAllTrainers();
+    List<UserEntity> findAllByRole(Role role);
 
 }

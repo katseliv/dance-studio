@@ -55,8 +55,8 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public List<LessonViewDto> listUserLessons(final int id) {
-        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllUserLessonViews(id));
+    public List<LessonViewDto> listUserLessons(final int userId) {
+        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllUserLessonViews(userId));
     }
 
 }
