@@ -19,6 +19,6 @@ public interface BookingService {
 
     List<BookingViewDto> listBookings();
 
-    List<BookingViewDto> listUserBookings(int id);
+    List<BookingViewDto> listUserBookings(int userId);
 
 }

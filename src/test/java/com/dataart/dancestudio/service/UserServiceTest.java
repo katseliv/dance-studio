@@ -2,10 +2,12 @@ package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.exception.UserAlreadyExistsException;
 import com.dataart.dancestudio.mapper.UserMapperImpl;
+import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.entity.UserDetailsEntity;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.model.entity.UserRegistrationEntity;
 import com.dataart.dancestudio.repository.UserRepository;
@@ -58,7 +60,7 @@ public class UserServiceTest {
 
     @Test
     public void createUser() throws IOException, UserAlreadyExistsException {
-        //given
+        // given
         final String password = "45";
         final String encodePassword = bCryptPasswordEncoder.encode(password);
 
@@ -93,17 +95,17 @@ public class UserServiceTest {
         when(userRepositoryMock.save(userRegistrationEntity)).thenReturn(id);
 
         // when
-        final int lessonId = userServiceImpl.createUser(userRegistrationDto);
+        final int userId = userServiceImpl.createUser(userRegistrationDto);
 
         // then
         verify(userMapperImpl, times(1)).userRegistrationDtoToUserRegistrationEntityWithPassword(
                 userRegistrationDto, userRegistrationEntity.getPassword());
-        assertEquals(id, lessonId);
+        assertEquals(id, userId);
     }
 
     @Test
     public void getUserById() throws IOException {
-        //given
+        // given
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity userEntity = UserEntity.builder()
@@ -141,7 +143,7 @@ public class UserServiceTest {
 
     @Test
     public void getUserByIdWhenOptionalNull() throws IOException {
-        //given
+        // given
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity userEntity = UserEntity.builder()
@@ -168,7 +170,7 @@ public class UserServiceTest {
 
     @Test
     public void getUserViewById() throws IOException {
-        //given
+        // given
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity userEntity = UserEntity.builder()
@@ -194,17 +196,17 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(id)).thenReturn(Optional.of(userEntity));
 
         // when
-        final UserViewDto lessonViewDtoActual = userServiceImpl.getUserViewById(id);
+        final UserViewDto userViewDtoActual = userServiceImpl.getUserViewById(id);
 
         // then
         verify(userMapperImpl, times(1)).userEntityToUserViewDto(userEntity);
         verify(userRepositoryMock, times(1)).findById(id);
-        assertEquals(userViewDto, lessonViewDtoActual);
+        assertEquals(userViewDto, userViewDtoActual);
     }
 
     @Test
     public void getUserViewByIdWhenOptionalNull() throws IOException {
-        //given
+        // given
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity userEntity = UserEntity.builder()
@@ -230,8 +232,58 @@ public class UserServiceTest {
     }
 
     @Test
+    public void getUserIdByEmail() {
+        // given
+        final String password = "45";
+        final String encodePassword = bCryptPasswordEncoder.encode(password);
+
+        final UserDetailsEntity userDetailsEntity = UserDetailsEntity.builder()
+                .id(id)
+                .email(email)
+                .password(encodePassword)
+                .build();
+        final UserDetailsDto userDetailsDto = UserDetailsDto.builder()
+                .id(id)
+                .email(email)
+                .password(encodePassword)
+                .build();
+
+        when(userRepositoryMock.findByEmail(email)).thenReturn(Optional.of(userDetailsEntity));
+
+        // when
+        final int userId = userServiceImpl.getUserIdByEmail(email);
+
+        // then
+        verify(userMapperImpl, times(1)).userDetailsEntityToUserDetailsDto(userDetailsEntity);
+        verify(userRepositoryMock, times(1)).findByEmail(email);
+        assertEquals(userDetailsDto.getId(), userId);
+    }
+
+    @Test
+    public void getUserIdByEmailWhenOptionalNull() {
+        // given
+        final String password = "45";
+        final String encodePassword = bCryptPasswordEncoder.encode(password);
+
+        final UserDetailsEntity userDetailsEntity = UserDetailsEntity.builder()
+                .id(id)
+                .email(email)
+                .password(encodePassword)
+                .build();
+
+        when(userRepositoryMock.findByEmail(email)).thenReturn(Optional.empty());
+
+        // when
+        assertThrows(NoSuchElementException.class, () -> userServiceImpl.getUserIdByEmail(email));
+
+        // then
+        verify(userMapperImpl, never()).userDetailsEntityToUserDetailsDto(userDetailsEntity);
+        verify(userRepositoryMock, times(1)).findByEmail(email);
+    }
+
+    @Test
     public void updateUserByIdWithChangedFieldAndImage() throws IOException {
-        //given
+        // given
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity newUserEntityWithUpdatedImage = UserEntity.builder()
@@ -269,7 +321,7 @@ public class UserServiceTest {
 
     @Test
     public void updateUserByIdWithChangedFieldAndEmptyImage() throws IOException {
-        //given
+        // given
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity newUserEntity = UserEntity.builder()
@@ -321,7 +373,7 @@ public class UserServiceTest {
 
     @Test
     public void updateUserByIdWithChangedFieldAndEmptyImageWhenOptionalNull() throws IOException {
-        //given
+        // given
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity newUserEntity = UserEntity.builder()
@@ -361,7 +413,7 @@ public class UserServiceTest {
 
     @Test
     public void doesNotUpdateUserByIdWithEmptyImage() throws IOException {
-        //given
+        // given
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity userEntity = UserEntity.builder()
@@ -412,7 +464,7 @@ public class UserServiceTest {
 
     @Test
     public void doesNotUpdateUserByIdWithEmptyImageWhenOptionalNull() throws IOException {
-        //given
+        // given
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserDto userDto = UserDto.builder()
@@ -454,7 +506,7 @@ public class UserServiceTest {
 
     @Test
     public void deleteUserById() {
-        //given
+        // given
         doNothing().when(userRepositoryMock).deleteById(id);
 
         // when
@@ -466,7 +518,7 @@ public class UserServiceTest {
 
     @Test
     public void listUsers() throws IOException {
-        //given
+        // given
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity userEntity = UserEntity.builder()
@@ -501,6 +553,45 @@ public class UserServiceTest {
         verify(userMapperImpl, times(1))
                 .userEntitiesToUserViewDtoList(userEntities);
         verify(userRepositoryMock, times(1)).findAll();
+        assertEquals(userViewDtoListExpected, userViewDtoListActual);
+    }
+
+    @Test
+    public void listTrainers() throws IOException {
+        // given
+        when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
+
+        final UserEntity userEntity = UserEntity.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .image(multipartFile.getBytes())
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .roleId(Role.TRAINER.getId())
+                .timeZone(timeZone)
+                .isDeleted(isDeleted)
+                .build();
+        final UserViewDto userViewDto = UserViewDto.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .image(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .build();
+
+        final List<UserViewDto> userViewDtoListExpected = List.of(userViewDto);
+        final List<UserEntity> userEntities = List.of(userEntity);
+
+        when(userRepositoryMock.findAllByRole(Role.TRAINER)).thenReturn(userEntities);
+
+        // when
+        final List<UserViewDto> userViewDtoListActual = userServiceImpl.listTrainers();
+
+        // then
+        verify(userMapperImpl, times(1)).userEntitiesToUserViewDtoList(userEntities);
+        verify(userRepositoryMock, times(1)).findAllByRole(Role.TRAINER);
         assertEquals(userViewDtoListExpected, userViewDtoListActual);
     }
 

@@ -79,7 +79,7 @@ public class BookingServiceTest {
 
     @Test
     public void createBooking() {
-        //given
+        // given
         when(bookingRepositoryMock.save(bookingEntity)).thenReturn(id);
 
         // when
@@ -92,7 +92,7 @@ public class BookingServiceTest {
 
     @Test
     public void getBookingById() {
-        //given
+        // given
         when(bookingRepositoryMock.findById(id)).thenReturn(Optional.of(bookingEntity));
 
         // when
@@ -106,7 +106,7 @@ public class BookingServiceTest {
 
     @Test
     public void getBookingByIdWhenOptionalNull() {
-        //given
+        // given
         when(bookingRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
@@ -119,7 +119,7 @@ public class BookingServiceTest {
 
     @Test
     public void getBookingViewById() {
-        //given
+        // given
         when(bookingRepositoryMock.findViewById(id)).thenReturn(Optional.of(bookingViewEntity));
 
         // when
@@ -133,7 +133,7 @@ public class BookingServiceTest {
 
     @Test
     public void getBookingViewByIdWhenOptionalNull() {
-        //given
+        // given
         when(bookingRepositoryMock.findViewById(id)).thenReturn(Optional.empty());
 
         // when
@@ -146,7 +146,7 @@ public class BookingServiceTest {
 
     @Test
     public void updateBookingById() {
-        //given
+        // given
         when(bookingRepositoryMock.findById(id)).thenReturn(Optional.of(bookingEntity));
         doNothing().when(bookingRepositoryMock).update(newBookingEntity, id);
 
@@ -160,7 +160,7 @@ public class BookingServiceTest {
 
     @Test
     public void updateBookingByIdWhenOptionalNull() {
-        //given
+        // given
         when(bookingRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
@@ -173,7 +173,7 @@ public class BookingServiceTest {
 
     @Test
     public void doesNotUpdateBookingById() {
-        //given
+        // given
         when(bookingRepositoryMock.findById(id)).thenReturn(Optional.of(bookingEntity));
 
         // when
@@ -186,7 +186,7 @@ public class BookingServiceTest {
 
     @Test
     public void doesNotUpdateBookingByIdWhenOptionalNull() {
-        //given;
+        // given;
         when(bookingRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
@@ -199,7 +199,7 @@ public class BookingServiceTest {
 
     @Test
     public void deleteBookingById() {
-        //given
+        // given
         doNothing().when(bookingRepositoryMock).deleteById(id);
 
         // when
@@ -211,7 +211,7 @@ public class BookingServiceTest {
 
     @Test
     public void listBookings() {
-        //given
+        // given
         final List<BookingViewDto> bookingViewDtoListExpected = List.of(bookingViewDto);
         final List<BookingViewEntity> bookingViewEntities = List.of(bookingViewEntity);
 
@@ -221,9 +221,26 @@ public class BookingServiceTest {
         final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listBookings();
 
         // then
-        verify(bookingMapperImpl, times(1))
-                .bookingViewEntitiesToBookingViewDtoList(bookingViewEntities);
+        verify(bookingMapperImpl, times(1)).bookingViewEntitiesToBookingViewDtoList(bookingViewEntities);
         verify(bookingRepositoryMock, times(1)).findAllViews();
+        assertEquals(bookingViewDtoListExpected, bookingViewDtoListActual);
+    }
+
+    @Test
+    public void listUserBookings() {
+        // given
+        final List<BookingViewDto> bookingViewDtoListExpected = List.of(bookingViewDto);
+        final List<BookingViewEntity> bookingViewEntities = List.of(bookingViewEntity);
+
+        final int userId = 1;
+        when(bookingRepositoryMock.findAllUserBookingViews(userId)).thenReturn(bookingViewEntities);
+
+        // when
+        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listUserBookings(userId);
+
+        // then
+        verify(bookingMapperImpl, times(1)).bookingViewEntitiesToBookingViewDtoList(bookingViewEntities);
+        verify(bookingRepositoryMock, times(1)).findAllUserBookingViews(userId);
         assertEquals(bookingViewDtoListExpected, bookingViewDtoListActual);
     }
 

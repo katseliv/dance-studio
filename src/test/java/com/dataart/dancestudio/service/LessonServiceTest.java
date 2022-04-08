@@ -102,7 +102,7 @@ public class LessonServiceTest {
 
     @Test
     public void createLesson() {
-        //given
+        // given
         when(lessonRepositoryMock.save(lessonEntity)).thenReturn(id);
 
         // when
@@ -115,7 +115,7 @@ public class LessonServiceTest {
 
     @Test
     public void getLessonById() {
-        //given
+        // given
         final LessonDto lessonDtoWithUTCStartDatetime = LessonDto.builder()
                 .userTrainerId(userTrainerId)
                 .danceStyleId(danceStyleId)
@@ -138,7 +138,7 @@ public class LessonServiceTest {
 
     @Test
     public void getLessonByIdWhenOptionalNull() {
-        //given
+        // given
         when(lessonRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
@@ -151,7 +151,7 @@ public class LessonServiceTest {
 
     @Test
     public void getLessonViewById() {
-        //given
+        // given
         when(lessonRepositoryMock.findViewById(id)).thenReturn(Optional.of(lessonViewEntity));
 
         // when
@@ -165,7 +165,7 @@ public class LessonServiceTest {
 
     @Test
     public void getLessonViewByIdWhenOptionalNull() {
-        //given
+        // given
         when(lessonRepositoryMock.findViewById(id)).thenReturn(Optional.empty());
 
         // when
@@ -178,7 +178,7 @@ public class LessonServiceTest {
 
     @Test
     public void updateLessonById() {
-        //given
+        // given
         when(lessonRepositoryMock.findById(id)).thenReturn(Optional.of(lessonEntity));
         doNothing().when(lessonRepositoryMock).update(newLessonEntity, id);
 
@@ -192,7 +192,7 @@ public class LessonServiceTest {
 
     @Test
     public void updateLessonByIdWhenOptionalNull() {
-        //given
+        // given
         when(lessonRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
@@ -205,7 +205,7 @@ public class LessonServiceTest {
 
     @Test
     public void doesNotUpdateLessonById() {
-        //given
+        // given
         final LessonDto lessonDto = LessonDto.builder()
                 .userTrainerId(userTrainerId)
                 .danceStyleId(danceStyleId)
@@ -228,7 +228,7 @@ public class LessonServiceTest {
 
     @Test
     public void doesNotUpdateLessonByIdWhenOptionalNull() {
-        //given
+        // given
         final LessonDto lessonDtoWithoutTimeZone = LessonDto.builder()
                 .userTrainerId(userTrainerId)
                 .danceStyleId(danceStyleId)
@@ -251,7 +251,7 @@ public class LessonServiceTest {
 
     @Test
     public void deleteLessonById() {
-        //given
+        // given
         doNothing().when(lessonRepositoryMock).deleteById(id);
 
         // when
@@ -263,7 +263,7 @@ public class LessonServiceTest {
 
     @Test
     public void listLessons() {
-        //given
+        // given
         final List<LessonViewDto> lessonViewDtoListExpected = List.of(lessonViewDto);
         final List<LessonViewEntity> lessonViewEntities = List.of(lessonViewEntity);
 
@@ -273,9 +273,26 @@ public class LessonServiceTest {
         final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listLessons();
 
         // then
-        verify(lessonMapperImpl, times(1))
-                .lessonViewEntitiesToLessonViewDtoList(lessonViewEntities);
+        verify(lessonMapperImpl, times(1)).lessonViewEntitiesToLessonViewDtoList(lessonViewEntities);
         verify(lessonRepositoryMock, times(1)).findAllViews();
+        assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
+    }
+
+    @Test
+    public void listUserLessons() {
+        // given
+        final List<LessonViewDto> lessonViewDtoListExpected = List.of(lessonViewDto);
+        final List<LessonViewEntity> lessonViewEntities = List.of(lessonViewEntity);
+
+        final int userId = 1;
+        when(lessonRepositoryMock.findAllUserLessonViews(userId)).thenReturn(lessonViewEntities);
+
+        // when
+        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listUserLessons(userId);
+
+        // then
+        verify(lessonMapperImpl, times(1)).lessonViewEntitiesToLessonViewDtoList(lessonViewEntities);
+        verify(lessonRepositoryMock, times(1)).findAllUserLessonViews(userId);
         assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
     }
 

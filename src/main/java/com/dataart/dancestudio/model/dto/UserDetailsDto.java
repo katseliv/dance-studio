@@ -19,7 +19,6 @@ public class UserDetailsDto implements UserDetails {
     private final String email;
     private final List<Role> roles;
     private final String password;
-    private final String passwordConfirmation;
 
     public static UserDetailsDtoBuilder builder() {
         return new UserDetailsDtoBuilder();
@@ -61,7 +60,6 @@ public class UserDetailsDto implements UserDetails {
         private String email;
         private List<Role> roles;
         private String password;
-        private String passwordConfirmation;
 
         private boolean isUsed = false;
 
@@ -88,15 +86,10 @@ public class UserDetailsDto implements UserDetails {
             return this;
         }
 
-        public UserDetailsDtoBuilder passwordConfirmation(final String passwordConfirmation) {
-            this.passwordConfirmation = passwordConfirmation;
-            return this;
-        }
-
         public UserDetailsDto build() {
             if (!isUsed) {
                 isUsed = true;
-                return new UserDetailsDto(id, email, roles, password, passwordConfirmation);
+                return new UserDetailsDto(id, email, roles, password);
             }
             throw new RuntimeException("Builder already built");
         }
