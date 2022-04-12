@@ -104,23 +104,65 @@ public class LessonRepositoryImpl implements LessonRepository {
     }
 
     @Override
-    public List<LessonViewEntity> findAllViews() {
+    public List<LessonViewEntity> findAllViews(final String trainerName, final String danceStyleName, final String date,
+                                               final int limit, final long offset) {
         final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
-                "FROM dancestudio.lessons l " +
-                "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
-                "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
-                "WHERE l.is_deleted = FALSE";
-        return jdbcTemplate.query(sql, rowViewMapper);
+                buildSqlFilteredAllLessonsBody(trainerName, danceStyleName, date) +
+                "ORDER BY l.id DESC " +
+                "LIMIT ? " +
+                "OFFSET ?";
+
+        return jdbcTemplate.query(sql, rowViewMapper, trainerName, danceStyleName, date, limit, offset);
     }
 
     @Override
-    public List<LessonViewEntity> findAllUserLessonViews(final int userId) {
+    public List<LessonViewEntity> findAllUserLessonViews(final int limit, final long offset, final int userId) {
         final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
                 "FROM dancestudio.lessons l " +
                 "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
                 "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
-                "WHERE l.user_trainer_id = ? AND l.is_deleted = FALSE";
-        return jdbcTemplate.query(sql, rowViewMapper, userId);
+                "WHERE l.user_trainer_id = ? AND l.is_deleted = FALSE " +
+                "ORDER BY l.id DESC " +
+                "LIMIT ? " +
+                "OFFSET ?";
+        return jdbcTemplate.query(sql, rowViewMapper, userId, limit, offset);
     }
+
+    @Override
+    public Optional<Integer> amountOfAllLessons(final String trainerName, final String danceStyleName, final String date) {
+        final String sql = "SELECT COUNT(l.id) " + buildSqlFilteredAllLessonsBody(trainerName, danceStyleName, date);
+        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, Integer.class, trainerName, danceStyleName, date));
+    }
+
+    private String buildSqlFilteredAllLessonsBody(final String trainerName, final String danceStyle, final String date) {
+        final String sql =
+                "FROM dancestudio.lessons l " +
+                        "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
+                        "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
+                        "WHERE l.is_deleted = FALSE ";
+
+        final StringBuilder stringBuilder = new StringBuilder(sql);
+
+        if (trainerName != null) {
+            stringBuilder.append("AND u.first_name || ' ' || u.last_name ILIKE '%' || ? || '%' ");
+        } else {
+            stringBuilder.append("OR u.first_name || ' ' || u.last_name ILIKE '%' || ? || '%' ");
+        }
+
+        if (danceStyle != null) {
+            stringBuilder.append("AND ds.name ILIKE '%' || ? || '%' ");
+        } else {
+            stringBuilder.append("OR ds.name ILIKE '%' || ? || '%' ");
+        }
+
+        if (date != null) {
+            stringBuilder.append("AND CAST(l.start_datetime AS VARCHAR) LIKE '%' || ? || '%' ");
+        } else {
+            stringBuilder.append("OR CAST(l.start_datetime AS VARCHAR) LIKE '%' || ? || '%' ");
+        }
+
+        return stringBuilder.toString();
+    }
+
 
 }

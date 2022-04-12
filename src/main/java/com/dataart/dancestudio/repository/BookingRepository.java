@@ -8,10 +8,10 @@ import java.util.Optional;
 
 public interface BookingRepository extends Repository<BookingEntity> {
 
-    Optional<BookingViewEntity> findViewById(final int id);
+    Optional<BookingViewEntity> findViewById(int id);
 
     List<BookingViewEntity> findAllViews();
 
-    List<BookingViewEntity> findAllUserBookingViews(final int id);
+    List<BookingViewEntity> findAllUserBookingViews(int id);
 
 }
