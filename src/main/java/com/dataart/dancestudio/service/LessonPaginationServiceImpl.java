@@ -60,8 +60,8 @@ public class LessonPaginationServiceImpl implements LessonPaginationService {
 
         final int totalPages = (int) Math.ceil((double) totalAmount / pageSize);
         final int startPageNumber = getStartPageNumber(totalPages, pageNumber);
-        final int endPageNumber = Math.max(Math.min(pageNumber + buttonLimit / 2, totalPages), buttonLimit);
         final int additive = (pageNumber - 1) * pageSize + 1;
+        final int endPageNumber = Math.max(Math.min(pageNumber + buttonLimit / 2, totalPages), buttonLimit);
 
         return UserLessonViewListPage.builder()
                 .pageSize(pageSize)
