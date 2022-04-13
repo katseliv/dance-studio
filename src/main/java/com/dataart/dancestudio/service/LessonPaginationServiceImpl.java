@@ -49,6 +49,7 @@ public class LessonPaginationServiceImpl implements LessonPaginationService {
                 .totalPages(totalPages)
                 .additive(additive)
                 .startPageNumber(startPageNumber)
+                .currentPageNumber(pageNumber)
                 .endPageNumber(endPageNumber)
                 .lessonViewDtoList(lessonViewDtoList)
                 .build();
@@ -69,6 +70,7 @@ public class LessonPaginationServiceImpl implements LessonPaginationService {
                 .totalPages(totalPages)
                 .additive(additive)
                 .startPageNumber(startPageNumber)
+                .currentPageNumber(pageNumber)
                 .endPageNumber(endPageNumber)
                 .userLessonViewDtoList(lessonViewDtoList)
                 .build();

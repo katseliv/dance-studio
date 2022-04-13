@@ -14,6 +14,7 @@ public class UserLessonViewListPage {
     private final int totalPages;
     private final int additive;
     private final int startPageNumber;
+    private final int currentPageNumber;
     private final int endPageNumber;
     private final List<LessonViewDto> userLessonViewDtoList;
 
@@ -27,6 +28,7 @@ public class UserLessonViewListPage {
         private int totalPages;
         private int additive;
         private int startPageNumber;
+        private int currentPageNumber;
         private int endPageNumber;
         private List<LessonViewDto> userLessonViewDtoList;
 
@@ -55,6 +57,11 @@ public class UserLessonViewListPage {
             return this;
         }
 
+        public UserLessonViewListPageBuilder currentPageNumber(final int currentPageNumber) {
+            this.currentPageNumber = currentPageNumber;
+            return this;
+        }
+
         public UserLessonViewListPageBuilder endPageNumber(final int endPageNumber) {
             this.endPageNumber = endPageNumber;
             return this;
@@ -68,7 +75,7 @@ public class UserLessonViewListPage {
         public UserLessonViewListPage build() {
             if (!isUsed) {
                 isUsed = true;
-                return new UserLessonViewListPage(pageSize, totalPages, additive, startPageNumber, endPageNumber, userLessonViewDtoList);
+                return new UserLessonViewListPage(pageSize, totalPages, additive, startPageNumber, currentPageNumber, endPageNumber, userLessonViewDtoList);
             }
             throw new RuntimeException("Builder already built");
         }

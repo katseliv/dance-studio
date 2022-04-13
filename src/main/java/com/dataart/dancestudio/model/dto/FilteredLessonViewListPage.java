@@ -17,6 +17,7 @@ public class FilteredLessonViewListPage {
     private final int totalPages;
     private final int additive;
     private final int startPageNumber;
+    private final int currentPageNumber;
     private final int endPageNumber;
     private final List<LessonViewDto> lessonViewDtoList;
 
@@ -33,6 +34,7 @@ public class FilteredLessonViewListPage {
         private int totalPages;
         private int additive;
         private int startPageNumber;
+        private int currentPageNumber;
         private int endPageNumber;
         private List<LessonViewDto> lessonViewDtoList;
 
@@ -76,6 +78,11 @@ public class FilteredLessonViewListPage {
             return this;
         }
 
+        public FilteredLessonViewListPageBuilder currentPageNumber(final int currentPageNumber) {
+            this.currentPageNumber = currentPageNumber;
+            return this;
+        }
+
         public FilteredLessonViewListPageBuilder endPageNumber(final int endPageNumber) {
             this.endPageNumber = endPageNumber;
             return this;
@@ -89,7 +96,7 @@ public class FilteredLessonViewListPage {
         public FilteredLessonViewListPage build() {
             if (!isUsed) {
                 isUsed = true;
-                return new FilteredLessonViewListPage(trainerName, danceStyleName, date, pageSize, totalPages, additive, startPageNumber, endPageNumber, lessonViewDtoList);
+                return new FilteredLessonViewListPage(trainerName, danceStyleName, date, pageSize, totalPages, additive, startPageNumber, currentPageNumber, endPageNumber, lessonViewDtoList);
             }
             throw new RuntimeException("Builder already built");
         }
