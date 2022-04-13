@@ -16,11 +16,11 @@ public interface UserRepository extends Repository<UserEntity> {
         throw new NotImplementedYetException("Such method wasn't implemented");
     }
 
-    int save(final UserRegistrationEntity userRegistrationEntity);
+    int save(UserRegistrationEntity userRegistrationEntity);
 
-    Optional<UserDetailsEntity> findByEmail(final String email);
+    Optional<UserDetailsEntity> findByEmail(String email);
 
-    void updateWithoutPicture(final UserEntity userEntity, final int id);
+    void updateWithoutPicture(UserEntity userEntity, int id);
 
     List<UserEntity> findAllByRole(Role role);
 

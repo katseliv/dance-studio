@@ -1,6 +1,7 @@
 package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.exception.UserAlreadyExistsException;
+import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.mapper.UserMapper;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
@@ -24,13 +25,15 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final LessonService lessonService;
 
     @Autowired
     public UserServiceImpl(final PasswordEncoder passwordEncoder, final UserRepository userRepository,
-                           final UserMapper userMapper) {
+                           final UserMapper userMapper, final LessonService lessonService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.lessonService = lessonService;
     }
 
     @Override
@@ -77,8 +80,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUserById(final int id) {
-        userRepository.deleteById(id);
+    public void deleteUserById(final int id) throws UserCanNotBeDeletedException {
+        if (lessonService.numberOfUserLessons(id) == 0) {
+            userRepository.deleteById(id);
+        } else {
+            throw new UserCanNotBeDeletedException("User has lessons!!!");
+        }
     }
 
     @Override

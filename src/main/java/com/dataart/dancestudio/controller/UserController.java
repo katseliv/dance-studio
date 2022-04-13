@@ -1,12 +1,14 @@
 package com.dataart.dancestudio.controller;
 
 import com.dataart.dancestudio.exception.UserAlreadyExistsException;
+import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.service.BookingService;
 import com.dataart.dancestudio.service.UserService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.Objects;
 
+@Slf4j
 @Controller
 @RequestMapping("/users")
 public class UserController {
@@ -106,7 +109,12 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable final int id) {
-        userService.deleteUserById(id);
+        try {
+            userService.deleteUserById(id);
+        } catch (final UserCanNotBeDeletedException e) {
+            log.warn(e.getMessage());
+            throw new RuntimeException(e);
+        }
         return "redirect:/users";
     }
 

@@ -17,8 +17,12 @@ public interface LessonService {
 
     void deleteLessonById(int id);
 
-    List<LessonViewDto> listLessons();
+    List<LessonViewDto> listLessons(String trainerName, String danceStyleName, String date, int limit, int offset);
 
-    List<LessonViewDto> listUserLessons(int userId);
+    List<LessonViewDto> listUserLessons(int userId, int limit, int offset);
+
+    int numberOfFilteredLessons(String trainerName, String danceStyleName, String date);
+
+    int numberOfUserLessons(int userId);
 
 }

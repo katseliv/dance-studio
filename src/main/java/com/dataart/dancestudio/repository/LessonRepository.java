@@ -8,10 +8,14 @@ import java.util.Optional;
 
 public interface LessonRepository extends Repository<LessonEntity> {
 
-    Optional<LessonViewEntity> findViewById(final int id);
+    Optional<LessonViewEntity> findViewById(int id);
 
-    List<LessonViewEntity> findAllViews();
+    List<LessonViewEntity> findAllViews(String trainerName, String danceStyleName, String date, int limit, long offset);
 
-    List<LessonViewEntity> findAllUserLessonViews(final int userId);
+    List<LessonViewEntity> findAllUserLessonViews(int userId, int limit, long offset);
+
+    Optional<Integer> numberOfFilteredLessons(String trainerName, String danceStyleName, String date);
+
+    Optional<Integer> numberOfUserLessons(int userId);
 
 }

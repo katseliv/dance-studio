@@ -50,13 +50,23 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public List<LessonViewDto> listLessons() {
-        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllViews());
+    public List<LessonViewDto> listLessons(final String trainerName, final String danceStyleName, final String date, final int limit, final int offset) {
+        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllViews(trainerName, danceStyleName, date, limit, offset));
     }
 
     @Override
-    public List<LessonViewDto> listUserLessons(final int userId) {
-        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllUserLessonViews(userId));
+    public List<LessonViewDto> listUserLessons(final int userId, final int limit, final int offset) {
+        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllUserLessonViews(userId, limit, offset));
+    }
+
+    @Override
+    public int numberOfFilteredLessons(final String trainerName, final String danceStyleName, final String date) {
+        return lessonRepository.numberOfFilteredLessons(trainerName, danceStyleName, date).orElseThrow();
+    }
+
+    @Override
+    public int numberOfUserLessons(final int userId) {
+        return lessonRepository.numberOfUserLessons(userId).orElseThrow();
     }
 
 }

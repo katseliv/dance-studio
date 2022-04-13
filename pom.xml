@@ -21,6 +21,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <version>2.6.5</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <version>2.6.3</version>
+        </dependency>
 
         <!--        db        -->
         <dependency>
@@ -103,13 +108,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.3.1</version>
+            <version>4.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>2.28.2</version>
+            <version>4.4.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
