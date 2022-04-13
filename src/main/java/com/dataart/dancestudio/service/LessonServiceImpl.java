@@ -5,9 +5,6 @@ import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.repository.LessonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,21 +50,23 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public Page<LessonViewDto> listLessons(final String trainerName, final String danceStyleName, final String date,
-                                           final Pageable pageable) {
-        final List<LessonViewDto> lessonViewDtoList = lessonMapper.lessonViewEntitiesToLessonViewDtoList(
-                lessonRepository.findAllViews(trainerName, danceStyleName, date, pageable.getPageSize(), pageable.getOffset()));
-        return new PageImpl<>(lessonViewDtoList, pageable, lessonRepository.amountOfAllLessons(trainerName, danceStyleName,
-                date).orElseThrow());
+    public List<LessonViewDto> listLessons(final String trainerName, final String danceStyleName, final String date, final int limit, final int offset) {
+        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllViews(trainerName, danceStyleName, date, limit, offset));
     }
 
     @Override
-    public Page<LessonViewDto> listUserLessons(final String trainerName, final String danceStyleName, final String date,
-                                               final Pageable pageable, final int userId) {
-        final List<LessonViewDto> lessonViewDtoList = lessonMapper.lessonViewEntitiesToLessonViewDtoList(
-                lessonRepository.findAllUserLessonViews(pageable.getPageSize(), pageable.getOffset(), userId));
-        return new PageImpl<>(lessonViewDtoList, pageable, lessonRepository.amountOfAllLessons(trainerName, danceStyleName,
-                date).orElseThrow());
+    public List<LessonViewDto> listUserLessons(final int userId, final int limit, final int offset) {
+        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllUserLessonViews(userId, limit, offset));
+    }
+
+    @Override
+    public int numberOfFilteredLessons(final String trainerName, final String danceStyleName, final String date) {
+        return lessonRepository.numberOfFilteredLessons(trainerName, danceStyleName, date).orElseThrow();
+    }
+
+    @Override
+    public int numberOfUserLessons(final int userId) {
+        return lessonRepository.numberOfUserLessons(userId).orElseThrow();
     }
 
 }

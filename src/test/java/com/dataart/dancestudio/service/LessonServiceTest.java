@@ -264,58 +264,58 @@ public class LessonServiceTest {
         verify(lessonRepositoryMock, times(1)).deleteById(id);
     }
 
-    @Test
-    public void listLessons() {
-        // given
-        final int pageNumber = 1;
-        final int pageSize = 5;
-        final PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
-
-        final String trainerName = "";
-        final String danceStyleName = "";
-        final String date = "";
-        final int amountOfLessons = 1;
-        final Page<LessonViewDto> lessonViewDtoListExpected = new PageImpl<>(List.of(lessonViewDto), pageRequest, amountOfLessons);
-        final List<LessonViewEntity> lessonViewEntities = List.of(lessonViewEntity);
-
-
-        when(lessonRepositoryMock.findAllViews(trainerName, danceStyleName, date, pageRequest.getPageSize(), pageRequest.getOffset())).thenReturn(lessonViewEntities);
-        when(lessonRepositoryMock.amountOfAllLessons(trainerName, danceStyleName, date)).thenReturn(Optional.of(amountOfLessons));
-
-        // when
-        final Page<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listLessons(trainerName, danceStyleName, date, pageRequest);
-
-        // then
-        verify(lessonMapperImpl, times(1)).lessonViewEntitiesToLessonViewDtoList(lessonViewEntities);
-        verify(lessonRepositoryMock, times(1)).findAllViews(trainerName, danceStyleName, date, pageRequest.getPageSize(), pageRequest.getOffset());
-        assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
-    }
-
-    @Test
-    public void listUserLessons() {
-        // given
-        final int pageNumber = 1;
-        final int pageSize = 5;
-        final PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
-
-        final int amountOfLessons = 1;
-        final Page<LessonViewDto> lessonViewDtoListExpected = new PageImpl<>(List.of(lessonViewDto), pageRequest, amountOfLessons);
-        final List<LessonViewEntity> lessonViewEntities = List.of(lessonViewEntity);
-
-        final String trainerName = "";
-        final String danceStyleName = "";
-        final String date = "";
-        final int userId = 1;
-        when(lessonRepositoryMock.findAllUserLessonViews(pageRequest.getPageSize(), pageRequest.getOffset(), userId)).thenReturn(lessonViewEntities);
-        when(lessonRepositoryMock.amountOfAllLessons(trainerName, danceStyleName, date)).thenReturn(Optional.of(amountOfLessons));
-
-        // when
-        final Page<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listUserLessons(trainerName, danceStyleName, date, pageRequest, userId);
-
-        // then
-        verify(lessonMapperImpl, times(1)).lessonViewEntitiesToLessonViewDtoList(lessonViewEntities);
-        verify(lessonRepositoryMock, times(1)).findAllUserLessonViews(pageRequest.getPageSize(), pageRequest.getOffset(), userId);
-        assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
-    }
+//    @Test
+//    public void listLessons() {
+//        // given
+//        final int pageNumber = 1;
+//        final int pageSize = 5;
+//        final PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
+//
+//        final String trainerName = "";
+//        final String danceStyleName = "";
+//        final String date = "";
+//        final int amountOfLessons = 1;
+//        final Page<LessonViewDto> lessonViewDtoListExpected = new PageImpl<>(List.of(lessonViewDto), pageRequest, amountOfLessons);
+//        final List<LessonViewEntity> lessonViewEntities = List.of(lessonViewEntity);
+//
+//
+//        when(lessonRepositoryMock.findAllViews(trainerName, danceStyleName, date, pageRequest.getPageSize(), pageRequest.getOffset())).thenReturn(lessonViewEntities);
+//        when(lessonRepositoryMock.amountOfAllLessons(trainerName, danceStyleName, date)).thenReturn(Optional.of(amountOfLessons));
+//
+//        // when
+//        final Page<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listLessons(trainerName, danceStyleName, date, pageRequest);
+//
+//        // then
+//        verify(lessonMapperImpl, times(1)).lessonViewEntitiesToLessonViewDtoList(lessonViewEntities);
+//        verify(lessonRepositoryMock, times(1)).findAllViews(trainerName, danceStyleName, date, pageRequest.getPageSize(), pageRequest.getOffset());
+//        assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
+//    }
+//
+//    @Test
+//    public void listUserLessons() {
+//        // given
+//        final int pageNumber = 1;
+//        final int pageSize = 5;
+//        final PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
+//
+//        final int amountOfLessons = 1;
+//        final Page<LessonViewDto> lessonViewDtoListExpected = new PageImpl<>(List.of(lessonViewDto), pageRequest, amountOfLessons);
+//        final List<LessonViewEntity> lessonViewEntities = List.of(lessonViewEntity);
+//
+//        final String trainerName = "";
+//        final String danceStyleName = "";
+//        final String date = "";
+//        final int userId = 1;
+//        when(lessonRepositoryMock.findAllUserLessonViews(pageRequest.getPageSize(), pageRequest.getOffset(), userId)).thenReturn(lessonViewEntities);
+//        when(lessonRepositoryMock.amountOfAllLessons(trainerName, danceStyleName, date)).thenReturn(Optional.of(amountOfLessons));
+//
+//        // when
+//        final Page<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listUserLessons(trainerName, danceStyleName, date, pageRequest, userId);
+//
+//        // then
+//        verify(lessonMapperImpl, times(1)).lessonViewEntitiesToLessonViewDtoList(lessonViewEntities);
+//        verify(lessonRepositoryMock, times(1)).findAllUserLessonViews(pageRequest.getPageSize(), pageRequest.getOffset(), userId);
+//        assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
+//    }
 
 }

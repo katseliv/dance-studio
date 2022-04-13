@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -27,8 +27,9 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="lesson, iter : ${lessons}">
-            <th scope="row"><a th:href="@{/lessons/__${lesson.id}__}" th:text="${iter.index + additive}"></a></th>
+        <tr th:each="lesson, iter : ${lessonPage.lessonViewDtoList}">
+            <th scope="row"><a th:href="@{/lessons/__${lesson.id}__}" th:text="${iter.index + lessonPage.additive}"></a>
+            </th>
             <td th:text="${lesson.trainerFirstName}"></td>
             <td th:text="${lesson.trainerLastName}"></td>
             <td th:text="${lesson.danceStyleName}"></td>
@@ -44,27 +45,64 @@
         </tbody>
     </table>
     <nav aria-label="Page navigation example">
-        <ul class="pagination" th:if="${endPageNumber > 0}">
+        <ul class="pagination" th:if="${lessonPage.endPageNumber > 0}">
             <li class="page-item">
                 <a class="page-link"
-                   th:href="@{/lessons(page=${startPageNumber - 1}, size=${pageSize}, trainerName=${trainerName}, styleName=${styleName}, date=${date})}"
+                   th:href="@{/lessons(page=${1}, size=${lessonPage.pageSize}, trainerName=${lessonPage.trainerName}, styleName=${lessonPage.danceStyleName}, date=${lessonPage.date})}"
                    aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
-            <li class="page-item" th:each="pageNumber : ${#numbers.sequence(startPageNumber, endPageNumber, 1)}">
-                <a class="page-link" th:if="${pageNumber} <= ${totalPages}"
-                   th:href="@{/lessons(page=${pageNumber}, size=${pageSize}, trainerName=${trainerName}, styleName=${styleName}, date=${date})}"
+            <li class="page-item"
+                th:each="pageNumber : ${#numbers.sequence(lessonPage.startPageNumber, lessonPage.endPageNumber, 1)}">
+                <a class="page-link" th:if="${pageNumber} <= ${lessonPage.totalPages}"
+                   th:href="@{/lessons(page=${pageNumber}, size=${lessonPage.pageSize}, trainerName=${lessonPage.trainerName}, styleName=${lessonPage.danceStyleName}, date=${lessonPage.date})}"
                    th:text="${pageNumber}"></a>
             </li>
             <li class="page-item">
-                <a class="page-link" th:href="@{/lessons(page=${endPageNumber}, size=${pageSize}, trainerName=${trainerName}, styleName=${styleName}, date=${date})}"
+                <a class="page-link"
+                   th:href="@{/lessons(page=${lessonPage.endPageNumber}, size=${lessonPage.pageSize}, trainerName=${lessonPage.trainerName}, styleName=${lessonPage.danceStyleName}, date=${lessonPage.date})}"
                    aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
         </ul>
     </nav>
+    <div class="row">
+        <div class="col" sec:authorize="hasRole('TRAINER')">
+            <form th:action="@{/lessons/create}">
+                <button type="submit" class="btn btn-outline-success">Create new lesson</button>
+            </form>
+        </div>
+        <div class="col d-flex">
+            <form class="d-flex" th:action="@{/lessons}" th:method="get">
+                <input th:name="page" th:value="${lessonPage.startPageNumber}" class="form-control me-2" type="hidden"
+                       placeholder="Page" aria-label="Search">
+                <input th:name="size" th:value="${lessonPage.pageSize}" class="form-control me-2" type="hidden"
+                       placeholder="Size" aria-label="Search">
+                <input th:name="trainerName" th:value="${lessonPage.trainerName}" class="form-control me-2"
+                       type="search"
+                       placeholder="Trainer" aria-label="Search">
+                <select th:name="styleName" class="form-select me-2" aria-label="Search" id="danceStyleId">
+                    <option th:value="''" selected>Style</option>
+                    <option th:each="style : ${styles}" th:value="${style.name}"
+                            th:text="${style.name}" th:selected="${style.name == lessonPage.danceStyleName}">
+                    </option>
+                </select>
+                <input th:name="date" th:value="${lessonPage.date}" class="form-control me-2" type="date"
+                       aria-label="Date">
+                <button class="btn btn-outline-success me-2" type="submit">Apply</button>
+                <button class="btn btn-outline-secondary me-2" th:type="reset">Clear</button>
+            </form>
+            <form class="d-flex" th:action="@{/lessons}" th:method="get">
+                <input th:name="page" th:value="${lessonPage.startPageNumber}" class="form-control me-2" type="hidden"
+                       placeholder="Page" aria-label="Search">
+                <input th:name="size" th:value="${lessonPage.pageSize}" class="form-control me-2" type="hidden"
+                       placeholder="Size" aria-label="Search">
+                <button class="btn btn-outline-secondary" type="submit">Reset</button>
+            </form>
+        </div>
+    </div>
 </div>
 </body>
 <script>

@@ -116,7 +116,7 @@ public class LessonRepositoryImpl implements LessonRepository {
     }
 
     @Override
-    public List<LessonViewEntity> findAllUserLessonViews(final int limit, final long offset, final int userId) {
+    public List<LessonViewEntity> findAllUserLessonViews(final int userId, final int limit, final long offset) {
         final String sql = "SELECT l.id, u.first_name, u.last_name, ds.name, l.start_datetime " +
                 "FROM dancestudio.lessons l " +
                 "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
@@ -129,9 +129,19 @@ public class LessonRepositoryImpl implements LessonRepository {
     }
 
     @Override
-    public Optional<Integer> amountOfAllLessons(final String trainerName, final String danceStyleName, final String date) {
+    public Optional<Integer> numberOfFilteredLessons(final String trainerName, final String danceStyleName, final String date) {
         final String sql = "SELECT COUNT(l.id) " + buildSqlFilteredAllLessonsBody(trainerName, danceStyleName, date);
         return Optional.ofNullable(jdbcTemplate.queryForObject(sql, Integer.class, trainerName, danceStyleName, date));
+    }
+
+    @Override
+    public Optional<Integer> numberOfUserLessons(final int userId) {
+        final String sql = "SELECT COUNT(l.id) " +
+                "FROM dancestudio.lessons l " +
+                "JOIN dancestudio.users u ON u.id = l.user_trainer_id " +
+                "JOIN dancestudio.dance_styles ds ON ds.id = l.dance_style_id " +
+                "WHERE l.user_trainer_id = ? AND l.is_deleted = FALSE";
+        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, Integer.class, userId));
     }
 
     private String buildSqlFilteredAllLessonsBody(final String trainerName, final String danceStyle, final String date) {

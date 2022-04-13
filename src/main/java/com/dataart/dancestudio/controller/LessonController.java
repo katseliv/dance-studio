@@ -1,17 +1,15 @@
 package com.dataart.dancestudio.controller;
 
 import com.dataart.dancestudio.model.dto.BookingDto;
+import com.dataart.dancestudio.model.dto.FilteredLessonViewListPage;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.DanceStyleViewDto;
-import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.dto.view.RoomViewDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.service.*;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,18 +24,18 @@ public class LessonController {
     private final UserService userService;
     private final DanceStyleService danceStyleService;
     private final RoomService roomService;
-    private final PaginationService paginationService;
+    private final LessonPaginationService lessonPaginationService;
     private final SecurityContextFacade securityContextFacade;
 
     @Autowired
     public LessonController(final LessonService lessonService, final UserService userService,
                             final DanceStyleService danceStyleService, final RoomService roomService,
-                            final PaginationService paginationService, final SecurityContextFacade securityContextFacade) {
+                            final LessonPaginationService lessonPaginationService, final SecurityContextFacade securityContextFacade) {
         this.lessonService = lessonService;
         this.userService = userService;
         this.danceStyleService = danceStyleService;
         this.roomService = roomService;
-        this.paginationService = paginationService;
+        this.lessonPaginationService = lessonPaginationService;
         this.securityContextFacade = securityContextFacade;
     }
 
@@ -87,15 +85,16 @@ public class LessonController {
                              @RequestParam(name = "trainerName", required = false) final String trainerName,
                              @RequestParam(name = "styleName", required = false) final String styleName,
                              @RequestParam(name = "date", required = false) final String date, final Model model) {
-        final PageRequest pageRequest = paginationService.initPageRequest(page, size);
-        final Page<LessonViewDto> lessonViewDtoPage = lessonService.listLessons(trainerName, styleName, date, pageRequest);
-        prepareModel(model);
-        prepareModelForLessons(trainerName, styleName, date, pageRequest.getPageNumber(), pageRequest.getPageSize(), lessonViewDtoPage, model);
+        final FilteredLessonViewListPage filteredLessonViewListPage = lessonPaginationService.getFilteredLessonViewListPage(page, size, trainerName, styleName, date);
 
-        if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.USER)) {
-            return "lists/user_lesson_list";
+        model.addAttribute("lessonPage", filteredLessonViewListPage);
+        model.addAttribute("booking", BookingDto.builder().build());
+        model.addAttribute("styles", danceStyleService.listDanceStyleViews());
+
+        if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.ADMIN)) {
+            return "lists/admin_lesson_list";
         } else {
-            return "lists/lesson_list";
+            return "lists/user_lesson_list";
         }
     }
 
@@ -106,33 +105,6 @@ public class LessonController {
         model.addAttribute("trainers", users);
         model.addAttribute("styles", styles);
         model.addAttribute("rooms", rooms);
-    }
-
-    private void prepareModelForLessons(final String trainerName, final String styleName, final String date,
-                                        final Integer pageNumber, final Integer pageSize,
-                                        final Page<LessonViewDto> lessonViewDtoPage, final Model model) {
-        final int buttonLimit = 5;
-        int totalPages = lessonViewDtoPage.getTotalPages();
-        int endPageNumber = pageNumber + buttonLimit;
-        if (endPageNumber > totalPages) {
-            endPageNumber = totalPages;
-        }
-
-        if (totalPages < 0) {
-            totalPages = 1;
-            endPageNumber = 1;
-        }
-
-        model.addAttribute("trainerName", trainerName);
-        model.addAttribute("styleName", styleName);
-        model.addAttribute("date", date);
-        model.addAttribute("startPageNumber", pageNumber);
-        model.addAttribute("endPageNumber", endPageNumber);
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("pageSize", pageSize);
-        model.addAttribute("additive", (pageNumber - 1) * pageSize + 1);
-        model.addAttribute("booking", BookingDto.builder().build());
-        model.addAttribute("lessons", lessonViewDtoPage.getContent());
     }
 
 }

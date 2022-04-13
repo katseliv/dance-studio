@@ -2,8 +2,8 @@ package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface LessonService {
 
@@ -17,8 +17,12 @@ public interface LessonService {
 
     void deleteLessonById(int id);
 
-    Page<LessonViewDto> listLessons(String trainerName, String danceStyleName, String date, Pageable pageable);
+    List<LessonViewDto> listLessons(String trainerName, String danceStyleName, String date, int limit, int offset);
 
-    Page<LessonViewDto> listUserLessons(String trainerName, String danceStyleName, String date, Pageable pageable, int userId);
+    List<LessonViewDto> listUserLessons(int userId, int limit, int offset);
+
+    int numberOfFilteredLessons(String trainerName, String danceStyleName, String date);
+
+    int numberOfUserLessons(int userId);
 
 }

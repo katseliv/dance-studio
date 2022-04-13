@@ -12,8 +12,10 @@ public interface LessonRepository extends Repository<LessonEntity> {
 
     List<LessonViewEntity> findAllViews(String trainerName, String danceStyleName, String date, int limit, long offset);
 
-    List<LessonViewEntity> findAllUserLessonViews(int limit, long offset, int userId);
+    List<LessonViewEntity> findAllUserLessonViews(int userId, int limit, long offset);
 
-    Optional<Integer> amountOfAllLessons(String trainerName, String danceStyleName, String date);
+    Optional<Integer> numberOfFilteredLessons(String trainerName, String danceStyleName, String date);
+
+    Optional<Integer> numberOfUserLessons(int userId);
 
 }
