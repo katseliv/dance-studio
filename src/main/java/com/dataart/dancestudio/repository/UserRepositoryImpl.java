@@ -112,7 +112,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void deleteById(final int id) {
+    public void markAsDeleted(final int id) {
         final String sql = "UPDATE dancestudio.users SET is_deleted = ? WHERE id = ?";
         jdbcTemplate.update(sql, true, id);
     }

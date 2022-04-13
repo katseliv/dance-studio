@@ -510,14 +510,14 @@ public class UserServiceTest {
     @Test
     public void deleteUserById() throws UserCanNotBeDeletedException {
         // given
-        doNothing().when(userRepositoryMock).deleteById(id);
+        doNothing().when(userRepositoryMock).markAsDeleted(id);
         when(lessonServiceMock.numberOfUserLessons(id)).thenReturn(0);
 
         // when
         userServiceImpl.deleteUserById(id);
 
         // then
-        verify(userRepositoryMock, times(1)).deleteById(id);
+        verify(userRepositoryMock, times(1)).markAsDeleted(id);
     }
 
     @Test
@@ -527,7 +527,7 @@ public class UserServiceTest {
         assertThrows(UserCanNotBeDeletedException.class, () -> userServiceImpl.deleteUserById(id));
 
         // then
-        verify(userRepositoryMock, never()).deleteById(id);
+        verify(userRepositoryMock, never()).markAsDeleted(id);
     }
 
     @Test

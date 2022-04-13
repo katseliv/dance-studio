@@ -252,13 +252,13 @@ public class LessonServiceTest {
     @Test
     public void deleteLessonById() {
         // given
-        doNothing().when(lessonRepositoryMock).deleteById(id);
+        doNothing().when(lessonRepositoryMock).markAsDeleted(id);
 
         // when
         lessonServiceImpl.deleteLessonById(id);
 
         // then
-        verify(lessonRepositoryMock, times(1)).deleteById(id);
+        verify(lessonRepositoryMock, times(1)).markAsDeleted(id);
     }
 
     @Test
