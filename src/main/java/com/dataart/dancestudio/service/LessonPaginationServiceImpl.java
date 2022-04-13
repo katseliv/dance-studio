@@ -6,9 +6,6 @@ import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,11 +15,6 @@ public class LessonPaginationServiceImpl implements LessonPaginationService {
     private static final int defaultPageNumber = 1;
     private static final int defaultPageSize = 5;
     private static final int buttonLimit = 5;
-
-    private int totalPages;
-    private int additive;
-    private int startPageNumber;
-    private int endPageNumber;
 
     private final LessonService lessonService;
 
@@ -37,9 +29,12 @@ public class LessonPaginationServiceImpl implements LessonPaginationService {
         final Integer pageSize = Optional.ofNullable(size).orElse(defaultPageSize);
 
         final List<LessonViewDto> lessonViewDtoList = lessonService.listLessons(trainerName, danceStyleName, date, pageSize, (pageNumber - 1) * pageSize);
-
         final int totalAmount = lessonService.numberOfFilteredLessons(trainerName, danceStyleName, date);
-        configurePagination(totalAmount, pageSize, pageNumber);
+
+        final int totalPages = (int) Math.ceil((double) totalAmount / pageSize);
+        final int startPageNumber = getStartPageNumber(totalPages, pageNumber);
+        final int endPageNumber = Math.max(Math.min(pageNumber + buttonLimit / 2, totalPages), buttonLimit);
+        final int additive = (pageNumber - 1) * pageSize + 1;
 
         return FilteredLessonViewListPage.builder()
                 .trainerName(trainerName)
@@ -63,7 +58,10 @@ public class LessonPaginationServiceImpl implements LessonPaginationService {
         final List<LessonViewDto> lessonViewDtoList = lessonService.listUserLessons(id, pageSize, (pageNumber - 1) * pageSize);
         final int totalAmount = lessonService.numberOfUserLessons(id);
 
-        configurePagination(totalAmount, pageSize, pageNumber);
+        final int totalPages = (int) Math.ceil((double) totalAmount / pageSize);
+        final int startPageNumber = getStartPageNumber(totalPages, pageNumber);
+        final int endPageNumber = Math.max(Math.min(pageNumber + buttonLimit / 2, totalPages), buttonLimit);
+        final int additive = (pageNumber - 1) * pageSize + 1;
 
         return UserLessonViewListPage.builder()
                 .pageSize(pageSize)
@@ -76,20 +74,14 @@ public class LessonPaginationServiceImpl implements LessonPaginationService {
                 .build();
     }
 
-    private void configurePagination(final int totalAmount, final int pageSize, final int pageNumber) {
-        final MathContext context = new MathContext(1, RoundingMode.UP);
-        final BigDecimal calculatedTotalPages = new BigDecimal((double) totalAmount / pageSize, context);
-        this.totalPages = calculatedTotalPages.intValue();
-
+    private int getStartPageNumber(final int totalPages, final int pageNumber) {
         if (totalPages <= buttonLimit) {
-            this.startPageNumber = 1;
+            return 1;
         } else if (pageNumber > totalPages - buttonLimit / 2) {
-            this.startPageNumber = totalPages - buttonLimit + 1;
+            return totalPages - buttonLimit + 1;
         } else {
-            this.startPageNumber = Math.max(pageNumber - buttonLimit / 2, 1);
+            return Math.max(pageNumber - buttonLimit / 2, 1);
         }
-
-        this.endPageNumber = Math.max(Math.min(pageNumber + buttonLimit / 2, totalPages), buttonLimit);
-        this.additive = (pageNumber - 1) * pageSize + 1;
     }
+
 }
