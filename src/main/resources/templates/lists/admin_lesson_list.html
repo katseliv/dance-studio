@@ -80,7 +80,7 @@
         </div>
         <div class="col d-flex">
             <form class="d-flex" th:action="@{/lessons}" th:method="get">
-                <input th:name="page" th:value="${lessonPage.startPageNumber}" class="form-control me-2" type="hidden"
+                <input th:name="page" th:value="${1}" class="form-control me-2" type="hidden"
                        placeholder="Page" aria-label="Search">
                 <input th:name="size" th:value="${lessonPage.pageSize}" class="form-control me-2" type="hidden"
                        placeholder="Size" aria-label="Search">
@@ -96,7 +96,6 @@
                 <input th:name="date" th:value="${lessonPage.date}" class="form-control me-2" type="date"
                        aria-label="Date">
                 <button class="btn btn-outline-success me-2" type="submit">Apply</button>
-                <button class="btn btn-outline-secondary me-2" th:type="reset">Clear</button>
             </form>
             <form class="d-flex" th:action="@{/lessons}" th:method="get">
                 <input th:name="page" th:value="${lessonPage.startPageNumber}" class="form-control me-2" type="hidden"

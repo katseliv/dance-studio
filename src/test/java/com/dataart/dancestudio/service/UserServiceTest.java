@@ -1,6 +1,7 @@
 package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.exception.UserAlreadyExistsException;
+import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.mapper.UserMapperImpl;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
@@ -44,6 +45,9 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepositoryMock;
+
+    @Mock
+    private LessonService lessonServiceMock;
 
     @InjectMocks
     private UserServiceImpl userServiceImpl;
@@ -501,19 +505,29 @@ public class UserServiceTest {
         verify(userRepositoryMock, never()).update(newUserEntity, id);
         verify(userRepositoryMock, never()).updateWithoutPicture(newUserEntity, id);
         verify(userMapperImpl, never()).userDtoToUserEntity(userDto);
-
     }
 
     @Test
-    public void deleteUserById() {
+    public void deleteUserById() throws UserCanNotBeDeletedException {
         // given
         doNothing().when(userRepositoryMock).deleteById(id);
+        when(lessonServiceMock.numberOfUserLessons(id)).thenReturn(0);
 
         // when
         userServiceImpl.deleteUserById(id);
 
         // then
         verify(userRepositoryMock, times(1)).deleteById(id);
+    }
+
+    @Test
+    public void deleteUserByIdWhenUserHasLessons() {
+        // when
+        when(lessonServiceMock.numberOfUserLessons(id)).thenReturn(1);
+        assertThrows(UserCanNotBeDeletedException.class, () -> userServiceImpl.deleteUserById(id));
+
+        // then
+        verify(userRepositoryMock, never()).deleteById(id);
     }
 
     @Test

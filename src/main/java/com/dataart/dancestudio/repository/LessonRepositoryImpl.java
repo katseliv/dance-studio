@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 import java.sql.PreparedStatement;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Component
 public class LessonRepositoryImpl implements LessonRepository {
@@ -112,7 +114,10 @@ public class LessonRepositoryImpl implements LessonRepository {
                 "LIMIT ? " +
                 "OFFSET ?";
 
-        return jdbcTemplate.query(sql, rowViewMapper, trainerName, danceStyleName, date, limit, offset);
+        final Object[] objects = Stream.of(trainerName, danceStyleName, date, limit, offset)
+                .filter(Objects::nonNull)
+                .toArray();
+        return jdbcTemplate.query(sql, rowViewMapper, objects);
     }
 
     @Override
@@ -131,7 +136,11 @@ public class LessonRepositoryImpl implements LessonRepository {
     @Override
     public Optional<Integer> numberOfFilteredLessons(final String trainerName, final String danceStyleName, final String date) {
         final String sql = "SELECT COUNT(l.id) " + buildSqlFilteredAllLessonsBody(trainerName, danceStyleName, date);
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, Integer.class, trainerName, danceStyleName, date));
+
+        final Object[] objects = Stream.of(trainerName, danceStyleName, date)
+                .filter(Objects::nonNull)
+                .toArray();
+        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, Integer.class, objects));
     }
 
     @Override
@@ -155,20 +164,14 @@ public class LessonRepositoryImpl implements LessonRepository {
 
         if (trainerName != null) {
             stringBuilder.append("AND u.first_name || ' ' || u.last_name ILIKE '%' || ? || '%' ");
-        } else {
-            stringBuilder.append("OR u.first_name || ' ' || u.last_name ILIKE '%' || ? || '%' ");
         }
 
         if (danceStyle != null) {
             stringBuilder.append("AND ds.name ILIKE '%' || ? || '%' ");
-        } else {
-            stringBuilder.append("OR ds.name ILIKE '%' || ? || '%' ");
         }
 
         if (date != null) {
             stringBuilder.append("AND CAST(l.start_datetime AS VARCHAR) LIKE '%' || ? || '%' ");
-        } else {
-            stringBuilder.append("OR CAST(l.start_datetime AS VARCHAR) LIKE '%' || ? || '%' ");
         }
 
         return stringBuilder.toString();

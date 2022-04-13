@@ -24,11 +24,14 @@ public class LessonPaginationServiceImpl implements LessonPaginationService {
     }
 
     @Override
-    public FilteredLessonViewListPage getFilteredLessonViewListPage(final Integer page, final Integer size, final String trainerName, final String danceStyleName, final String date) {
-        final Integer pageNumber = Optional.ofNullable(page).orElse(defaultPageNumber);
-        final Integer pageSize = Optional.ofNullable(size).orElse(defaultPageSize);
+    public FilteredLessonViewListPage getFilteredLessonViewListPage(final Integer page, final Integer size,
+                                                                    final String trainerName, final String danceStyleName,
+                                                                    final String date) {
+        final int pageNumber = Optional.ofNullable(page).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(size).orElse(defaultPageSize);
 
-        final List<LessonViewDto> lessonViewDtoList = lessonService.listLessons(trainerName, danceStyleName, date, pageSize, (pageNumber - 1) * pageSize);
+        final List<LessonViewDto> lessonViewDtoList = lessonService.listLessons(
+                trainerName, danceStyleName, date, pageSize, (pageNumber - 1) * pageSize);
         final int totalAmount = lessonService.numberOfFilteredLessons(trainerName, danceStyleName, date);
 
         final int totalPages = (int) Math.ceil((double) totalAmount / pageSize);
@@ -52,10 +55,11 @@ public class LessonPaginationServiceImpl implements LessonPaginationService {
 
     @Override
     public UserLessonViewListPage getUserLessonViewListPage(final Integer id, final Integer page, final Integer size) {
-        final Integer pageNumber = Optional.ofNullable(page).orElse(defaultPageNumber);
-        final Integer pageSize = Optional.ofNullable(size).orElse(defaultPageSize);
+        final int pageNumber = Optional.ofNullable(page).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(size).orElse(defaultPageSize);
 
-        final List<LessonViewDto> lessonViewDtoList = lessonService.listUserLessons(id, pageSize, (pageNumber - 1) * pageSize);
+        final List<LessonViewDto> lessonViewDtoList = lessonService.listUserLessons(
+                id, pageSize, (pageNumber - 1) * pageSize);
         final int totalAmount = lessonService.numberOfUserLessons(id);
 
         final int totalPages = (int) Math.ceil((double) totalAmount / pageSize);
