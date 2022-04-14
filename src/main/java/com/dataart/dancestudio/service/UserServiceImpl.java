@@ -82,6 +82,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public void deleteUserById(final int id) throws UserCanNotBeDeletedException {
         if (lessonService.numberOfUserLessons(id) == 0) {

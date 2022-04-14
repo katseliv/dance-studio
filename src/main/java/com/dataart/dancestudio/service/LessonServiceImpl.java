@@ -4,26 +4,39 @@ import com.dataart.dancestudio.mapper.LessonMapper;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.repository.LessonRepository;
+import com.dataart.dancestudio.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class LessonServiceImpl implements LessonService {
 
+    private final UserRepository userRepository;
     private final LessonRepository lessonRepository;
     private final LessonMapper lessonMapper;
 
     @Autowired
-    public LessonServiceImpl(final LessonRepository lessonRepository, final LessonMapper lessonMapper) {
+    public LessonServiceImpl(final UserRepository userRepository, final LessonRepository lessonRepository, final LessonMapper lessonMapper) {
+        this.userRepository = userRepository;
         this.lessonRepository = lessonRepository;
         this.lessonMapper = lessonMapper;
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public int createLesson(final LessonDto lessonDto) {
-        return lessonRepository.save(lessonMapper.lessonDtoToLessonEntity(lessonDto));
+        if (userRepository.findById(lessonDto.getUserTrainerId()).isPresent()) {
+            return lessonRepository.save(lessonMapper.lessonDtoToLessonEntity(lessonDto));
+        } else {
+            log.info("Lesson wasn't created");
+            throw new RuntimeException("Lesson wasn't created");
+        }
     }
 
     @Override
