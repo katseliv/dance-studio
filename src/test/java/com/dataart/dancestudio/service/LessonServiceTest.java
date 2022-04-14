@@ -306,4 +306,71 @@ public class LessonServiceTest {
         assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
     }
 
+    @Test
+    public void numberOfFilteredLessons() {
+        // given
+        final String trainerName = "";
+        final String danceStyleName = "";
+        final String date = "";
+        final int numberOfFilteredLessons = 5;
+        final int numberOfFilteredLessonsExpected = 5;
+
+        when(lessonRepositoryMock.numberOfFilteredLessons(trainerName, danceStyleName, date)).thenReturn(Optional.of(numberOfFilteredLessons));
+
+        // when
+        final int numberOfFilteredLessonsActual = lessonServiceImpl.numberOfFilteredLessons(trainerName, danceStyleName, date);
+
+        // then
+        verify(lessonRepositoryMock, times(1)).numberOfFilteredLessons(trainerName, danceStyleName, date);
+        assertEquals(numberOfFilteredLessonsExpected, numberOfFilteredLessonsActual);
+    }
+
+    @Test
+    public void numberOfFilteredLessonsWhenOptionalNull() {
+        // given
+        final String trainerName = "";
+        final String danceStyleName = "";
+        final String date = "";
+
+        when(lessonRepositoryMock.numberOfFilteredLessons(trainerName, danceStyleName, date)).thenReturn(Optional.empty());
+
+        // when
+        assertThrows(NoSuchElementException.class, () -> lessonServiceImpl.numberOfFilteredLessons(trainerName, danceStyleName, date));
+
+        // then
+        verify(lessonRepositoryMock, times(1)).numberOfFilteredLessons(trainerName, danceStyleName, date);
+    }
+
+    @Test
+    public void numberOfUserLessons() {
+        final int userId = 1;
+
+        // given
+        final int numberOfUserLessons = 5;
+        final int numberOfUserLessonsExpected = 5;
+
+        when(lessonRepositoryMock.numberOfUserLessons(userId)).thenReturn(Optional.of(numberOfUserLessons));
+
+        // when
+        final int numberOfFilteredLessonsActual = lessonServiceImpl.numberOfUserLessons(userId);
+
+        // then
+        verify(lessonRepositoryMock, times(1)).numberOfUserLessons(userId);
+        assertEquals(numberOfUserLessonsExpected, numberOfFilteredLessonsActual);
+    }
+
+    @Test
+    public void numberOfUserLessonsWhenOptionalNull() {
+        // given
+        final int userId = 1;
+
+        when(lessonRepositoryMock.numberOfUserLessons(userId)).thenReturn(Optional.empty());
+
+        // when
+        assertThrows(NoSuchElementException.class, () -> lessonServiceImpl.numberOfUserLessons(userId));
+
+        // then
+        verify(lessonRepositoryMock, times(1)).numberOfUserLessons(userId);
+    }
+
 }

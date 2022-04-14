@@ -102,6 +102,7 @@ public class UserServiceTest {
         final int userId = userServiceImpl.createUser(userRegistrationDto);
 
         // then
+        verify(userRepositoryMock, times(1)).save(userRegistrationEntity);
         verify(userMapperImpl, times(1)).userRegistrationDtoToUserRegistrationEntityWithPassword(
                 userRegistrationDto, userRegistrationEntity.getPassword());
         assertEquals(id, userId);
