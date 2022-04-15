@@ -200,13 +200,13 @@ public class BookingServiceTest {
     @Test
     public void deleteBookingById() {
         // given
-        doNothing().when(bookingRepositoryMock).deleteById(id);
+        doNothing().when(bookingRepositoryMock).markAsDeleted(id);
 
         // when
         bookingServiceImpl.deleteBookingById(id);
 
         // then
-        verify(bookingRepositoryMock, times(1)).deleteById(id);
+        verify(bookingRepositoryMock, times(1)).markAsDeleted(id);
     }
 
     @Test

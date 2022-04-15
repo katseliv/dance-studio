@@ -4,26 +4,35 @@ import com.dataart.dancestudio.mapper.LessonMapper;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.repository.LessonRepository;
+import com.dataart.dancestudio.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Transactional
 @Service
 public class LessonServiceImpl implements LessonService {
 
+    private final UserRepository userRepository;
     private final LessonRepository lessonRepository;
     private final LessonMapper lessonMapper;
 
     @Autowired
-    public LessonServiceImpl(final LessonRepository lessonRepository, final LessonMapper lessonMapper) {
+    public LessonServiceImpl(final UserRepository userRepository, final LessonRepository lessonRepository, final LessonMapper lessonMapper) {
+        this.userRepository = userRepository;
         this.lessonRepository = lessonRepository;
         this.lessonMapper = lessonMapper;
     }
 
     @Override
     public int createLesson(final LessonDto lessonDto) {
-        return lessonRepository.save(lessonMapper.lessonDtoToLessonEntity(lessonDto));
+        if (userRepository.findById(lessonDto.getUserTrainerId()).isPresent()) {
+            return lessonRepository.save(lessonMapper.lessonDtoToLessonEntity(lessonDto));
+        } else {
+            throw new RuntimeException("Lesson wasn't created");
+        }
     }
 
     @Override
@@ -46,7 +55,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public void deleteLessonById(final int id) {
-        lessonRepository.deleteById(id);
+        lessonRepository.markAsDeleted(id);
     }
 
     @Override

@@ -11,7 +11,7 @@ public interface Repository<T> {
 
     void update(T t, int id);
 
-    void deleteById(int id);
+    void markAsDeleted(int id);
 
     List<T> findAll();
 

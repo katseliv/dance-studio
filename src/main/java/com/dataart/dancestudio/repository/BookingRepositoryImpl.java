@@ -81,7 +81,7 @@ public class BookingRepositoryImpl implements BookingRepository {
     }
 
     @Override
-    public void deleteById(final int id) {
+    public void markAsDeleted(final int id) {
         final String sql = "UPDATE dancestudio.bookings SET is_deleted = ? WHERE id = ?";
         jdbcTemplate.update(sql, true, id);
     }

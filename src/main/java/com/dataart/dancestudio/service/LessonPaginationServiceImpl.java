@@ -5,10 +5,12 @@ import com.dataart.dancestudio.model.dto.UserLessonViewListPage;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+@Transactional
 @Service
 public class LessonPaginationServiceImpl implements LessonPaginationService {
 

@@ -13,12 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
 @Slf4j
+@Transactional
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -70,7 +72,7 @@ public class UserServiceImpl implements UserService {
                 userRepository.update(userMapper.userDtoToUserEntity(userDto), id);
             } else {
                 final UserDto userDtoFromDB = getUserById(id);
-                if (!hasToBeUpdated(userDto, userDtoFromDB)) {
+                if (!isAnyUserProfileDataUpdated(userDto, userDtoFromDB)) {
                     userRepository.updateWithoutPicture(userMapper.userDtoToUserEntity(userDto), id);
                 }
             }
@@ -82,7 +84,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserById(final int id) throws UserCanNotBeDeletedException {
         if (lessonService.numberOfUserLessons(id) == 0) {
-            userRepository.deleteById(id);
+            userRepository.markAsDeleted(id);
         } else {
             throw new UserCanNotBeDeletedException("User has lessons!!!");
         }
@@ -98,8 +100,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.userEntitiesToUserViewDtoList(userRepository.findAllByRole(Role.TRAINER));
     }
 
-    //TODO: think about naming
-    private boolean hasToBeUpdated(final UserDto userDto, final UserDto userDtoFromDB) {
+    private boolean isAnyUserProfileDataUpdated(final UserDto userDto, final UserDto userDtoFromDB) {
         return Objects.equals(userDto.getFirstName(), userDtoFromDB.getFirstName()) &&
                 Objects.equals(userDto.getLastName(), userDtoFromDB.getLastName()) &&
                 Objects.equals(userDto.getEmail(), userDtoFromDB.getEmail()) &&

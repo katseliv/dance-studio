@@ -41,7 +41,7 @@ public class UserServiceTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Mock
-    MultipartFile multipartFile;
+    private MultipartFile multipartFile;
 
     @Mock
     private UserRepository userRepositoryMock;
@@ -97,14 +97,65 @@ public class UserServiceTest {
                 .build();
 
         when(userRepositoryMock.save(userRegistrationEntity)).thenReturn(id);
+        when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.empty());
 
         // when
         final int userId = userServiceImpl.createUser(userRegistrationDto);
 
         // then
+        verify(userRepositoryMock, times(1)).save(userRegistrationEntity);
         verify(userMapperImpl, times(1)).userRegistrationDtoToUserRegistrationEntityWithPassword(
                 userRegistrationDto, userRegistrationEntity.getPassword());
         assertEquals(id, userId);
+    }
+
+    @Test
+    public void createUserWhenSuchUserAlreadyExists() throws IOException {
+        // given
+        final String password = "45";
+        final String encodePassword = bCryptPasswordEncoder.encode(password);
+
+        when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
+
+        final UserRegistrationEntity userRegistrationEntity = UserRegistrationEntity.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .image(multipartFile.getBytes())
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .password(encodePassword)
+                .roleId(Role.USER.getId())
+                .timeZone(timeZone)
+                .isDeleted(isDeleted)
+                .build();
+        final UserRegistrationDto userRegistrationDto = UserRegistrationDto.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .multipartFile(multipartFile)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .password(password)
+                .roleId(Role.USER.getId())
+                .timeZone(timeZone)
+                .isDeleted(isDeleted)
+                .build();
+        final UserDetailsEntity userDetailsEntity = UserDetailsEntity.builder()
+                .id(id)
+                .email(email)
+                .password(encodePassword)
+                .build();
+
+        when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.of(userDetailsEntity));
+
+        // when
+        assertThrows(UserAlreadyExistsException.class, () -> userServiceImpl.createUser(userRegistrationDto));
+
+        // then
+        verify(userRepositoryMock, never()).save(userRegistrationEntity);
+        verify(userMapperImpl, never()).userRegistrationDtoToUserRegistrationEntityWithPassword(
+                userRegistrationDto, userRegistrationEntity.getPassword());
     }
 
     @Test
@@ -510,14 +561,14 @@ public class UserServiceTest {
     @Test
     public void deleteUserById() throws UserCanNotBeDeletedException {
         // given
-        doNothing().when(userRepositoryMock).deleteById(id);
+        doNothing().when(userRepositoryMock).markAsDeleted(id);
         when(lessonServiceMock.numberOfUserLessons(id)).thenReturn(0);
 
         // when
         userServiceImpl.deleteUserById(id);
 
         // then
-        verify(userRepositoryMock, times(1)).deleteById(id);
+        verify(userRepositoryMock, times(1)).markAsDeleted(id);
     }
 
     @Test
@@ -527,7 +578,7 @@ public class UserServiceTest {
         assertThrows(UserCanNotBeDeletedException.class, () -> userServiceImpl.deleteUserById(id));
 
         // then
-        verify(userRepositoryMock, never()).deleteById(id);
+        verify(userRepositoryMock, never()).markAsDeleted(id);
     }
 
     @Test

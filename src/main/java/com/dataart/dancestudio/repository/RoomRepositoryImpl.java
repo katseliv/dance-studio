@@ -44,7 +44,7 @@ public class RoomRepositoryImpl implements RoomRepository {
     }
 
     @Override
-    public void deleteById(final int id) {
+    public void markAsDeleted(final int id) {
         throw new NotImplementedYetException("Such method wasn't implemented");
     }
 
