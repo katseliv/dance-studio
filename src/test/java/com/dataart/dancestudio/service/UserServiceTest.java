@@ -41,7 +41,7 @@ public class UserServiceTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Mock
-    MultipartFile multipartFile;
+    private MultipartFile multipartFile;
 
     @Mock
     private UserRepository userRepositoryMock;
@@ -97,6 +97,7 @@ public class UserServiceTest {
                 .build();
 
         when(userRepositoryMock.save(userRegistrationEntity)).thenReturn(id);
+        when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.empty());
 
         // when
         final int userId = userServiceImpl.createUser(userRegistrationDto);
@@ -106,6 +107,55 @@ public class UserServiceTest {
         verify(userMapperImpl, times(1)).userRegistrationDtoToUserRegistrationEntityWithPassword(
                 userRegistrationDto, userRegistrationEntity.getPassword());
         assertEquals(id, userId);
+    }
+
+    @Test
+    public void createUserWhenSuchUserAlreadyExists() throws IOException {
+        // given
+        final String password = "45";
+        final String encodePassword = bCryptPasswordEncoder.encode(password);
+
+        when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
+
+        final UserRegistrationEntity userRegistrationEntity = UserRegistrationEntity.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .image(multipartFile.getBytes())
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .password(encodePassword)
+                .roleId(Role.USER.getId())
+                .timeZone(timeZone)
+                .isDeleted(isDeleted)
+                .build();
+        final UserRegistrationDto userRegistrationDto = UserRegistrationDto.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .multipartFile(multipartFile)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .password(password)
+                .roleId(Role.USER.getId())
+                .timeZone(timeZone)
+                .isDeleted(isDeleted)
+                .build();
+        final UserDetailsEntity userDetailsEntity = UserDetailsEntity.builder()
+                .id(id)
+                .email(email)
+                .password(encodePassword)
+                .build();
+
+        when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.of(userDetailsEntity));
+
+        // when
+        assertThrows(UserAlreadyExistsException.class, () -> userServiceImpl.createUser(userRegistrationDto));
+
+        // then
+        verify(userRepositoryMock, never()).save(userRegistrationEntity);
+        verify(userMapperImpl, never()).userRegistrationDtoToUserRegistrationEntityWithPassword(
+                userRegistrationDto, userRegistrationEntity.getPassword());
     }
 
     @Test

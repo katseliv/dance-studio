@@ -4,8 +4,10 @@ import com.dataart.dancestudio.mapper.LessonMapperImpl;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.entity.LessonEntity;
+import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.model.entity.view.LessonViewEntity;
 import com.dataart.dancestudio.repository.LessonRepository;
+import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,6 +35,9 @@ public class LessonServiceTest {
 
     @Mock
     private LessonRepository lessonRepositoryMock;
+
+    @Mock
+    private UserRepository userRepositoryMock;
 
     @InjectMocks
     private LessonServiceImpl lessonServiceImpl;
@@ -104,6 +109,7 @@ public class LessonServiceTest {
     public void createLesson() {
         // given
         when(lessonRepositoryMock.save(lessonEntity)).thenReturn(id);
+        when(userRepositoryMock.findById(lessonDto.getUserTrainerId())).thenReturn(Optional.of(UserEntity.builder().build()));
 
         // when
         final int lessonId = lessonServiceImpl.createLesson(lessonDto);
@@ -111,6 +117,18 @@ public class LessonServiceTest {
         // then
         verify(lessonMapperImpl, times(1)).lessonDtoToLessonEntity(lessonDto);
         assertEquals(id, lessonId);
+    }
+
+    @Test
+    public void createLessonWhenUserDoesNotExist() {
+        // given
+        when(userRepositoryMock.findById(lessonDto.getUserTrainerId())).thenReturn(Optional.empty());
+
+        // when
+        assertThrows(RuntimeException.class, () -> lessonServiceImpl.createLesson(lessonDto));
+
+        // then
+        verify(lessonMapperImpl, never()).lessonDtoToLessonEntity(lessonDto);
     }
 
     @Test
