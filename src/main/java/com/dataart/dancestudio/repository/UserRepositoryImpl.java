@@ -82,7 +82,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<UserDetailsEntity> findByEmail(final String email) {
         final String sql = "SELECT id, email, role_id, password " +
-                "FROM dancestudio.users WHERE LOWER(email) = LOWER(?)";
+                "FROM dancestudio.users WHERE LOWER(email) = LOWER(?) AND is_deleted = FALSE";
 
         final List<UserDetailsEntity> userDetailsEntities = jdbcTemplate.query(sql, rowDetailsMapper, email);
 

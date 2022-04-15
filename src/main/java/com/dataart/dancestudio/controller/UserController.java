@@ -17,8 +17,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -51,7 +53,10 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerUser(final Model model, @ModelAttribute("user") final UserRegistrationDto userRegistrationDto) throws IOException, UserAlreadyExistsException {
+    public String registerUser(final Model model, @ModelAttribute("user") @Valid final UserRegistrationDto userRegistrationDto, final BindingResult bindingResult) throws IOException, UserAlreadyExistsException {
+        if (bindingResult.hasErrors()) {
+            return "registration";
+        }
         if (!Objects.equals(userRegistrationDto.getPassword(), userRegistrationDto.getPasswordConfirmation())) {
             model.addAttribute("user", userRegistrationDto);
             model.addAttribute("error", "Password wasn't confirmed");
@@ -76,7 +81,10 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public String createUser(final Model model, @ModelAttribute("user") final UserRegistrationDto userRegistrationDto) throws IOException, UserAlreadyExistsException {
+    public String createUser(final Model model, @ModelAttribute("user") @Valid final UserRegistrationDto userRegistrationDto, final BindingResult bindingResult) throws IOException, UserAlreadyExistsException {
+        if (bindingResult.hasErrors()) {
+            return "forms/user_form";
+        }
         final int id = userService.createUser(userRegistrationDto);
         model.addAttribute("user_view", userService.getUserViewById(id));
         return "infos/user_info";
@@ -95,7 +103,10 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public String updateUser(final Model model, @ModelAttribute("user") final UserDto userDto, @PathVariable final int id) {
+    public String updateUser(final Model model, @ModelAttribute("user") @Valid final UserDto userDto, @PathVariable final int id, final BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "forms/user_edit";
+        }
         userService.updateUserById(userDto, id);
         model.addAttribute("user_view", userService.getUserViewById(id));
         return "infos/user_info";

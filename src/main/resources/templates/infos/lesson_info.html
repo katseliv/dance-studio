@@ -27,7 +27,7 @@
         <p th:text="${#temporals.format(lesson_view.startDatetime, 'dd/MM/yyyy, HH:mm')}"></p>
         <form sec:authorize="hasRole('ADMIN') or hasRole('TRAINER')"
               th:action="@{/lessons/__${lesson_view.id}__/update}" th:method="get">
-            <button type="submit" class="btn btn-lg btn-success w-100 mt-2">Edit</button>
+            <button type="submit" class="btn btn-lg btn-outline-success w-100 mt-2">Edit</button>
         </form>
     </div>
 </div>

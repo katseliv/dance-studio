@@ -5,19 +5,40 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
 public class UserRegistrationDto {
 
     private final Integer id;
+
+    @NotBlank(message = "Username is blank.")
     private final String username;
+
+    @NotBlank(message = "First Name is blank.")
     private final String firstName;
+
+    @NotBlank(message = "Last Name is blank.")
     private final String lastName;
+
     private final MultipartFile multipartFile;
+
+    @NotBlank(message = "Email is blank.")
+    @Email(message = "Email invalid.")
     private final String email;
+
+    @NotBlank(message = "Phone Number is blank.")
+    @Size(min = 7, max = 11, message = "Phone Number is out of range.")
     private final String phoneNumber;
+
+    @NotBlank(message = "Password is blank.")
     private final String password;
+
+    @NotBlank(message = "Password confirmation is blank.")
     private final String passwordConfirmation;
     private final Integer roleId;
     private final String timeZone;

@@ -34,12 +34,12 @@
             <td th:text="${user.lastName}"></td>
             <td>
                 <form th:action="@{/users/__${user.id}__/update}" th:method="get">
-                    <button type="submit" class="btn btn-success">Edit</button>
+                    <button type="submit" class="btn btn-outline-success">Edit</button>
                 </form>
             </td>
             <td>
                 <form th:action="@{/users/__${user.id}__}" th:method="delete">
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
                 </form>
             </td>
         </tr>
@@ -48,7 +48,7 @@
     <div class="row">
         <div class="col">
             <form th:action="@{/users/create}">
-                <button type="submit" class="btn btn-success">Create new user</button>
+                <button type="submit" class="btn btn-outline-success">Create new user</button>
             </form>
         </div>
     </div>
