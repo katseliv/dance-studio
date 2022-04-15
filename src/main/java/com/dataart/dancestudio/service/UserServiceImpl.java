@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
+@Transactional
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -38,7 +38,6 @@ public class UserServiceImpl implements UserService {
         this.lessonService = lessonService;
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public int createUser(final UserRegistrationDto userRegistrationDto) throws IOException, UserAlreadyExistsException {
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isEmpty()) {

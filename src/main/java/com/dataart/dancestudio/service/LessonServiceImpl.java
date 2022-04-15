@@ -5,13 +5,13 @@ import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.repository.LessonRepository;
 import com.dataart.dancestudio.repository.UserRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
+@Transactional
 @Service
 public class LessonServiceImpl implements LessonService {
 
@@ -31,7 +31,6 @@ public class LessonServiceImpl implements LessonService {
         if (userRepository.findById(lessonDto.getUserTrainerId()).isPresent()) {
             return lessonRepository.save(lessonMapper.lessonDtoToLessonEntity(lessonDto));
         } else {
-            log.info("Lesson wasn't created");
             throw new RuntimeException("Lesson wasn't created");
         }
     }
