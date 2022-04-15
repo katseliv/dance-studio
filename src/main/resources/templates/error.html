@@ -9,30 +9,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
             integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
             crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <meta charset="UTF-8">
-    <title>User</title>
+    <title>Lessons</title>
 </head>
 <header th:insert="header :: header"></header>
 <body>
 <div class="container p-5 overflow-hidden">
-    <h1 class="h3 mb-5 fw-normal text-center">User</h1>
+    <h1 class="h1 mb-5 fw-normal text-center">Error Page</h1>
     <div class="container w-25">
-        <div class="mb-3">
-            <img th:src="@{'data:image/jpeg;base64,' + ${user_view.image}}" class="img-fluid" alt="Picture" src=""/>
-        </div>
-        <h5>Username: </h5>
-        <p th:text="${user_view.username}"></p>
-        <h5>First Name: </h5>
-        <p th:text="${user_view.firstName}"></p>
-        <h5>Last Name: </h5>
-        <p th:text="${user_view.lastName}"></p>
-        <h5>Email: </h5>
-        <p th:text="${user_view.email}"></p>
-        <h5>Phone Number: </h5>
-        <p th:text="${user_view.phoneNumber}"></p>
-        <form th:action="@{/users/__${user_view.id}__/update}" th:method="get">
-            <button type="submit" class="btn btn-lg btn-outline-success w-100 mt-2">Edit</button>
-        </form>
+        <h6 class="h3 mb-3 fw-normal text-center" th:text="|${error} ${status}|">Not Found 404</h6>
+        <h6 class="h3 mb-3 fw-normal text-center" th:text="${message}">Message that error returned</h6>
     </div>
 </div>
 </body>

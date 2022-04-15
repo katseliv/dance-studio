@@ -20,8 +20,8 @@
         <form id="lessonForm" th:action="@{/lessons/__${lesson.id}__}" th:object="${lesson}" th:method="put">
             <div class="mb-3">
                 <label for="userTrainerId" class="form-label">Trainer</label>
-                <select th:field="*{userTrainerId}" class="form-select" aria-label="Default select example"
-                        id="userTrainerId">
+                <select class="form-select" id="userTrainerId" th:field="*{userTrainerId}"
+                        th:classappend="${#fields.hasErrors('userTrainerId')} ? 'is-invalid' : ''">
                     <option th:each="userTrainer : ${trainers}" th:if="${userTrainer.id} == *{userTrainerId}"
                             th:value="${userTrainer.id}"
                             th:text="|${userTrainer.firstName} ${userTrainer.lastName}|" selected>
@@ -29,39 +29,45 @@
                             th:value="${userTrainer.id}"
                             th:text="|${userTrainer.firstName} ${userTrainer.lastName}|">
                 </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('userTrainerId')}" th:errors="*{userTrainerId}"></div>
             </div>
             <div class="mb-3">
                 <label for="danceStyleId" class="form-label">Dance Style</label>
-                <select th:field="*{danceStyleId}" class="form-select" aria-label="Default select example"
-                        id="danceStyleId">
+                <select class="form-select" id="danceStyleId" th:field="*{danceStyleId}"
+                        th:classappend="${#fields.hasErrors('danceStyleId')} ? 'is-invalid' : ''">
                     <option th:each="style : ${styles}" th:if="${style.id} == *{danceStyleId}" th:value="${style.id}"
                             th:text="${style.name}" selected>
                     <option th:each="style : ${styles}" th:unless="${style.id} == *{danceStyleId}"
                             th:value="${style.id}"
                             th:text="${style.name}">
                 </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('danceStyleId')}" th:errors="*{danceStyleId}"></div>
             </div>
             <div class="mb-3">
                 <label for="startDatetime" class="form-label">Datetime</label>
-                <input th:field="*{startDatetime}" th:placeholder="*{startDatetime}" class="form-control"
-                       type="datetime-local" id="startDatetime"
-                       name="startDatetime">
+                <input class="form-control" type="datetime-local" id="startDatetime" name="startDatetime"
+                       th:field="*{startDatetime}" th:placeholder="*{startDatetime}"
+                       th:classappend="${#fields.hasErrors('startDatetime')} ? 'is-invalid' : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('startDatetime')}" th:errors="*{startDatetime}"></div>
             </div>
             <div class="mb-3">
                 <label for="duration" class="form-label">Duration</label>
                 <input th:field="*{duration}" th:placeholder="*{duration}" class="form-control" id="duration">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
             </div>
             <div class="mb-3">
                 <label for="roomId" class="form-label">Room</label>
-                <select th:field="*{roomId}" class="form-select" aria-label="Default select example" id="roomId">
+                <select class="form-select" id="roomId" th:field="*{roomId}"
+                        th:classappend="${#fields.hasErrors('roomId')} ? 'is-invalid' : ''">
                     <option th:each="room : ${rooms}" th:if="${room.id} == *{roomId}" th:value="${room.id}"
                             th:text="${room.name}" selected>
                     <option th:each="room : ${rooms}" th:unless="${room.id} == *{roomId}" th:value="${room.id}"
                             th:text="${room.name}">
                 </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('roomId')}" th:errors="*{roomId}"></div>
             </div>
             <input th:field="*{timeZone}" class="form-control" type="hidden" id="timeZone" name="timeZone">
-            <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-success w-100 mt-2">Edit</button>
+            <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-outline-success w-100 mt-2">Edit</button>
         </form>
     </div>
 </div>

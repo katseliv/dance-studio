@@ -10,10 +10,13 @@ import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.service.*;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -40,7 +43,11 @@ public class LessonController {
     }
 
     @PostMapping("/create")
-    public String createLesson(final Model model, @ModelAttribute("lesson") final LessonDto lessonDto) {
+    public String createLesson(final Model model, @ModelAttribute("lesson") @Valid final LessonDto lessonDto, final BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            prepareModel(model);
+            return "forms/lesson_form";
+        }
         final int id = lessonService.createLesson(lessonDto);
         model.addAttribute("lesson_view", lessonService.getLessonViewById(id));
         return "infos/lesson_info";
@@ -60,7 +67,11 @@ public class LessonController {
     }
 
     @PutMapping("/{id}")
-    public String updateLesson(final Model model, @ModelAttribute("lesson") final LessonDto lessonDto, @PathVariable final int id) {
+    public String updateLesson(final Model model, @ModelAttribute("lesson") @Valid final LessonDto lessonDto, @PathVariable final int id, final BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            prepareModel(model);
+            return "forms/lesson_edit";
+        }
         lessonService.updateLessonById(lessonDto, id);
         model.addAttribute("lesson_view", lessonService.getLessonViewById(id));
         return "infos/lesson_info";
@@ -76,6 +87,12 @@ public class LessonController {
     @DeleteMapping("/{id}")
     public String deleteLesson(@PathVariable final int id) {
         lessonService.deleteLessonById(id);
+        if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
+            final Authentication authentication = securityContextFacade.getContext().getAuthentication();
+            final String email = authentication.getName();
+            final int userId = userService.getUserIdByEmail(email);
+            return "redirect:/trainers/" + userId + "/lessons";
+        }
         return "redirect:/lessons";
     }
 

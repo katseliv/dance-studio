@@ -31,44 +31,66 @@
               th:method="post">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
-                <input th:field="*{username}" class="form-control" id="username">
+                <input class="form-control" id="username"
+                       th:field="*{username}" th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
             </div>
             <div class="mb-3">
                 <label for="firstName" class="form-label">First Name</label>
-                <input th:field="*{firstName}" class="form-control" id="firstName">
+                <input class="form-control" id="firstName"
+                       th:field="*{firstName}" th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid' : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
             </div>
             <div class="mb-3">
                 <label for="lastName" class="form-label">Last Name</label>
-                <input th:field="*{lastName}" class="form-control" id="lastName">
+                <input class="form-control" id="lastName"
+                       th:field="*{lastName}" th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid' : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
             </div>
             <div class="mb-3">
                 <label for="image" class="form-label">Image</label>
-                <input th:field="*{multipartFile}" class="form-control" type="file" id="image">
+                <input class="form-control" type="file" id="image"
+                       th:field="*{multipartFile}"
+                       th:classappend="${#fields.hasErrors('multipartFile')} ? 'is-invalid' : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('multipartFile')}"
+                     th:errors="*{multipartFile}"></div>
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input th:field="*{email}" type="email" class="form-control" id="email">
+                <input class="form-control" type="email" id="email"
+                       th:field="*{email}" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
             </div>
             <div class="mb-3">
                 <label for="phoneNumber" class="form-label">Phone Number</label>
-                <input th:field="*{phoneNumber}" class="form-control" id="phoneNumber">
+                <input class="form-control" id="phoneNumber"
+                       th:field="*{phoneNumber}"
+                       th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid' : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('phoneNumber')}"
+                     th:errors="*{phoneNumber}"></div>
             </div>
             <div class="mb-3">
                 <label for="inputPassword" class="form-label">Password</label>
-                <input th:field="*{password}" type="password" class="form-control" id="inputPassword">
+                <input class="form-control" type="password" id="inputPassword"
+                       th:field="*{password}" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
             </div>
             <div class="mb-3">
                 <label for="confirmPassword" class="form-label">Confirm Password</label>
-                <input th:field="*{passwordConfirmation}" type="password" class="form-control" id="confirmPassword">
+                <input class="form-control" type="password" id="confirmPassword"
+                       th:field="*{passwordConfirmation}"
+                       th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('passwordConfirmation')}"
+                     th:errors="*{passwordConfirmation}"></div>
             </div>
             <div class="mb-3 text-center text-danger">
                 <p th:if="${error} != null" th:text="${error}"></p>
             </div>
             <input th:field="*{timeZone}" class="form-control" type="hidden" id="timeZone"
                    name="timeZone">
-            <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-success w-100 mt-2">Submit</button>
+            <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-outline-success w-100 mt-2">Submit</button>
         </form>
-        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-primary w-100 mt-2">Return</button>
+        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-outline-primary w-100 mt-2">Return</button>
     </div>
 </div>
 </body>
