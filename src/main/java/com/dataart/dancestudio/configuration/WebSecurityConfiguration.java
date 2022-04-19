@@ -1,7 +1,7 @@
 package com.dataart.dancestudio.configuration;
 
 import com.dataart.dancestudio.mapper.UserMapper;
-import com.dataart.dancestudio.repository.UserRepositoryImpl;
+import com.dataart.dancestudio.repository.UserRepository;
 import com.dataart.dancestudio.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,12 +21,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final UserRepositoryImpl userRepositoryImpl;
+    private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Autowired
-    public WebSecurityConfiguration(final UserRepositoryImpl userRepositoryImpl, final UserMapper userMapper) {
-        this.userRepositoryImpl = userRepositoryImpl;
+    public WebSecurityConfiguration(final UserRepository userRepository, final UserMapper userMapper) {
+        this.userRepository = userRepository;
         this.userMapper = userMapper;
     }
 
@@ -43,7 +43,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public UserDetailsService userDetailsServiceBean() {
-        return new UserDetailsServiceImpl(userRepositoryImpl, userMapper);
+        return new UserDetailsServiceImpl(userRepository, userMapper);
     }
 
     @Bean

@@ -3,6 +3,7 @@ package com.dataart.dancestudio.service;
 import com.dataart.dancestudio.mapper.BookingMapper;
 import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
+import com.dataart.dancestudio.model.entity.BookingEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,40 +26,34 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public int createBooking(final BookingDto bookingDto) {
-        return bookingRepository.save(bookingMapper.bookingDtoToBookingEntity(bookingDto));
+        final BookingEntity bookingEntity = bookingRepository.save(bookingMapper.bookingDtoToBookingEntity(bookingDto));
+        return bookingEntity.getId();
     }
 
     @Override
     public BookingDto getBookingById(final int id) {
-        return bookingMapper.bookingEntityToBookingDto(bookingRepository.findById(id).orElseThrow());
+        return bookingMapper.bookingEntityToBookingDto(bookingRepository.findBookingEntityByIdAndIsDeletedFalse(id));
     }
 
     @Override
     public BookingViewDto getBookingViewById(final int id) {
-        return bookingMapper.bookingViewEntityToBookingViewDto(bookingRepository.findViewById(id).orElseThrow());
-    }
-
-    @Override
-    public void updateBookingById(final BookingDto bookingDto, final int id) {
-        final BookingDto bookingDtoFromDB = getBookingById(id);
-        if (!bookingDto.equals(bookingDtoFromDB)) {
-            bookingRepository.update(bookingMapper.bookingDtoToBookingEntity(bookingDto), id);
-        }
+        return bookingMapper.bookingEntityToBookingViewDto(bookingRepository.findBookingEntityByIdAndIsDeletedFalse(id));
     }
 
     @Override
     public void deleteBookingById(final int id) {
-        bookingRepository.markAsDeleted(id);
+        bookingRepository.markAsDeletedById(id);
     }
 
     @Override
     public List<BookingViewDto> listBookings() {
-        return bookingMapper.bookingViewEntitiesToBookingViewDtoList(bookingRepository.findAllViews());
+        return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingRepository.findAllByIsDeletedFalse());
     }
 
     @Override
     public List<BookingViewDto> listUserBookings(final int userId) {
-        return bookingMapper.bookingViewEntitiesToBookingViewDtoList(bookingRepository.findAllUserBookingViews(userId));
+        return bookingMapper.bookingEntitiesToBookingViewDtoList(
+                bookingRepository.findBookingEntitiesByUserIdAndIsDeletedFalse(userId));
     }
 
 }

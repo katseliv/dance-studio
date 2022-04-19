@@ -1,17 +1,24 @@
 package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.BookingEntity;
-import com.dataart.dancestudio.model.entity.view.BookingViewEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface BookingRepository extends Repository<BookingEntity> {
+@Repository
+public interface BookingRepository extends JpaRepository<BookingEntity, Integer> {
 
-    Optional<BookingViewEntity> findViewById(int id);
+    @Modifying
+    @Query("UPDATE bookings SET isDeleted = TRUE WHERE id = ?1")
+    void markAsDeletedById(int id);
 
-    List<BookingViewEntity> findAllViews();
+    BookingEntity findBookingEntityByIdAndIsDeletedFalse(int id);
 
-    List<BookingViewEntity> findAllUserBookingViews(int id);
+    List<BookingEntity> findAllByIsDeletedFalse();
+
+    List<BookingEntity> findBookingEntitiesByUserIdAndIsDeletedFalse(int userId);
 
 }

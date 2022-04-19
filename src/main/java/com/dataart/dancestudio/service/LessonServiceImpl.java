@@ -20,7 +20,8 @@ public class LessonServiceImpl implements LessonService {
     private final LessonMapper lessonMapper;
 
     @Autowired
-    public LessonServiceImpl(final UserRepository userRepository, final LessonRepository lessonRepository, final LessonMapper lessonMapper) {
+    public LessonServiceImpl(final UserRepository userRepository, final LessonRepository lessonRepository,
+                             final LessonMapper lessonMapper) {
         this.userRepository = userRepository;
         this.lessonRepository = lessonRepository;
         this.lessonMapper = lessonMapper;
@@ -59,13 +60,16 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public List<LessonViewDto> listLessons(final String trainerName, final String danceStyleName, final String date, final int limit, final int offset) {
-        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllViews(trainerName, danceStyleName, date, limit, offset));
+    public List<LessonViewDto> listLessons(final String trainerName, final String danceStyleName, final String date,
+                                           final int limit, final int offset) {
+        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(
+                lessonRepository.findAllViews(trainerName, danceStyleName, date, limit, offset));
     }
 
     @Override
     public List<LessonViewDto> listUserLessons(final int userId, final int limit, final int offset) {
-        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(lessonRepository.findAllUserLessonViews(userId, limit, offset));
+        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(
+                lessonRepository.findAllUserLessonViews(userId, limit, offset));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.dataart.dancestudio.controller;
 
 import com.dataart.dancestudio.model.dto.BookingDto;
+import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 import com.dataart.dancestudio.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,19 +24,13 @@ public class BookingController {
     @PostMapping("/create")
     public String createBooking(final Model model, @ModelAttribute("booking") final BookingDto bookingDto) {
         final int id = bookingService.createBooking(bookingDto);
-        model.addAttribute("booking_view", bookingService.getBookingViewById(id));
+        final BookingViewDto bookingViewDto = bookingService.getBookingViewById(id);
+        model.addAttribute("booking_view", bookingViewDto);
         return "infos/booking_info";
     }
 
     @GetMapping("/{id}")
     public String getBooking(final Model model, @PathVariable final int id) {
-        model.addAttribute("booking_view", bookingService.getBookingViewById(id));
-        return "infos/booking_info";
-    }
-
-    @PutMapping("/{id}")
-    public String updateBooking(final Model model, @ModelAttribute("booking") final BookingDto bookingDto, @PathVariable final int id) {
-        bookingService.updateBookingById(bookingDto, id);
         model.addAttribute("booking_view", bookingService.getBookingViewById(id));
         return "infos/booking_info";
     }
