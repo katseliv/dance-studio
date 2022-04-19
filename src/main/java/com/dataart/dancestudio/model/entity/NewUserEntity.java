@@ -2,15 +2,15 @@ package com.dataart.dancestudio.model.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
-@ToString
-@Table(name = "users", schema = "dancestudio")
 @Entity(name = "users")
+@Where(clause = "is_deleted = false")
+@Table(name = "users", schema = "dancestudio")
 public class NewUserEntity {
 
     @Id

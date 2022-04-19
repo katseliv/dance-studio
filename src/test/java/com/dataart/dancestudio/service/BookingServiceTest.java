@@ -17,8 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,28 +87,53 @@ public class BookingServiceTest {
     public void getBookingById() {
         // given
         when(bookingMapperImpl.bookingEntityToBookingDto(bookingEntity)).thenReturn(bookingDto);
-        when(bookingRepositoryMock.findBookingEntityByIdAndIsDeletedFalse(id)).thenReturn(bookingEntity);
+        when(bookingRepositoryMock.findById(id)).thenReturn(Optional.of(bookingEntity));
 
         // when
         final BookingDto bookingDtoActual = bookingServiceImpl.getBookingById(id);
 
         // then
-        verify(bookingRepositoryMock, times(1)).findBookingEntityByIdAndIsDeletedFalse(id);
+        verify(bookingRepositoryMock, times(1)).findById(id);
         assertEquals(bookingDto, bookingDtoActual);
+    }
+
+    @Test
+    public void getBookingByIdWhenOptionalNull() {
+        // given
+        when(bookingRepositoryMock.findById(id)).thenReturn(Optional.empty());
+
+        // when
+        assertThrows(NoSuchElementException.class, () -> bookingServiceImpl.getBookingById(id));
+
+        // then
+        verify(bookingMapperImpl, never()).bookingEntityToBookingDto(bookingEntity);
+        verify(bookingRepositoryMock, times(1)).findById(id);
     }
 
     @Test
     public void getBookingViewById() {
         // given
         when(bookingMapperImpl.bookingEntityToBookingViewDto(bookingEntity)).thenReturn(bookingViewDto);
-        when(bookingRepositoryMock.findBookingEntityByIdAndIsDeletedFalse(id)).thenReturn(bookingEntity);
+        when(bookingRepositoryMock.findById(id)).thenReturn(Optional.of(bookingEntity));
 
         // when
         final BookingViewDto bookingViewDtoActual = bookingServiceImpl.getBookingViewById(id);
 
         // then
-        verify(bookingRepositoryMock, times(1)).findBookingEntityByIdAndIsDeletedFalse(id);
+        verify(bookingRepositoryMock, times(1)).findById(id);
         assertEquals(bookingViewDto, bookingViewDtoActual);
+    }
+
+    @Test
+    public void getBookingViewByIdWhenOptionalNull() {
+        // given
+        when(bookingRepositoryMock.findById(id)).thenReturn(Optional.empty());
+
+        // when
+        assertThrows(NoSuchElementException.class, () -> bookingServiceImpl.getBookingViewById(id));
+
+        // then
+        verify(bookingRepositoryMock, times(1)).findById(id);
     }
 
     @Test
@@ -127,13 +155,13 @@ public class BookingServiceTest {
         final List<BookingEntity> bookingEntities = List.of(bookingEntity);
 
         when(bookingMapperImpl.bookingEntitiesToBookingViewDtoList(bookingEntities)).thenReturn(bookingViewDtoListExpected);
-        when(bookingRepositoryMock.findAllByIsDeletedFalse()).thenReturn(bookingEntities);
+        when(bookingRepositoryMock.findAll()).thenReturn(bookingEntities);
 
         // when
         final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listBookings();
 
         // then
-        verify(bookingRepositoryMock, times(1)).findAllByIsDeletedFalse();
+        verify(bookingRepositoryMock, times(1)).findAll();
         assertEquals(bookingViewDtoListExpected, bookingViewDtoListActual);
     }
 
@@ -145,13 +173,13 @@ public class BookingServiceTest {
 
         final int userId = 1;
         when(bookingMapperImpl.bookingEntitiesToBookingViewDtoList(bookingEntities)).thenReturn(bookingViewDtoListExpected);
-        when(bookingRepositoryMock.findBookingEntitiesByUserIdAndIsDeletedFalse(userId)).thenReturn(bookingEntities);
+        when(bookingRepositoryMock.findAllByUserId(userId)).thenReturn(bookingEntities);
 
         // when
         final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listUserBookings(userId);
 
         // then
-        verify(bookingRepositoryMock, times(1)).findBookingEntitiesByUserIdAndIsDeletedFalse(userId);
+        verify(bookingRepositoryMock, times(1)).findAllByUserId(userId);
         assertEquals(bookingViewDtoListExpected, bookingViewDtoListActual);
     }
 

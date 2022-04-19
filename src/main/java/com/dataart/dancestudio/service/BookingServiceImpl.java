@@ -32,12 +32,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto getBookingById(final int id) {
-        return bookingMapper.bookingEntityToBookingDto(bookingRepository.findBookingEntityByIdAndIsDeletedFalse(id));
+        return bookingMapper.bookingEntityToBookingDto(bookingRepository.findById(id).orElseThrow());
     }
 
     @Override
     public BookingViewDto getBookingViewById(final int id) {
-        return bookingMapper.bookingEntityToBookingViewDto(bookingRepository.findBookingEntityByIdAndIsDeletedFalse(id));
+        return bookingMapper.bookingEntityToBookingViewDto(bookingRepository.findById(id).orElseThrow());
     }
 
     @Override
@@ -47,13 +47,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingViewDto> listBookings() {
-        return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingRepository.findAllByIsDeletedFalse());
+        return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingRepository.findAll());
     }
 
     @Override
     public List<BookingViewDto> listUserBookings(final int userId) {
         return bookingMapper.bookingEntitiesToBookingViewDtoList(
-                bookingRepository.findBookingEntitiesByUserIdAndIsDeletedFalse(userId));
+                bookingRepository.findAllByUserId(userId));
     }
 
 }

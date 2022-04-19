@@ -2,14 +2,16 @@ package com.dataart.dancestudio.model.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Table(name = "lessons", schema = "dancestudio")
 @Entity(name = "lessons")
+@Where(clause = "is_deleted = false")
+@Table(name = "lessons", schema = "dancestudio")
 public class NewLessonEntity {
 
     @Id

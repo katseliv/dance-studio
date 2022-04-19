@@ -15,10 +15,6 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Integer>
     @Query("UPDATE bookings SET isDeleted = TRUE WHERE id = ?1")
     void markAsDeletedById(int id);
 
-    BookingEntity findBookingEntityByIdAndIsDeletedFalse(int id);
-
-    List<BookingEntity> findAllByIsDeletedFalse();
-
-    List<BookingEntity> findBookingEntitiesByUserIdAndIsDeletedFalse(int userId);
+    List<BookingEntity> findAllByUserId(int userId);
 
 }
