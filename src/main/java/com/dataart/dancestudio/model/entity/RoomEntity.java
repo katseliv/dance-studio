@@ -1,17 +1,33 @@
 package com.dataart.dancestudio.model.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
+@ToString
+@Builder
 @Entity(name = "rooms")
 @Where(clause = "is_deleted = false")
 @Table(name = "rooms", schema = "dancestudio")
 public class RoomEntity {
+
+    public RoomEntity() {
+    }
+
+    private RoomEntity(final Integer id, final String name, final String description, final StudioEntity studio,
+                       final Boolean isDeleted) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.studio = studio;
+        this.isDeleted = isDeleted;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
