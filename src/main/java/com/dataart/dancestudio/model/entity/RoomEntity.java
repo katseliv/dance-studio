@@ -1,9 +1,6 @@
 package com.dataart.dancestudio.model.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -12,13 +9,11 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Builder
+@NoArgsConstructor
 @Entity(name = "rooms")
 @Where(clause = "is_deleted = false")
 @Table(name = "rooms", schema = "dancestudio")
 public class RoomEntity {
-
-    public RoomEntity() {
-    }
 
     private RoomEntity(final Integer id, final String name, final String description, final StudioEntity studio,
                        final Boolean isDeleted) {

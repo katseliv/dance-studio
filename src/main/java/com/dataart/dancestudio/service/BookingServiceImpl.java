@@ -38,29 +38,25 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto getBookingById(final int id) {
         final Optional<BookingEntity> bookingEntity = bookingRepository.findById(id);
-        if (bookingEntity.isPresent()) {
-            log.info("Booking with id = " + bookingEntity.get().getId() + " was found.");
-        } else {
-            log.info("Booking wasn't found.");
-        }
+        bookingEntity.ifPresentOrElse(
+                (booking) -> log.info("Booking with id = {} was found.", booking.getId()),
+                () -> log.info("Booking wasn't found."));
         return bookingMapper.bookingEntityToBookingDto(bookingEntity.orElseThrow());
     }
 
     @Override
     public BookingViewDto getBookingViewById(final int id) {
         final Optional<BookingEntity> bookingEntity = bookingRepository.findById(id);
-        if (bookingEntity.isPresent()) {
-            log.info("Booking with id = " + bookingEntity.get().getId() + " was found.");
-        } else {
-            log.info("Booking wasn't found.");
-        }
+        bookingEntity.ifPresentOrElse(
+                (booking) -> log.info("Booking with id = {} was found.", booking.getId()),
+                () -> log.info("Booking wasn't found."));
         return bookingMapper.bookingEntityToBookingViewDto(bookingEntity.orElseThrow());
     }
 
     @Override
     public void deleteBookingById(final int id) {
         bookingRepository.markAsDeletedById(id);
-        log.info("Booking with id = " + id + " was deleted.");
+        log.info("Booking with id = {} was deleted.", id);
     }
 
     @Override

@@ -1,9 +1,6 @@
 package com.dataart.dancestudio.model.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -12,13 +9,11 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Builder
+@NoArgsConstructor
 @Entity(name = "users")
 @Where(clause = "is_deleted = false")
 @Table(name = "users", schema = "dancestudio")
 public class NewUserEntity {
-
-    public NewUserEntity() {
-    }
 
     private NewUserEntity(final Integer id, final String username, final String firstName, final String lastName,
                           final byte[] image, final String email, final String phoneNumber, final String password,

@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
                 }
             }
         } catch (final IOException e) {
-            log.error(String.valueOf(e));
+            log.error("An exception occurred!", e);
         }
     }
 

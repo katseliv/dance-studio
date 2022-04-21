@@ -7,7 +7,6 @@ import com.dataart.dancestudio.model.entity.BookingEntity;
 import com.dataart.dancestudio.model.entity.NewLessonEntity;
 import com.dataart.dancestudio.model.entity.NewUserEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -49,25 +48,19 @@ public class BookingServiceTest {
             .lessonId(lessonId)
             .isDeleted(isDeleted)
             .build();
-    private final BookingEntity bookingEntity = new BookingEntity();
+    final NewUserEntity newUserEntity = NewUserEntity.builder().id(userId).build();
+    final NewLessonEntity lessonEntity = NewLessonEntity.builder().id(lessonId).build();
+    private final BookingEntity bookingEntity = BookingEntity.builder()
+            .id(id)
+            .user(newUserEntity)
+            .lesson(lessonEntity)
+            .build();
     private final BookingViewDto bookingViewDto = BookingViewDto.builder()
             .firstName(firstName)
             .lastName(lastName)
             .danceStyle(danceStyle)
             .startDatetime(startDatetime)
             .build();
-
-    @BeforeEach
-    public void initBookingEntity() {
-        final NewUserEntity newUserEntity = new NewUserEntity();
-        newUserEntity.setId(userId);
-        final NewLessonEntity newLessonEntity = new NewLessonEntity();
-        newLessonEntity.setId(lessonId);
-        bookingEntity.setId(id);
-        bookingEntity.setUser(new NewUserEntity());
-        bookingEntity.setLesson(newLessonEntity);
-        bookingEntity.setIsDeleted(isDeleted);
-    }
 
     @Test
     public void createBooking() {

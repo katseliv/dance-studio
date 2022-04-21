@@ -1,10 +1,6 @@
 package com.dataart.dancestudio.model.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.annotations.Where;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -13,13 +9,10 @@ import java.time.LocalTime;
 @Setter
 @ToString
 @Builder
+@NoArgsConstructor
 @Entity(name = "studios")
-@Where(clause = "is_deleted = false")
 @Table(name = "studios", schema = "dancestudio")
 public class StudioEntity {
-
-    public StudioEntity() {
-    }
 
     private StudioEntity(final Integer id, final String name, final String description, final LocalTime startTime,
                          final LocalTime endTime) {
