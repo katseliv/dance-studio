@@ -5,9 +5,9 @@ import com.dataart.dancestudio.model.dto.UserLessonViewListPage;
 
 public interface LessonPaginationService {
 
-    FilteredLessonViewListPage getFilteredLessonViewListPage(Integer page, Integer size, String trainerName,
+    FilteredLessonViewListPage getFilteredLessonViewListPage(String page, String size, String trainerName,
                                                              String danceStyleName, String date);
 
-    UserLessonViewListPage getUserLessonViewListPage(Integer id, Integer page, Integer size);
+    UserLessonViewListPage getUserLessonViewListPage(Integer id, String page, String size);
 
 }

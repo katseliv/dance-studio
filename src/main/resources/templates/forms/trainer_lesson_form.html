@@ -18,19 +18,8 @@
     <h1 class="h3 mb-5 fw-normal text-center">Create Lesson</h1>
     <div class="container w-25">
         <form id="lessonForm" th:action="@{/lessons/create}" th:object="${lesson}" method="post" novalidate>
-            <div class="mb-3">
-                <label for="userTrainerId" class="form-label">Trainer</label>
-                <select class="form-select" id="userTrainerId"
-                        th:classappend="${#fields.hasErrors('userTrainerId')} ? 'is-invalid' : ''"
-                        th:field="*{userTrainerId}">
-                    <option th:value="''" selected>Choose one</option>
-                    <option th:each="userTrainer : ${trainers}" th:value="${userTrainer.id}"
-                            th:text="|${userTrainer.firstName} ${userTrainer.lastName}|">
-                    </option>
-                </select>
-                <div class="invalid-feedback" th:if="${#fields.hasErrors('userTrainerId')}"
-                     th:errors="*{userTrainerId}"></div>
-            </div>
+            <input th:name="userTrainerId" th:value="${session.userId}" class="form-control" type="hidden"
+                   id="userTrainerId">
             <div class="mb-3">
                 <label for="danceStyleId" class="form-label">Dance Style</label>
                 <select class="form-select" id="danceStyleId"

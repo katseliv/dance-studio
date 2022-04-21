@@ -4,7 +4,7 @@ import com.dataart.dancestudio.mapper.BookingMapperImpl;
 import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 import com.dataart.dancestudio.model.entity.BookingEntity;
-import com.dataart.dancestudio.model.entity.NewLessonEntity;
+import com.dataart.dancestudio.model.entity.LessonEntity;
 import com.dataart.dancestudio.model.entity.NewUserEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ public class BookingServiceTest {
             .isDeleted(isDeleted)
             .build();
     final NewUserEntity newUserEntity = NewUserEntity.builder().id(userId).build();
-    final NewLessonEntity lessonEntity = NewLessonEntity.builder().id(lessonId).build();
+    final LessonEntity lessonEntity = LessonEntity.builder().id(lessonId).build();
     private final BookingEntity bookingEntity = BookingEntity.builder()
             .id(id)
             .user(newUserEntity)

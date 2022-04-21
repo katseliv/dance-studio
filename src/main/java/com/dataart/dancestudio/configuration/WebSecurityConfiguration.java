@@ -73,7 +73,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/lessons/create").not().hasRole("USER")
                 .antMatchers(HttpMethod.PUT, "/lessons/{id}").not().hasRole("USER")
                 .antMatchers(HttpMethod.DELETE, "/lessons/{id}").not().hasRole("USER")
-                .antMatchers("/trainers/{id}/lessons").not().hasRole("USER")
+                .antMatchers("/trainers/{id}/lessons").hasRole("TRAINER")
 
                 .anyRequest().authenticated()
 

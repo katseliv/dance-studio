@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Map;
+
 @Controller
 @RequestMapping("/trainers")
 public class TrainerController {
@@ -20,17 +22,17 @@ public class TrainerController {
     protected AuthenticationManager authenticationManager;
 
     @Autowired
-    public TrainerController(final LessonPaginationService lessonPaginationService, final AuthenticationManager authenticationManager) {
+    public TrainerController(final LessonPaginationService lessonPaginationService,
+                             final AuthenticationManager authenticationManager) {
         this.lessonPaginationService = lessonPaginationService;
         this.authenticationManager = authenticationManager;
     }
 
     @GetMapping(path = "/{id}/lessons")
-    public String getTrainerLessons(@RequestParam(name = "page", required = false) final Integer page,
-                                    @RequestParam(name = "size", required = false) final Integer size,
+    public String getTrainerLessons(@RequestParam(required = false) final Map<String, String> allParams,
                                     @PathVariable final int id, final Model model) {
-
-        final UserLessonViewListPage userLessonViewListPage = lessonPaginationService.getUserLessonViewListPage(id, page, size);
+        final UserLessonViewListPage userLessonViewListPage = lessonPaginationService
+                .getUserLessonViewListPage(id, allParams.get("page"), allParams.get("size"));
 
         model.addAttribute("lessonPage", userLessonViewListPage);
         model.addAttribute("booking", BookingDto.builder().build());

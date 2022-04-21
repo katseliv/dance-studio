@@ -25,7 +25,9 @@
         <p th:text="${lesson_view.danceStyleName}"></p>
         <h5>Start Datetime: </h5>
         <p th:text="${#temporals.format(lesson_view.startDatetime, 'dd/MM/yyyy, HH:mm')}"></p>
-        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-outline-primary w-100 mt-2">Return</button>
+        <form th:action="@{/lessons/__${lesson_view.id}__/update}" th:method="get">
+            <button type="submit" class="btn btn-lg btn-outline-success w-100 mt-2">Edit</button>
+        </form>
     </div>
 </div>
 </body>

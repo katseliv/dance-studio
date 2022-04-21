@@ -3,9 +3,7 @@ package com.dataart.dancestudio.service;
 import com.dataart.dancestudio.mapper.LessonMapperImpl;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
-import com.dataart.dancestudio.model.entity.LessonEntity;
-import com.dataart.dancestudio.model.entity.UserEntity;
-import com.dataart.dancestudio.model.entity.view.LessonViewEntity;
+import com.dataart.dancestudio.model.entity.*;
 import com.dataart.dancestudio.repository.LessonRepository;
 import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -14,6 +12,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -54,10 +57,17 @@ public class LessonServiceTest {
     private final LocalDateTime startDatetime = LocalDateTime.now();
     private final boolean isDeleted = false;
     private final String timeZone = "Europe/Moscow";
-    private final LocalDateTime localDateTime = LocalDateTime.parse(startDatetime.toString());
-    private final ZonedDateTime localDateTimeZoned = localDateTime.atZone(ZoneId.of(timeZone));
+    private final ZonedDateTime localDateTimeZoned = startDatetime.atZone(ZoneId.of(timeZone));
     private final ZonedDateTime utcZoned = localDateTimeZoned.withZoneSameInstant(ZoneId.of("UTC"));
 
+    final NewUserEntity userTrainer = NewUserEntity.builder()
+            .id(userTrainerId)
+            .firstName(firstName)
+            .lastName(lastName)
+            .build();
+    final NewUserEntity newUserTrainer = NewUserEntity.builder().id(newUserTrainerId).build();
+    final DanceStyleEntity danceStyle = DanceStyleEntity.builder().id(danceStyleId).name(danceStyleName).build();
+    final RoomEntity room = RoomEntity.builder().id(roomId).build();
     private final LessonDto lessonDto = LessonDto.builder()
             .userTrainerId(userTrainerId)
             .danceStyleId(danceStyleId)
@@ -68,26 +78,23 @@ public class LessonServiceTest {
             .timeZone(timeZone)
             .build();
     private final LessonEntity lessonEntity = LessonEntity.builder()
-            .userTrainerId(userTrainerId)
-            .danceStyleId(danceStyleId)
+            .id(id)
+            .userTrainer(userTrainer)
+            .danceStyle(danceStyle)
             .startDatetime(utcZoned.toLocalDateTime())
             .duration(duration)
-            .roomId(roomId)
+            .room(room)
             .isDeleted(isDeleted)
             .build();
     private final LessonViewDto lessonViewDto = LessonViewDto.builder()
+            .id(id)
             .trainerFirstName(firstName)
             .trainerLastName(lastName)
             .danceStyleName(danceStyleName)
-            .startDatetime(startDatetime)
-            .build();
-    private final LessonViewEntity lessonViewEntity = LessonViewEntity.builder()
-            .trainerFirstName(firstName)
-            .trainerLastName(lastName)
-            .danceStyleName(danceStyleName)
-            .startDatetime(startDatetime)
+            .startDatetime(utcZoned.toLocalDateTime())
             .build();
     private final LessonDto newLessonDto = LessonDto.builder()
+            .id(id)
             .userTrainerId(newUserTrainerId)
             .danceStyleId(danceStyleId)
             .startDatetime(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startDatetime))
@@ -97,25 +104,27 @@ public class LessonServiceTest {
             .timeZone(timeZone)
             .build();
     private final LessonEntity newLessonEntity = LessonEntity.builder()
-            .userTrainerId(newUserTrainerId)
-            .danceStyleId(danceStyleId)
+            .id(id)
+            .userTrainer(newUserTrainer)
+            .danceStyle(danceStyle)
             .startDatetime(utcZoned.toLocalDateTime())
             .duration(duration)
-            .roomId(roomId)
+            .room(room)
             .isDeleted(isDeleted)
             .build();
 
     @Test
     public void createLesson() {
         // given
-        when(lessonRepositoryMock.save(lessonEntity)).thenReturn(id);
+        when(lessonMapperImpl.lessonDtoToLessonEntity(lessonDto)).thenReturn(lessonEntity);
+        when(lessonRepositoryMock.save(lessonEntity)).thenReturn(lessonEntity);
         when(userRepositoryMock.findById(lessonDto.getUserTrainerId())).thenReturn(Optional.of(UserEntity.builder().build()));
 
         // when
         final int lessonId = lessonServiceImpl.createLesson(lessonDto);
 
         // then
-        verify(lessonMapperImpl, times(1)).lessonDtoToLessonEntity(lessonDto);
+        verify(lessonRepositoryMock, times(1)).save(lessonEntity);
         assertEquals(id, lessonId);
     }
 
@@ -143,13 +152,13 @@ public class LessonServiceTest {
                 .isDeleted(isDeleted)
                 .build();
 
+        when(lessonMapperImpl.lessonEntityToLessonDto(lessonEntity)).thenReturn(lessonDtoWithUTCStartDatetime);
         when(lessonRepositoryMock.findById(id)).thenReturn(Optional.of(lessonEntity));
 
         // when
         final LessonDto lessonDtoActual = lessonServiceImpl.getLessonById(id);
 
         // then
-        verify(lessonMapperImpl, times(1)).lessonEntityToLessonDto(lessonEntity);
         verify(lessonRepositoryMock, times(1)).findById(id);
         assertEquals(lessonDtoWithUTCStartDatetime, lessonDtoActual);
     }
@@ -170,113 +179,53 @@ public class LessonServiceTest {
     @Test
     public void getLessonViewById() {
         // given
-        when(lessonRepositoryMock.findViewById(id)).thenReturn(Optional.of(lessonViewEntity));
+        when(lessonMapperImpl.lessonEntityToLessonViewDto(lessonEntity)).thenReturn(lessonViewDto);
+        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.of(lessonEntity));
 
         // when
         final LessonViewDto lessonViewDtoActual = lessonServiceImpl.getLessonViewById(id);
 
         // then
-        verify(lessonMapperImpl, times(1)).lessonViewEntityToLessonViewDto(lessonViewEntity);
-        verify(lessonRepositoryMock, times(1)).findViewById(id);
+        verify(lessonRepositoryMock, times(1)).findById(id);
         assertEquals(lessonViewDto, lessonViewDtoActual);
     }
 
     @Test
     public void getLessonViewByIdWhenOptionalNull() {
         // given
-        when(lessonRepositoryMock.findViewById(id)).thenReturn(Optional.empty());
+        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
         assertThrows(NoSuchElementException.class, () -> lessonServiceImpl.getLessonViewById(id));
 
         // then
-        verify(lessonMapperImpl, never()).lessonViewEntityToLessonViewDto(lessonViewEntity);
-        verify(lessonRepositoryMock, times(1)).findViewById(id);
+        verify(lessonMapperImpl, never()).lessonEntityToLessonViewDto(lessonEntity);
+        verify(lessonRepositoryMock, times(1)).findById(id);
     }
 
     @Test
     public void updateLessonById() {
         // given
-        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.of(lessonEntity));
-        doNothing().when(lessonRepositoryMock).update(newLessonEntity, id);
+        when(lessonMapperImpl.lessonDtoToLessonEntity(newLessonDto)).thenReturn(newLessonEntity);
+        when(lessonRepositoryMock.save(newLessonEntity)).thenReturn(newLessonEntity);
 
         // when
         lessonServiceImpl.updateLessonById(newLessonDto, id);
 
         // then
-        verify(lessonRepositoryMock, times(1)).update(newLessonEntity, id);
-        verify(lessonMapperImpl, times(1)).lessonDtoToLessonEntity(newLessonDto);
-    }
-
-    @Test
-    public void updateLessonByIdWhenOptionalNull() {
-        // given
-        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.empty());
-
-        // when
-        assertThrows(NoSuchElementException.class, () -> lessonServiceImpl.updateLessonById(newLessonDto, id));
-
-        // then
-        verify(lessonRepositoryMock, never()).update(newLessonEntity, id);
-        verify(lessonMapperImpl, never()).lessonDtoToLessonEntity(newLessonDto);
-    }
-
-    @Test
-    public void doesNotUpdateLessonById() {
-        // given
-        final LessonDto lessonDto = LessonDto.builder()
-                .userTrainerId(userTrainerId)
-                .danceStyleId(danceStyleId)
-                .startDatetime(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(utcZoned.toLocalDateTime()))
-                .duration(String.valueOf(duration))
-                .roomId(roomId)
-                .isDeleted(isDeleted)
-                .timeZone(null)
-                .build();
-
-        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.of(lessonEntity));
-
-        // when
-        lessonServiceImpl.updateLessonById(lessonDto, id);
-
-        // then
-        verify(lessonRepositoryMock, never()).update(lessonEntity, id);
-        verify(lessonMapperImpl, never()).lessonDtoToLessonEntity(lessonDto);
-    }
-
-    @Test
-    public void doesNotUpdateLessonByIdWhenOptionalNull() {
-        // given
-        final LessonDto lessonDtoWithoutTimeZone = LessonDto.builder()
-                .userTrainerId(userTrainerId)
-                .danceStyleId(danceStyleId)
-                .startDatetime(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(utcZoned.toLocalDateTime()))
-                .duration(String.valueOf(duration))
-                .roomId(roomId)
-                .isDeleted(isDeleted)
-                .timeZone(null)
-                .build();
-
-        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.empty());
-
-        // when
-        assertThrows(NoSuchElementException.class, () -> lessonServiceImpl.updateLessonById(lessonDtoWithoutTimeZone, id));
-
-        // then
-        verify(lessonRepositoryMock, never()).update(lessonEntity, id);
-        verify(lessonMapperImpl, never()).lessonDtoToLessonEntity(lessonDtoWithoutTimeZone);
+        verify(lessonRepositoryMock, times(1)).save(newLessonEntity);
     }
 
     @Test
     public void deleteLessonById() {
         // given
-        doNothing().when(lessonRepositoryMock).markAsDeleted(id);
+        doNothing().when(lessonRepositoryMock).markAsDeletedById(id);
 
         // when
         lessonServiceImpl.deleteLessonById(id);
 
         // then
-        verify(lessonRepositoryMock, times(1)).markAsDeleted(id);
+        verify(lessonRepositoryMock, times(1)).markAsDeletedById(id);
     }
 
     @Test
@@ -289,17 +238,17 @@ public class LessonServiceTest {
         final String danceStyleName = "";
         final String date = "";
         final List<LessonViewDto> lessonViewDtoListExpected = List.of(lessonViewDto);
-        final List<LessonViewEntity> lessonViewEntities = List.of(lessonViewEntity);
+        final Page<LessonEntity> lessonEntities = new PageImpl<>(List.of(lessonEntity));
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
-
-        when(lessonRepositoryMock.findAllViews(trainerName, danceStyleName, date, pageNumber, pageNumber * pageSize)).thenReturn(lessonViewEntities);
+        when(lessonRepositoryMock.findAll((Specification<LessonEntity>) any(), eq(pageable))).thenReturn(lessonEntities);
 
         // when
-        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listLessons(trainerName, danceStyleName, date, pageNumber, pageNumber * pageSize);
+        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listLessons(trainerName, danceStyleName, date, pageable);
 
         // then
-        verify(lessonMapperImpl, times(1)).lessonViewEntitiesToLessonViewDtoList(lessonViewEntities);
-        verify(lessonRepositoryMock, times(1)).findAllViews(trainerName, danceStyleName, date, pageNumber, pageNumber * pageSize);
+//        verify(lessonMapperImpl, times(1)).lessonEntitiesToLessonViewDtoList(lessonEntities);
+        verify(lessonRepositoryMock, times(1)).findAll((Specification<LessonEntity>) any(), eq(pageable));
         assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
     }
 
@@ -310,17 +259,19 @@ public class LessonServiceTest {
         final int pageSize = 5;
 
         final List<LessonViewDto> lessonViewDtoListExpected = List.of(lessonViewDto);
-        final List<LessonViewEntity> lessonViewEntities = List.of(lessonViewEntity);
+        final List<LessonEntity> lessonEntities = List.of(lessonEntity);
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         final int userId = 1;
-        when(lessonRepositoryMock.findAllUserLessonViews(userId, pageNumber, pageNumber * pageSize)).thenReturn(lessonViewEntities);
+
+        when(lessonMapperImpl.lessonEntitiesToLessonViewDtoList(lessonEntities)).thenReturn(lessonViewDtoListExpected);
+        when(lessonRepositoryMock.findAllByUserTrainerId(userId, pageable)).thenReturn(lessonEntities);
 
         // when
-        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listUserLessons(userId, pageNumber, pageNumber * pageSize);
+        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listUserLessons(userId, pageable);
 
         // then
-        verify(lessonMapperImpl, times(1)).lessonViewEntitiesToLessonViewDtoList(lessonViewEntities);
-        verify(lessonRepositoryMock, times(1)).findAllUserLessonViews(userId, pageNumber, pageNumber * pageSize);
+        verify(lessonRepositoryMock, times(1)).findAllByUserTrainerId(userId, pageable);
         assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
     }
 
@@ -333,30 +284,14 @@ public class LessonServiceTest {
         final int numberOfFilteredLessons = 5;
         final int numberOfFilteredLessonsExpected = 5;
 
-        when(lessonRepositoryMock.numberOfFilteredLessons(trainerName, danceStyleName, date)).thenReturn(Optional.of(numberOfFilteredLessons));
+        when(lessonRepositoryMock.count((Specification<LessonEntity>) any())).thenReturn((long) numberOfFilteredLessons);
 
         // when
         final int numberOfFilteredLessonsActual = lessonServiceImpl.numberOfFilteredLessons(trainerName, danceStyleName, date);
 
         // then
-        verify(lessonRepositoryMock, times(1)).numberOfFilteredLessons(trainerName, danceStyleName, date);
+        verify(lessonRepositoryMock, times(1)).count((Specification<LessonEntity>) any());
         assertEquals(numberOfFilteredLessonsExpected, numberOfFilteredLessonsActual);
-    }
-
-    @Test
-    public void numberOfFilteredLessonsWhenOptionalNull() {
-        // given
-        final String trainerName = "";
-        final String danceStyleName = "";
-        final String date = "";
-
-        when(lessonRepositoryMock.numberOfFilteredLessons(trainerName, danceStyleName, date)).thenReturn(Optional.empty());
-
-        // when
-        assertThrows(NoSuchElementException.class, () -> lessonServiceImpl.numberOfFilteredLessons(trainerName, danceStyleName, date));
-
-        // then
-        verify(lessonRepositoryMock, times(1)).numberOfFilteredLessons(trainerName, danceStyleName, date);
     }
 
     @Test
@@ -367,28 +302,14 @@ public class LessonServiceTest {
         final int numberOfUserLessons = 5;
         final int numberOfUserLessonsExpected = 5;
 
-        when(lessonRepositoryMock.numberOfUserLessons(userId)).thenReturn(Optional.of(numberOfUserLessons));
+        when(lessonRepositoryMock.countAllByUserTrainerId(userId)).thenReturn(numberOfUserLessons);
 
         // when
         final int numberOfFilteredLessonsActual = lessonServiceImpl.numberOfUserLessons(userId);
 
         // then
-        verify(lessonRepositoryMock, times(1)).numberOfUserLessons(userId);
+        verify(lessonRepositoryMock, times(1)).countAllByUserTrainerId(userId);
         assertEquals(numberOfUserLessonsExpected, numberOfFilteredLessonsActual);
-    }
-
-    @Test
-    public void numberOfUserLessonsWhenOptionalNull() {
-        // given
-        final int userId = 1;
-
-        when(lessonRepositoryMock.numberOfUserLessons(userId)).thenReturn(Optional.empty());
-
-        // when
-        assertThrows(NoSuchElementException.class, () -> lessonServiceImpl.numberOfUserLessons(userId));
-
-        // then
-        verify(lessonRepositoryMock, times(1)).numberOfUserLessons(userId);
     }
 
 }

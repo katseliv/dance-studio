@@ -23,7 +23,7 @@ public class LessonDto {
     private final String startDatetime;
 
     @NotNull(message = "Duration is null.")
-    @Pattern(regexp = "-?[0-9]+",  message = "Duration invalid.")
+    @Pattern(regexp = "-?[0-9]+", message = "Duration invalid.")
     @Min(value = 1, message = "Duration is too short.")
     @Max(value = 4, message = "Duration is too long.")
     private final String duration;

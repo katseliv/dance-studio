@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Table(name = "bookings", schema = "dancestudio")
 public class BookingEntity {
 
-    private BookingEntity(final Integer id, final NewUserEntity user, final NewLessonEntity lesson, final Boolean isDeleted) {
+    private BookingEntity(final Integer id, final NewUserEntity user, final LessonEntity lesson, final Boolean isDeleted) {
         this.id = id;
         this.user = user;
         this.lesson = lesson;
@@ -33,7 +33,7 @@ public class BookingEntity {
 
     @ManyToOne
     @JoinColumn(name = "lesson_id", referencedColumnName = "id")
-    private NewLessonEntity lesson;
+    private LessonEntity lesson;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
