@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int createUser(final UserRegistrationDto userRegistrationDto) throws IOException, UserAlreadyExistsException {
+    public int createUser(final UserRegistrationDto userRegistrationDto) throws IOException {
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isEmpty()) {
             final String password = passwordEncoder.encode(userRegistrationDto.getPassword());
             final UserEntity userEntity = userMapper.userRegistrationDtoToUserEntityWithPassword(
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUserById(final int id) throws UserCanNotBeDeletedException {
+    public void deleteUserById(final int id) {
         if (lessonService.numberOfUserLessons(id) == 0) {
             userRepository.markAsDeletedById(id);
             log.info("User with id = {} was deleted.", id);

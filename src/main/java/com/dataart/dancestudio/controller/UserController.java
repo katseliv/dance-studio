@@ -1,6 +1,5 @@
 package com.dataart.dancestudio.controller;
 
-import com.dataart.dancestudio.exception.UserAlreadyExistsException;
 import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
@@ -52,7 +51,7 @@ public class UserController {
 
     @PostMapping("/register")
     public String registerUser(final Model model, @ModelAttribute("user") @Valid final UserRegistrationDto userRegistrationDto,
-                               final BindingResult bindingResult) throws IOException, UserAlreadyExistsException {
+                               final BindingResult bindingResult) throws IOException {
         if (bindingResult.hasErrors()) {
             return "registration";
         }
@@ -81,7 +80,7 @@ public class UserController {
 
     @PostMapping("/create")
     public String createUser(@ModelAttribute("user") @Valid final UserRegistrationDto userRegistrationDto,
-                             final BindingResult bindingResult) throws IOException, UserAlreadyExistsException {
+                             final BindingResult bindingResult) throws IOException {
 
         if (bindingResult.hasErrors()) {
             return "forms/user_form";
