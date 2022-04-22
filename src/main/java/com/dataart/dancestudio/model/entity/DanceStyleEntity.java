@@ -9,15 +9,10 @@ import javax.persistence.*;
 @ToString
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "dance_styles", schema = "dancestudio")
 @Entity(name = "dance_styles")
 public class DanceStyleEntity {
-
-    private DanceStyleEntity(final Integer id, final String name, final String description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

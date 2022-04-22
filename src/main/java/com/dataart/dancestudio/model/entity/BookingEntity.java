@@ -10,17 +10,11 @@ import javax.persistence.*;
 @ToString
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "bookings")
 @Where(clause = "is_deleted = false")
 @Table(name = "bookings", schema = "dancestudio")
 public class BookingEntity {
-
-    private BookingEntity(final Integer id, final NewUserEntity user, final LessonEntity lesson, final Boolean isDeleted) {
-        this.id = id;
-        this.user = user;
-        this.lesson = lesson;
-        this.isDeleted = isDeleted;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +27,7 @@ public class BookingEntity {
 
     @ManyToOne
     @JoinColumn(name = "lesson_id", referencedColumnName = "id")
-    private LessonEntity lesson;
+    private NewLessonEntity lesson;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;

@@ -10,19 +10,11 @@ import javax.persistence.*;
 @ToString
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "rooms")
 @Where(clause = "is_deleted = false")
 @Table(name = "rooms", schema = "dancestudio")
 public class RoomEntity {
-
-    private RoomEntity(final Integer id, final String name, final String description, final StudioEntity studio,
-                       final Boolean isDeleted) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.studio = studio;
-        this.isDeleted = isDeleted;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
