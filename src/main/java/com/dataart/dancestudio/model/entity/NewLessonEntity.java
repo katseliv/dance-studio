@@ -1,9 +1,6 @@
 package com.dataart.dancestudio.model.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -13,25 +10,12 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "lessons")
 @Where(clause = "is_deleted = false")
 @Table(name = "lessons", schema = "dancestudio")
 public class NewLessonEntity {
-
-    public NewLessonEntity() {
-    }
-
-    private NewLessonEntity(final Integer id, final NewUserEntity userTrainer, final DanceStyleEntity danceStyle,
-                            final LocalDateTime startDatetime, final Integer duration, final RoomEntity room,
-                            final Boolean isDeleted) {
-        this.id = id;
-        this.userTrainer = userTrainer;
-        this.danceStyle = danceStyle;
-        this.startDatetime = startDatetime;
-        this.duration = duration;
-        this.room = room;
-        this.isDeleted = isDeleted;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

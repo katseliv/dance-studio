@@ -10,18 +10,10 @@ import java.time.LocalTime;
 @ToString
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "studios")
 @Table(name = "studios", schema = "dancestudio")
 public class StudioEntity {
-
-    private StudioEntity(final Integer id, final String name, final String description, final LocalTime startTime,
-                         final LocalTime endTime) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

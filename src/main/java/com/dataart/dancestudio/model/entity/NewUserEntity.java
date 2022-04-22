@@ -10,26 +10,11 @@ import javax.persistence.*;
 @ToString
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "users")
 @Where(clause = "is_deleted = false")
 @Table(name = "users", schema = "dancestudio")
 public class NewUserEntity {
-
-    private NewUserEntity(final Integer id, final String username, final String firstName, final String lastName,
-                          final byte[] image, final String email, final String phoneNumber, final String password,
-                          final Role role, final String timeZone, final Boolean isDeleted) {
-        this.id = id;
-        this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.image = image;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.password = password;
-        this.role = role;
-        this.timeZone = timeZone;
-        this.isDeleted = isDeleted;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
