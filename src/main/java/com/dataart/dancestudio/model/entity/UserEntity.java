@@ -1,105 +1,76 @@
 package com.dataart.dancestudio.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
+import java.util.Arrays;
+import java.util.Objects;
 
 @Getter
-@EqualsAndHashCode
-@AllArgsConstructor
+@Setter
+@ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Entity(name = "users")
+@Where(clause = "is_deleted = false")
+@Table(name = "users", schema = "dancestudio")
 public class UserEntity {
 
-    private final Integer id;
-    private final String username;
-    private final String firstName;
-    private final String lastName;
-    private final byte[] image;
-    private final String email;
-    private final String phoneNumber;
-    private final Integer roleId;
-    private final String timeZone;
-    private final Boolean isDeleted;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
-    public static UserEntityBuilder builder() {
-        return new UserEntityBuilder();
+    @Column(name = "username")
+    private String username;
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "image")
+    private byte[] image;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "role_id")
+    private Role role;
+
+    @Column(name = "time_zone")
+    private String timeZone;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final UserEntity that = (UserEntity) o;
+        return Objects.equals(id, that.id) && Objects.equals(username, that.username)
+                && Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName)
+                && Arrays.equals(image, that.image) && Objects.equals(email, that.email)
+                && Objects.equals(phoneNumber, that.phoneNumber) && Objects.equals(password, that.password)
+                && role == that.role && Objects.equals(timeZone, that.timeZone)
+                && Objects.equals(isDeleted, that.isDeleted);
     }
 
-    public static class UserEntityBuilder {
-
-        private Integer id;
-        private String username;
-        private String firstName;
-        private String lastName;
-        private byte[] image;
-        private String email;
-        private String phoneNumber;
-        private Integer roleId;
-        private String timeZone;
-        private Boolean isDeleted;
-
-        private boolean isUsed = false;
-
-        public UserEntityBuilder() {
-        }
-
-        public UserEntityBuilder id(final Integer id) {
-            this.id = id;
-            return this;
-        }
-
-        public UserEntityBuilder username(final String username) {
-            this.username = username;
-            return this;
-        }
-
-        public UserEntityBuilder firstName(final String firstName) {
-            this.firstName = firstName;
-            return this;
-        }
-
-        public UserEntityBuilder lastName(final String lastName) {
-            this.lastName = lastName;
-            return this;
-        }
-
-        public UserEntityBuilder image(final byte[] image) {
-            this.image = image;
-            return this;
-        }
-
-        public UserEntityBuilder email(final String email) {
-            this.email = email;
-            return this;
-        }
-
-        public UserEntityBuilder phoneNumber(final String phoneNumber) {
-            this.phoneNumber = phoneNumber;
-            return this;
-        }
-
-        public UserEntityBuilder roleId(final Integer roleId) {
-            this.roleId = roleId;
-            return this;
-        }
-
-        public UserEntityBuilder timeZone(final String timeZone) {
-            this.timeZone = timeZone;
-            return this;
-        }
-
-        public UserEntityBuilder isDeleted(final Boolean isDeleted) {
-            this.isDeleted = isDeleted;
-            return this;
-        }
-
-        public UserEntity build() {
-            if (!isUsed) {
-                isUsed = true;
-                return new UserEntity(id, username, firstName, lastName, image, email, phoneNumber, roleId, timeZone, isDeleted);
-            }
-            throw new RuntimeException("Builder already built");
-        }
-
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(id, username, firstName, lastName, email, phoneNumber, password, role, timeZone, isDeleted);
+        result = 31 * result + Arrays.hashCode(image);
+        return result;
     }
 
 }

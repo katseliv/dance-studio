@@ -29,7 +29,8 @@ public interface LessonRepository extends JpaRepository<LessonEntity, Integer>, 
     @Override
     Page<LessonEntity> findAll(Specification<LessonEntity> specification, @NonNull Pageable pageable);
 
-    static Specification<LessonEntity> hasTrainerNameAndDanceStyleNameAndDate(final String trainerName, final String danceStyleName,
+    static Specification<LessonEntity> hasTrainerNameAndDanceStyleNameAndDate(final String trainerName,
+                                                                              final String danceStyleName,
                                                                               final String date) {
         return (root, query, criteriaBuilder) -> {
             final Predicate trainerNamePredicate = Strings.isBlank(trainerName) ? null : criteriaBuilder.or(

@@ -5,7 +5,6 @@ import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.entity.LessonEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 import java.time.LocalDateTime;
@@ -15,6 +14,18 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface LessonMapper {
+
+    @Mapping(target = "userTrainerId", source = "userTrainer.id")
+    @Mapping(target = "danceStyleId", source = "danceStyle.id")
+    @Mapping(target = "roomId", source = "room.id")
+    @Mapping(target = "isDeleted", defaultValue = "false")
+    LessonDto lessonEntityToLessonDto(LessonEntity entity);
+
+    @Mapping(target = "trainerFirstName", source = "userTrainer.firstName")
+    @Mapping(target = "trainerLastName", source = "userTrainer.lastName")
+    @Mapping(target = "danceStyleName", source = "danceStyle.name")
+    @Mapping(target = "startDatetime", source = "startDatetime")
+    LessonViewDto lessonEntityToLessonViewDto(LessonEntity lessonEntity);
 
     @Mapping(target = "userTrainer.id", source = "userTrainerId")
     @Mapping(target = "danceStyle.id", source = "danceStyleId")
@@ -33,18 +44,6 @@ public interface LessonMapper {
         final ZonedDateTime utcZoned = localDateTimeZoned.withZoneSameInstant(ZoneId.of("UTC"));
         return utcZoned.toLocalDateTime();
     }
-
-    @Mapping(target = "userTrainerId", source = "userTrainer.id")
-    @Mapping(target = "danceStyleId", source = "danceStyle.id")
-    @Mapping(target = "roomId", source = "room.id")
-    @Mapping(target = "isDeleted", defaultValue = "false")
-    LessonDto lessonEntityToLessonDto(LessonEntity entity);
-
-    @Mapping(target = "trainerFirstName", source = "userTrainer.firstName")
-    @Mapping(target = "trainerLastName", source = "userTrainer.lastName")
-    @Mapping(target = "danceStyleName", source = "danceStyle.name")
-    @Mapping(target = "startDatetime", source = "startDatetime")
-    LessonViewDto lessonEntityToLessonViewDto(LessonEntity lessonEntity);
 
     List<LessonViewDto> lessonEntitiesToLessonViewDtoList(Iterable<LessonEntity> entities);
 

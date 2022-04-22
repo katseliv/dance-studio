@@ -21,9 +21,8 @@ public class BookingController {
     }
 
     @PostMapping("/create")
-    public String createBooking(final Model model, @ModelAttribute("booking") final BookingDto bookingDto) {
+    public String createBooking(@ModelAttribute("booking") final BookingDto bookingDto) {
         final int id = bookingService.createBooking(bookingDto);
-        model.addAttribute("booking_view", bookingService.getBookingViewById(id));
         return "redirect:/bookings/" + id;
     }
 

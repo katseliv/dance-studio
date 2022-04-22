@@ -3,7 +3,10 @@ package com.dataart.dancestudio.service;
 import com.dataart.dancestudio.mapper.LessonMapperImpl;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
-import com.dataart.dancestudio.model.entity.*;
+import com.dataart.dancestudio.model.entity.DanceStyleEntity;
+import com.dataart.dancestudio.model.entity.LessonEntity;
+import com.dataart.dancestudio.model.entity.RoomEntity;
+import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.LessonRepository;
 import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -60,12 +63,12 @@ public class LessonServiceTest {
     private final ZonedDateTime localDateTimeZoned = startDatetime.atZone(ZoneId.of(timeZone));
     private final ZonedDateTime utcZoned = localDateTimeZoned.withZoneSameInstant(ZoneId.of("UTC"));
 
-    final NewUserEntity userTrainer = NewUserEntity.builder()
+    final UserEntity userTrainer = UserEntity.builder()
             .id(userTrainerId)
             .firstName(firstName)
             .lastName(lastName)
             .build();
-    final NewUserEntity newUserTrainer = NewUserEntity.builder().id(newUserTrainerId).build();
+    final UserEntity newUserTrainer = UserEntity.builder().id(newUserTrainerId).build();
     final DanceStyleEntity danceStyle = DanceStyleEntity.builder().id(danceStyleId).name(danceStyleName).build();
     final RoomEntity room = RoomEntity.builder().id(roomId).build();
     private final LessonDto lessonDto = LessonDto.builder()

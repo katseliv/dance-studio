@@ -5,7 +5,7 @@ import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 import com.dataart.dancestudio.model.entity.BookingEntity;
 import com.dataart.dancestudio.model.entity.LessonEntity;
-import com.dataart.dancestudio.model.entity.NewUserEntity;
+import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +48,7 @@ public class BookingServiceTest {
             .lessonId(lessonId)
             .isDeleted(isDeleted)
             .build();
-    final NewUserEntity newUserEntity = NewUserEntity.builder().id(userId).build();
+    final UserEntity newUserEntity = UserEntity.builder().id(userId).build();
     final LessonEntity lessonEntity = LessonEntity.builder().id(lessonId).build();
     private final BookingEntity bookingEntity = BookingEntity.builder()
             .id(id)

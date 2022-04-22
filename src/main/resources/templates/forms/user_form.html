@@ -65,8 +65,7 @@
                        th:field="*{password}" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''">
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
             </div>
-            <input th:field="*{timeZone}" class="form-control" type="hidden" id="timeZone"
-                   name="timeZone">
+            <input th:field="*{timeZone}" class="form-control" type="hidden" id="timeZone" name="timeZone">
             <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-outline-success w-100 mt-2">Submit</button>
         </form>
     </div>
