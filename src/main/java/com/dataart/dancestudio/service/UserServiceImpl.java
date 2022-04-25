@@ -8,6 +8,7 @@ import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Transactional
@@ -39,43 +40,60 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int createUser(final UserRegistrationDto userRegistrationDto) throws IOException, UserAlreadyExistsException {
+    public int createUser(final UserRegistrationDto userRegistrationDto) throws IOException {
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isEmpty()) {
             final String password = passwordEncoder.encode(userRegistrationDto.getPassword());
-            return userRepository.save(
-                    userMapper.userRegistrationDtoToUserRegistrationEntityWithPassword(userRegistrationDto, password));
+            final UserEntity userEntity = userMapper.userRegistrationDtoToUserEntityWithPassword(
+                    userRegistrationDto, password);
+            userEntity.setRole(Role.USER);
+            final UserEntity newUserEntity = userRepository.save(userEntity);
+            final Integer id = newUserEntity.getId();
+            log.info("User with id = {} was created.", id);
+            return id;
         }
+        log.info("User wasn't created.");
         throw new UserAlreadyExistsException("User already exists in the database!");
     }
 
     @Override
     public UserDto getUserById(final int id) {
-        return userMapper.userEntityToUserDto(userRepository.findById(id).orElseThrow());
+        final Optional<UserEntity> userEntity = userRepository.findById(id);
+        userEntity.ifPresentOrElse(
+                (user) -> log.info("User with id = {} was found.", user.getId()),
+                () -> log.info("User wasn't found."));
+        return userMapper.userEntityToUserDto(userEntity.orElseThrow());
     }
 
     @Override
     public UserViewDto getUserViewById(final int id) {
-        return userMapper.userEntityToUserViewDto(userRepository.findById(id).orElseThrow());
+        final Optional<UserEntity> userEntity = userRepository.findById(id);
+        userEntity.ifPresentOrElse(
+                (user) -> log.info("User with id = {} was found.", user.getId()),
+                () -> log.info("User wasn't found."));
+        return userMapper.userEntityToUserViewDto(userEntity.orElseThrow());
     }
 
     @Override
     public int getUserIdByEmail(final String email) {
-        final UserDetailsDto userDetailsDto = userMapper.userDetailsEntityToUserDetailsDto(
-                userRepository.findByEmail(email).orElseThrow()
-        );
-        return userDetailsDto.getId();
+        final UserDetailsDto userDetailsDto = userMapper.userEntityToUserDetailsDto(
+                userRepository.findByEmail(email).orElseThrow());
+        final Integer id = userDetailsDto.getId();
+        log.info("User with id = {} was found.", id);
+        return id;
     }
 
     @Override
     public void updateUserById(final UserDto userDto, final int id) {
         try {
+            final UserEntity userEntity = userRepository.findById(id).orElseThrow();
             if (!userDto.getMultipartFile().isEmpty()) {
-                userRepository.update(userMapper.userDtoToUserEntity(userDto), id);
+                userMapper.mergeUserEntityAndUserDto(userEntity, userDto);
+                userRepository.save(userEntity);
+                log.info("User with id = {} was updated with picture.", id);
             } else {
-                final UserDto userDtoFromDB = getUserById(id);
-                if (!isAnyUserProfileDataUpdated(userDto, userDtoFromDB)) {
-                    userRepository.updateWithoutPicture(userMapper.userDtoToUserEntity(userDto), id);
-                }
+                userMapper.mergeUserEntityAndUserDtoWithoutPicture(userEntity, userDto);
+                userRepository.save(userEntity);
+                log.info("User with id = {} was updated without picture.", id);
             }
         } catch (final IOException e) {
             log.error("An exception occurred!", e);
@@ -83,29 +101,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUserById(final int id) throws UserCanNotBeDeletedException {
+    public void deleteUserById(final int id) {
         if (lessonService.numberOfUserLessons(id) == 0) {
-            userRepository.markAsDeleted(id);
+            userRepository.markAsDeletedById(id);
+            log.info("User with id = {} was deleted.", id);
         } else {
+            log.info("User with id = {} wasn't deleted.", id);
             throw new UserCanNotBeDeletedException("User has lessons!!!");
         }
     }
 
     @Override
     public List<UserViewDto> listUsers() {
-        return userMapper.userEntitiesToUserViewDtoList(userRepository.findAll());
+        final List<UserEntity> userEntities = userRepository.findAll();
+        if (userEntities.size() != 0) {
+            log.info("Users were found.");
+        } else {
+            log.info("There aren't users.");
+        }
+        return userMapper.userEntitiesToUserViewDtoList(userEntities);
     }
 
     @Override
     public List<UserViewDto> listTrainers() {
-        return userMapper.userEntitiesToUserViewDtoList(userRepository.findAllByRole(Role.TRAINER));
-    }
-
-    private boolean isAnyUserProfileDataUpdated(final UserDto userDto, final UserDto userDtoFromDB) {
-        return Objects.equals(userDto.getFirstName(), userDtoFromDB.getFirstName()) &&
-                Objects.equals(userDto.getLastName(), userDtoFromDB.getLastName()) &&
-                Objects.equals(userDto.getEmail(), userDtoFromDB.getEmail()) &&
-                Objects.equals(userDto.getPhoneNumber(), userDtoFromDB.getPhoneNumber());
+        final List<UserEntity> userEntities = userRepository.findAllByRole(Role.TRAINER);
+        if (userEntities.size() != 0) {
+            log.info("Users were found.");
+        } else {
+            log.info("There aren't users.");
+        }
+        return userMapper.userEntitiesToUserViewDtoList(userEntities);
     }
 
 }

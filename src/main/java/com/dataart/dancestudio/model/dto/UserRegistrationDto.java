@@ -38,7 +38,6 @@ public class UserRegistrationDto {
     @NotBlank(message = "Password is blank.")
     private final String password;
 
-    @NotBlank(message = "Password confirmation is blank.")
     private final String passwordConfirmation;
     private final Integer roleId;
     private final String timeZone;

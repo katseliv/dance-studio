@@ -1,12 +1,14 @@
 package com.dataart.dancestudio.service;
 
+import com.dataart.dancestudio.exception.BookingException;
 import com.dataart.dancestudio.mapper.BookingMapperImpl;
 import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 import com.dataart.dancestudio.model.entity.BookingEntity;
-import com.dataart.dancestudio.model.entity.NewLessonEntity;
-import com.dataart.dancestudio.model.entity.NewUserEntity;
+import com.dataart.dancestudio.model.entity.LessonEntity;
+import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
+import com.dataart.dancestudio.repository.LessonRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,11 +34,15 @@ public class BookingServiceTest {
     @Mock
     private BookingRepository bookingRepositoryMock;
 
+    @Mock
+    private LessonRepository lessonRepositoryMock;
+
     @InjectMocks
     private BookingServiceImpl bookingServiceImpl;
 
     private final int id = 1;
     private final int userId = 13;
+    private final int newUserId = 15;
     private final int lessonId = 14;
     private final boolean isDeleted = false;
     private final String firstName = "Alex";
@@ -48,11 +54,12 @@ public class BookingServiceTest {
             .lessonId(lessonId)
             .isDeleted(isDeleted)
             .build();
-    final NewUserEntity newUserEntity = NewUserEntity.builder().id(userId).build();
-    final NewLessonEntity lessonEntity = NewLessonEntity.builder().id(lessonId).build();
+    final UserEntity userEntity = UserEntity.builder().id(userId).build();
+    final UserEntity newUserEntity = UserEntity.builder().id(newUserId).build();
+    final LessonEntity lessonEntity = LessonEntity.builder().id(lessonId).userTrainer(newUserEntity).build();
     private final BookingEntity bookingEntity = BookingEntity.builder()
             .id(id)
-            .user(newUserEntity)
+            .user(userEntity)
             .lesson(lessonEntity)
             .build();
     private final BookingViewDto bookingViewDto = BookingViewDto.builder()
@@ -63,10 +70,11 @@ public class BookingServiceTest {
             .build();
 
     @Test
-    public void createBooking() {
+    public void createBooking() throws BookingException {
         // given
         when(bookingMapperImpl.bookingDtoToBookingEntity(bookingDto)).thenReturn(bookingEntity);
         when(bookingRepositoryMock.save(bookingEntity)).thenReturn(bookingEntity);
+        when(lessonRepositoryMock.findById(lessonId)).thenReturn(Optional.of(lessonEntity));
 
         // when
         final int bookingId = bookingServiceImpl.createBooking(bookingDto);

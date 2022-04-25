@@ -25,7 +25,6 @@
             <th scope="col">Dance Style</th>
             <th scope="col">Start Datetime</th>
             <th scope="col"></th>
-            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -37,13 +36,6 @@
             <td th:text="${lesson.danceStyleName}"></td>
             <td class="startDatetime" th:text="${#temporals.format(lesson.startDatetime, 'dd/MM/yyyy, HH:mm')}"></td>
             <td>
-                <form th:action="@{/bookings/create}" th:object="${booking}" th:method="post">
-                    <input type="hidden" th:value="${session.userId}" th:attr="name='userId'"/>
-                    <input type="hidden" th:value="${lesson.id}" th:attr="name='lessonId'"/>
-                    <button type="submit" class="btn btn-outline-success">Book</button>
-                </form>
-            </td>
-            <td>
                 <form th:action="@{/lessons/__${lesson.id}__}" th:method="delete">
                     <button type="submit" class="btn btn-outline-danger">Delete</button>
                 </form>
@@ -52,7 +44,7 @@
         </tbody>
     </table>
     <nav aria-label="Page navigation example">
-        <ul class="pagination" th:if="${lessonPage.totalPages != 0}">
+        <ul class="pagination" th:if="${lessonPage.totalPages > 1}">
             <li class="page-item">
                 <a class="page-link"
                    th:href="@{/trainers/__${session.userId}__/lessons(page=${1}, size=${lessonPage.pageSize})}">

@@ -3,14 +3,20 @@ package com.dataart.dancestudio.service;
 import com.dataart.dancestudio.mapper.LessonMapper;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
+import com.dataart.dancestudio.model.entity.LessonEntity;
 import com.dataart.dancestudio.repository.LessonRepository;
 import com.dataart.dancestudio.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @Transactional
 @Service
 public class LessonServiceImpl implements LessonService {
@@ -30,56 +36,95 @@ public class LessonServiceImpl implements LessonService {
     @Override
     public int createLesson(final LessonDto lessonDto) {
         if (userRepository.findById(lessonDto.getUserTrainerId()).isPresent()) {
-            return lessonRepository.save(lessonMapper.lessonDtoToLessonEntity(lessonDto));
+            final LessonEntity lessonEntity = lessonRepository.save(lessonMapper.lessonDtoToLessonEntity(lessonDto));
+            final int id = lessonEntity.getId();
+            log.info(lessonEntity + " was created.");
+            return id;
         } else {
+            log.info("Lesson wasn't created");
             throw new RuntimeException("Lesson wasn't created");
         }
     }
 
     @Override
     public LessonDto getLessonById(final int id) {
-        return lessonMapper.lessonEntityToLessonDto(lessonRepository.findById(id).orElseThrow());
+        final Optional<LessonEntity> lessonEntity = lessonRepository.findById(id);
+        lessonEntity.ifPresentOrElse(
+                (lesson) -> log.info("Lesson with id = {} was found.", lesson.getId()),
+                () -> log.info("Lesson wasn't found."));
+        return lessonMapper.lessonEntityToLessonDto(lessonEntity.orElseThrow());
     }
 
     @Override
     public LessonViewDto getLessonViewById(final int id) {
-        return lessonMapper.lessonViewEntityToLessonViewDto(lessonRepository.findViewById(id).orElseThrow());
+        final Optional<LessonEntity> lessonEntity = lessonRepository.findById(id);
+        lessonEntity.ifPresentOrElse(
+                (lesson) -> log.info("Lesson with id = {} was found.", lesson.getId()),
+                () -> log.info("Lesson wasn't found."));
+        return lessonMapper.lessonEntityToLessonViewDto(lessonEntity.orElseThrow());
     }
 
     @Override
     public void updateLessonById(final LessonDto lessonDto, final int id) {
-        final LessonDto lessonDtoFromDB = getLessonById(id);
-        if (!lessonDto.equals(lessonDtoFromDB)) {
-            lessonRepository.update(lessonMapper.lessonDtoToLessonEntity(lessonDto), id);
-        }
+        final LessonEntity lessonEntity = lessonMapper.lessonDtoToLessonEntity(lessonDto);
+        lessonEntity.setId(id);
+        lessonRepository.save(lessonEntity);
+        log.info("Lesson with id = {} was updated.", id);
     }
 
     @Override
     public void deleteLessonById(final int id) {
-        lessonRepository.markAsDeleted(id);
+        lessonRepository.markAsDeletedById(id);
+        log.info("Lesson with id = {} was deleted.", id);
     }
 
     @Override
     public List<LessonViewDto> listLessons(final String trainerName, final String danceStyleName, final String date,
-                                           final int limit, final int offset) {
-        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(
-                lessonRepository.findAllViews(trainerName, danceStyleName, date, limit, offset));
+                                           final Pageable pageable) {
+        final Specification<LessonEntity> specification = LessonRepository.hasTrainerNameAndDanceStyleNameAndDate(
+                trainerName, danceStyleName, date);
+        final List<LessonEntity> lessonEntities = lessonRepository.findAll(specification, pageable).getContent();
+        if (lessonEntities.size() != 0) {
+            log.info("Lessons were found.");
+        } else {
+            log.info("There aren't lessons.");
+        }
+        return lessonMapper.lessonEntitiesToLessonViewDtoList(lessonEntities);
     }
 
     @Override
-    public List<LessonViewDto> listUserLessons(final int userId, final int limit, final int offset) {
-        return lessonMapper.lessonViewEntitiesToLessonViewDtoList(
-                lessonRepository.findAllUserLessonViews(userId, limit, offset));
+    public List<LessonViewDto> listUserLessons(final int userId, final Pageable pageable) {
+        final List<LessonEntity> lessonEntities = lessonRepository.findAllByUserTrainerId(userId, pageable);
+        if (lessonEntities.size() != 0) {
+            log.info("Lessons were found.");
+        } else {
+            log.info("There aren't lessons.");
+        }
+        return lessonMapper.lessonEntitiesToLessonViewDtoList(lessonEntities);
     }
 
     @Override
     public int numberOfFilteredLessons(final String trainerName, final String danceStyleName, final String date) {
-        return lessonRepository.numberOfFilteredLessons(trainerName, danceStyleName, date).orElseThrow();
+        final Specification<LessonEntity> specification = LessonRepository.hasTrainerNameAndDanceStyleNameAndDate(
+                trainerName, danceStyleName, date);
+        final long numberOfFilteredLessons = lessonRepository.count(specification);
+        if (numberOfFilteredLessons != 0) {
+            log.info("There are lessons.");
+        } else {
+            log.info("There aren't lessons.");
+        }
+        return (int) numberOfFilteredLessons;
     }
 
     @Override
     public int numberOfUserLessons(final int userId) {
-        return lessonRepository.numberOfUserLessons(userId).orElseThrow();
+        final int numberOfUserLessons = lessonRepository.countAllByUserTrainerId(userId);
+        if (numberOfUserLessons != 0) {
+            log.info("There are lessons.");
+        } else {
+            log.info("There aren't lessons.");
+        }
+        return numberOfUserLessons;
     }
 
 }

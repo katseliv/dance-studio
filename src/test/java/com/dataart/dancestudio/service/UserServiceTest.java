@@ -8,9 +8,7 @@ import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.entity.Role;
-import com.dataart.dancestudio.model.entity.UserDetailsEntity;
 import com.dataart.dancestudio.model.entity.UserEntity;
-import com.dataart.dancestudio.model.entity.UserRegistrationEntity;
 import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,15 +69,17 @@ public class UserServiceTest {
         when(bCryptPasswordEncoder.encode(password)).thenReturn(encodePassword);
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
-        final UserRegistrationEntity userRegistrationEntity = UserRegistrationEntity.builder()
+        final byte[] multipartFileBytes = multipartFile.getBytes();
+        final UserEntity userEntity = UserEntity.builder()
+                .id(id)
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
-                .image(multipartFile.getBytes())
+                .image(multipartFileBytes)
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .password(encodePassword)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
@@ -96,16 +96,15 @@ public class UserServiceTest {
                 .isDeleted(isDeleted)
                 .build();
 
-        when(userRepositoryMock.save(userRegistrationEntity)).thenReturn(id);
+        doReturn(userEntity).when(userMapperImpl).userRegistrationDtoToUserEntityWithPassword(userRegistrationDto, userEntity.getPassword());
         when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.empty());
+        when(userRepositoryMock.save(userEntity)).thenReturn(userEntity);
 
         // when
         final int userId = userServiceImpl.createUser(userRegistrationDto);
 
         // then
-        verify(userRepositoryMock, times(1)).save(userRegistrationEntity);
-        verify(userMapperImpl, times(1)).userRegistrationDtoToUserRegistrationEntityWithPassword(
-                userRegistrationDto, userRegistrationEntity.getPassword());
+        verify(userRepositoryMock, times(1)).save(userEntity);
         assertEquals(id, userId);
     }
 
@@ -117,7 +116,7 @@ public class UserServiceTest {
 
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
-        final UserRegistrationEntity userRegistrationEntity = UserRegistrationEntity.builder()
+        final UserEntity userEntity = UserEntity.builder()
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
@@ -125,7 +124,7 @@ public class UserServiceTest {
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .password(encodePassword)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
@@ -141,21 +140,16 @@ public class UserServiceTest {
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
-        final UserDetailsEntity userDetailsEntity = UserDetailsEntity.builder()
-                .id(id)
-                .email(email)
-                .password(encodePassword)
-                .build();
 
-        when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.of(userDetailsEntity));
+        when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.of(userEntity));
 
         // when
         assertThrows(UserAlreadyExistsException.class, () -> userServiceImpl.createUser(userRegistrationDto));
 
         // then
-        verify(userRepositoryMock, never()).save(userRegistrationEntity);
-        verify(userMapperImpl, never()).userRegistrationDtoToUserRegistrationEntityWithPassword(
-                userRegistrationDto, userRegistrationEntity.getPassword());
+        verify(userMapperImpl, never()).userRegistrationDtoToUserEntityWithPassword(
+                userRegistrationDto, userEntity.getPassword());
+        verify(userRepositoryMock, never()).save(userEntity);
     }
 
     @Test
@@ -164,17 +158,19 @@ public class UserServiceTest {
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity userEntity = UserEntity.builder()
+                .id(id)
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
         final UserDto userDtoWithoutMultipartFile = UserDto.builder()
+                .id(id)
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
@@ -185,13 +181,13 @@ public class UserServiceTest {
                 .isDeleted(isDeleted)
                 .build();
 
+        when(userMapperImpl.userEntityToUserDto(userEntity)).thenReturn(userDtoWithoutMultipartFile);
         when(userRepositoryMock.findById(id)).thenReturn(Optional.of(userEntity));
 
         // when
         final UserDto userDtoActual = userServiceImpl.getUserById(id);
 
         // then
-        verify(userMapperImpl, times(1)).userEntityToUserDto(userEntity);
         verify(userRepositoryMock, times(1)).findById(id);
         assertEquals(userDtoWithoutMultipartFile, userDtoActual);
     }
@@ -208,7 +204,7 @@ public class UserServiceTest {
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
@@ -235,7 +231,7 @@ public class UserServiceTest {
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
@@ -271,7 +267,7 @@ public class UserServiceTest {
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
@@ -292,24 +288,26 @@ public class UserServiceTest {
         final String password = "45";
         final String encodePassword = bCryptPasswordEncoder.encode(password);
 
-        final UserDetailsEntity userDetailsEntity = UserDetailsEntity.builder()
+        final UserEntity userEntity = UserEntity.builder()
                 .id(id)
                 .email(email)
+                .role(Role.USER)
                 .password(encodePassword)
                 .build();
         final UserDetailsDto userDetailsDto = UserDetailsDto.builder()
                 .id(id)
                 .email(email)
+                .roles(List.of(Role.USER))
                 .password(encodePassword)
                 .build();
 
-        when(userRepositoryMock.findByEmail(email)).thenReturn(Optional.of(userDetailsEntity));
+        when(userRepositoryMock.findByEmail(email)).thenReturn(Optional.of(userEntity));
 
         // when
         final int userId = userServiceImpl.getUserIdByEmail(email);
 
         // then
-        verify(userMapperImpl, times(1)).userDetailsEntityToUserDetailsDto(userDetailsEntity);
+        verify(userMapperImpl, times(1)).userEntityToUserDetailsDto(userEntity);
         verify(userRepositoryMock, times(1)).findByEmail(email);
         assertEquals(userDetailsDto.getId(), userId);
     }
@@ -320,9 +318,10 @@ public class UserServiceTest {
         final String password = "45";
         final String encodePassword = bCryptPasswordEncoder.encode(password);
 
-        final UserDetailsEntity userDetailsEntity = UserDetailsEntity.builder()
+        final UserEntity userEntity = UserEntity.builder()
                 .id(id)
                 .email(email)
+                .role(Role.USER)
                 .password(encodePassword)
                 .build();
 
@@ -332,15 +331,27 @@ public class UserServiceTest {
         assertThrows(NoSuchElementException.class, () -> userServiceImpl.getUserIdByEmail(email));
 
         // then
-        verify(userMapperImpl, never()).userDetailsEntityToUserDetailsDto(userDetailsEntity);
+        verify(userMapperImpl, never()).userEntityToUserDetailsDto(userEntity);
         verify(userRepositoryMock, times(1)).findByEmail(email);
     }
+
 
     @Test
     public void updateUserByIdWithChangedFieldAndImage() throws IOException {
         // given
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
+        final UserEntity userEntity = UserEntity.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .image(multipartFile.getBytes())
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .role(Role.USER)
+                .timeZone(timeZone)
+                .isDeleted(isDeleted)
+                .build();
         final UserEntity newUserEntityWithUpdatedImage = UserEntity.builder()
                 .username(username)
                 .firstName(firstName)
@@ -348,7 +359,7 @@ public class UserServiceTest {
                 .image(new byte[]{1, 20, 30, 40})
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
@@ -365,13 +376,14 @@ public class UserServiceTest {
                 .build();
 
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 20, 30, 40});
+        when(userRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(userEntity));
+        when(userRepositoryMock.save(newUserEntityWithUpdatedImage)).thenReturn(newUserEntityWithUpdatedImage);
 
         // when
         userServiceImpl.updateUserById(newUserDto, id);
 
         // then
-        verify(userRepositoryMock, times(1)).update(newUserEntityWithUpdatedImage, id);
-        verify(userMapperImpl, times(1)).userDtoToUserEntity(newUserDto);
+        verify(userRepositoryMock, times(1)).save(newUserEntityWithUpdatedImage);
     }
 
     @Test
@@ -386,7 +398,7 @@ public class UserServiceTest {
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
@@ -397,7 +409,7 @@ public class UserServiceTest {
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
@@ -414,16 +426,13 @@ public class UserServiceTest {
                 .build();
 
         when(multipartFile.isEmpty()).thenReturn(true);
-
-        doNothing().when(userRepositoryMock).updateWithoutPicture(newUserEntity, id);
         when(userRepositoryMock.findById(id)).thenReturn(Optional.of(userEntity));
 
         // when
         userServiceImpl.updateUserById(newUserDto, id);
 
         // then
-        verify(userRepositoryMock, times(1)).updateWithoutPicture(newUserEntity, id);
-        verify(userMapperImpl, times(1)).userDtoToUserEntity(newUserDto);
+        verify(userRepositoryMock, times(1)).save(newUserEntity);
     }
 
     @Test
@@ -438,7 +447,7 @@ public class UserServiceTest {
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
@@ -454,16 +463,13 @@ public class UserServiceTest {
                 .isDeleted(isDeleted)
                 .build();
 
-        when(multipartFile.isEmpty()).thenReturn(true);
-
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
         assertThrows(NoSuchElementException.class, () -> userServiceImpl.updateUserById(newUserDto, id));
 
         // then
-        verify(userRepositoryMock, never()).updateWithoutPicture(newUserEntity, id);
-        verify(userMapperImpl, never()).userDtoToUserEntity(newUserDto);
+        verify(userRepositoryMock, never()).save(newUserEntity);
     }
 
     @Test
@@ -477,7 +483,7 @@ public class UserServiceTest {
                 .lastName(lastName)
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
@@ -499,22 +505,19 @@ public class UserServiceTest {
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
 
         when(multipartFile.isEmpty()).thenReturn(true);
-
         when(userRepositoryMock.findById(id)).thenReturn(Optional.of(userEntity));
 
         // when
         userServiceImpl.updateUserById(userDto, id);
 
         // then
-        verify(userRepositoryMock, never()).update(newUserEntity, id);
-        verify(userRepositoryMock, never()).updateWithoutPicture(newUserEntity, id);
-        verify(userMapperImpl, never()).userDtoToUserEntity(userDto);
+        verify(userRepositoryMock, never()).save(newUserEntity);
     }
 
     @Test
@@ -540,12 +543,10 @@ public class UserServiceTest {
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
-
-        when(multipartFile.isEmpty()).thenReturn(true);
 
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
@@ -553,22 +554,20 @@ public class UserServiceTest {
         assertThrows(NoSuchElementException.class, () -> userServiceImpl.updateUserById(userDto, id));
 
         // then
-        verify(userRepositoryMock, never()).update(newUserEntity, id);
-        verify(userRepositoryMock, never()).updateWithoutPicture(newUserEntity, id);
-        verify(userMapperImpl, never()).userDtoToUserEntity(userDto);
+        verify(userRepositoryMock, never()).save(newUserEntity);
     }
 
     @Test
     public void deleteUserById() throws UserCanNotBeDeletedException {
         // given
-        doNothing().when(userRepositoryMock).markAsDeleted(id);
+        doNothing().when(userRepositoryMock).markAsDeletedById(id);
         when(lessonServiceMock.numberOfUserLessons(id)).thenReturn(0);
 
         // when
         userServiceImpl.deleteUserById(id);
 
         // then
-        verify(userRepositoryMock, times(1)).markAsDeleted(id);
+        verify(userRepositoryMock, times(1)).markAsDeletedById(id);
     }
 
     @Test
@@ -578,7 +577,7 @@ public class UserServiceTest {
         assertThrows(UserCanNotBeDeletedException.class, () -> userServiceImpl.deleteUserById(id));
 
         // then
-        verify(userRepositoryMock, never()).markAsDeleted(id);
+        verify(userRepositoryMock, never()).markAsDeletedById(id);
     }
 
     @Test
@@ -593,7 +592,7 @@ public class UserServiceTest {
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.USER.getId())
+                .role(Role.USER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();
@@ -633,7 +632,7 @@ public class UserServiceTest {
                 .image(multipartFile.getBytes())
                 .email(email)
                 .phoneNumber(phoneNumber)
-                .roleId(Role.TRAINER.getId())
+                .role(Role.TRAINER)
                 .timeZone(timeZone)
                 .isDeleted(isDeleted)
                 .build();

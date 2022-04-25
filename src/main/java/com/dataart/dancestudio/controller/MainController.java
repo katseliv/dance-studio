@@ -42,7 +42,9 @@ public class MainController {
 
     private boolean isAuthenticated() {
         final Authentication authentication = securityContextFacade.getContext().getAuthentication();
-        return authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
+        return authentication != null
+                && !(authentication instanceof AnonymousAuthenticationToken)
+                && authentication.isAuthenticated();
     }
 
 }

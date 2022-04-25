@@ -1,6 +1,5 @@
 package com.dataart.dancestudio.controller;
 
-import com.dataart.dancestudio.exception.UserAlreadyExistsException;
 import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
@@ -8,7 +7,6 @@ import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.service.BookingService;
 import com.dataart.dancestudio.service.UserService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +22,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Objects;
 
-@Slf4j
 @Controller
 @RequestMapping("/users")
 public class UserController {
@@ -53,7 +50,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerUser(final Model model, @ModelAttribute("user") @Valid final UserRegistrationDto userRegistrationDto, final BindingResult bindingResult) throws IOException, UserAlreadyExistsException {
+    public String registerUser(final Model model, @ModelAttribute("user") @Valid final UserRegistrationDto userRegistrationDto,
+                               final BindingResult bindingResult) throws IOException {
         if (bindingResult.hasErrors()) {
             return "registration";
         }
@@ -81,13 +79,14 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public String createUser(final Model model, @ModelAttribute("user") @Valid final UserRegistrationDto userRegistrationDto, final BindingResult bindingResult) throws IOException, UserAlreadyExistsException {
+    public String createUser(@ModelAttribute("user") @Valid final UserRegistrationDto userRegistrationDto,
+                             final BindingResult bindingResult) throws IOException {
+
         if (bindingResult.hasErrors()) {
             return "forms/user_form";
         }
         final int id = userService.createUser(userRegistrationDto);
-        model.addAttribute("user_view", userService.getUserViewById(id));
-        return "infos/user_info";
+        return "redirect:/users/" + id;
     }
 
     @GetMapping("/create")
@@ -103,7 +102,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public String updateUser(final Model model, @ModelAttribute("user") @Valid final UserDto userDto, @PathVariable final int id, final BindingResult bindingResult) {
+    public String updateUser(final Model model, @ModelAttribute("user") @Valid final UserDto userDto,
+                             @PathVariable final int id, final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "forms/user_edit";
         }
@@ -123,7 +123,6 @@ public class UserController {
         try {
             userService.deleteUserById(id);
         } catch (final UserCanNotBeDeletedException e) {
-            log.warn(e.getMessage());
             throw new RuntimeException(e);
         }
         return "redirect:/users";
@@ -146,7 +145,9 @@ public class UserController {
 
     private boolean isAuthenticated() {
         final Authentication authentication = securityContextFacade.getContext().getAuthentication();
-        return authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
+        return authentication != null
+                && !(authentication instanceof AnonymousAuthenticationToken)
+                && authentication.isAuthenticated();
     }
 
 }

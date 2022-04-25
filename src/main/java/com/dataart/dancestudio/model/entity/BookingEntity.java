@@ -23,11 +23,11 @@ public class BookingEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private NewUserEntity user;
+    private UserEntity user;
 
     @ManyToOne
     @JoinColumn(name = "lesson_id", referencedColumnName = "id")
-    private NewLessonEntity lesson;
+    private LessonEntity lesson;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;

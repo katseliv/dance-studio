@@ -1,26 +1,23 @@
 package com.dataart.dancestudio.repository;
 
-import com.dataart.dancestudio.exception.NotImplementedYetException;
 import com.dataart.dancestudio.model.entity.Role;
-import com.dataart.dancestudio.model.entity.UserDetailsEntity;
 import com.dataart.dancestudio.model.entity.UserEntity;
-import com.dataart.dancestudio.model.entity.UserRegistrationEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository extends Repository<UserEntity> {
+@Repository
+public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
-    @Override
-    default int save(final UserEntity userEntity) {
-        throw new NotImplementedYetException("Such method wasn't implemented");
-    }
+    @Modifying
+    @Query("UPDATE users SET isDeleted = TRUE WHERE id = ?1")
+    void markAsDeletedById(final int id);
 
-    int save(UserRegistrationEntity userRegistrationEntity);
-
-    Optional<UserDetailsEntity> findByEmail(String email);
-
-    void updateWithoutPicture(UserEntity userEntity, int id);
+    Optional<UserEntity> findByEmail(String email);
 
     List<UserEntity> findAllByRole(Role role);
 

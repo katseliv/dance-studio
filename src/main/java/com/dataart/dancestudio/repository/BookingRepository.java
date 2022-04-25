@@ -17,4 +17,6 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Integer>
 
     List<BookingEntity> findAllByUserId(int userId);
 
+    boolean existsByUserIdAndLessonId(int userId, int lessonId);
+
 }

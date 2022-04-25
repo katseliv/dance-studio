@@ -17,7 +17,8 @@ public class DanceStyleServiceImpl implements DanceStyleService {
     private final DanceStyleMapper danceStyleMapper;
 
     @Autowired
-    public DanceStyleServiceImpl(final DanceStyleRepository danceStyleRepository, final DanceStyleMapper danceStyleMapper) {
+    public DanceStyleServiceImpl(final DanceStyleRepository danceStyleRepository,
+                                 final DanceStyleMapper danceStyleMapper) {
         this.danceStyleRepository = danceStyleRepository;
         this.danceStyleMapper = danceStyleMapper;
     }

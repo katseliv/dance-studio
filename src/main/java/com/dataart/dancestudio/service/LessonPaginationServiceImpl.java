@@ -4,6 +4,8 @@ import com.dataart.dancestudio.model.dto.FilteredLessonViewListPage;
 import com.dataart.dancestudio.model.dto.UserLessonViewListPage;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,14 +28,15 @@ public class LessonPaginationServiceImpl implements LessonPaginationService {
     }
 
     @Override
-    public FilteredLessonViewListPage getFilteredLessonViewListPage(final Integer page, final Integer size,
+    public FilteredLessonViewListPage getFilteredLessonViewListPage(final String page, final String size,
                                                                     final String trainerName, final String danceStyleName,
                                                                     final String date) {
-        final int pageNumber = Optional.ofNullable(page).orElse(defaultPageNumber);
-        final int pageSize = Optional.ofNullable(size).orElse(defaultPageSize);
+        final int pageNumber = Optional.ofNullable(page).map(Integer::parseInt).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(size).map(Integer::parseInt).orElse(defaultPageSize);
 
-        final List<LessonViewDto> lessonViewDtoList = lessonService.listLessons(
-                trainerName, danceStyleName, date, pageSize, (pageNumber - 1) * pageSize);
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        final List<LessonViewDto> lessonViewDtoList = lessonService.listLessons(trainerName, danceStyleName, date, pageable);
         final int totalAmount = lessonService.numberOfFilteredLessons(trainerName, danceStyleName, date);
 
         final int totalPages = (int) Math.ceil((double) totalAmount / pageSize);
@@ -56,12 +59,13 @@ public class LessonPaginationServiceImpl implements LessonPaginationService {
     }
 
     @Override
-    public UserLessonViewListPage getUserLessonViewListPage(final Integer id, final Integer page, final Integer size) {
-        final int pageNumber = Optional.ofNullable(page).orElse(defaultPageNumber);
-        final int pageSize = Optional.ofNullable(size).orElse(defaultPageSize);
+    public UserLessonViewListPage getUserLessonViewListPage(final Integer id, final String page, final String size) {
+        final int pageNumber = Optional.ofNullable(page).map(Integer::parseInt).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(size).map(Integer::parseInt).orElse(defaultPageSize);
 
-        final List<LessonViewDto> lessonViewDtoList = lessonService.listUserLessons(
-                id, pageSize, (pageNumber - 1) * pageSize);
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        final List<LessonViewDto> lessonViewDtoList = lessonService.listUserLessons(id, pageable);
         final int totalAmount = lessonService.numberOfUserLessons(id);
 
         final int totalPages = (int) Math.ceil((double) totalAmount / pageSize);
