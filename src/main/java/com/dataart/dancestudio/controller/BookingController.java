@@ -24,18 +24,11 @@ public class BookingController {
     public String createBooking(final Model model, @ModelAttribute("booking") final BookingDto bookingDto) {
         final int id = bookingService.createBooking(bookingDto);
         model.addAttribute("booking_view", bookingService.getBookingViewById(id));
-        return "infos/booking_info";
+        return "redirect:/bookings/" + id;
     }
 
     @GetMapping("/{id}")
     public String getBooking(final Model model, @PathVariable final int id) {
-        model.addAttribute("booking_view", bookingService.getBookingViewById(id));
-        return "infos/booking_info";
-    }
-
-    @PutMapping("/{id}")
-    public String updateBooking(final Model model, @ModelAttribute("booking") final BookingDto bookingDto, @PathVariable final int id) {
-        bookingService.updateBookingById(bookingDto, id);
         model.addAttribute("booking_view", bookingService.getBookingViewById(id));
         return "infos/booking_info";
     }

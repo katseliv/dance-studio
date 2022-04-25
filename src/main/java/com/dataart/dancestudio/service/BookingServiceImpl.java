@@ -3,13 +3,17 @@ package com.dataart.dancestudio.service;
 import com.dataart.dancestudio.mapper.BookingMapper;
 import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
+import com.dataart.dancestudio.model.entity.BookingEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @Transactional
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -25,40 +29,56 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public int createBooking(final BookingDto bookingDto) {
-        return bookingRepository.save(bookingMapper.bookingDtoToBookingEntity(bookingDto));
+        final BookingEntity bookingEntity = bookingRepository.save(bookingMapper.bookingDtoToBookingEntity(bookingDto));
+        final int id = bookingEntity.getId();
+        log.info(bookingEntity + " was created.");
+        return id;
     }
 
     @Override
     public BookingDto getBookingById(final int id) {
-        return bookingMapper.bookingEntityToBookingDto(bookingRepository.findById(id).orElseThrow());
+        final Optional<BookingEntity> bookingEntity = bookingRepository.findById(id);
+        bookingEntity.ifPresentOrElse(
+                (booking) -> log.info("Booking with id = {} was found.", booking.getId()),
+                () -> log.info("Booking wasn't found."));
+        return bookingMapper.bookingEntityToBookingDto(bookingEntity.orElseThrow());
     }
 
     @Override
     public BookingViewDto getBookingViewById(final int id) {
-        return bookingMapper.bookingViewEntityToBookingViewDto(bookingRepository.findViewById(id).orElseThrow());
-    }
-
-    @Override
-    public void updateBookingById(final BookingDto bookingDto, final int id) {
-        final BookingDto bookingDtoFromDB = getBookingById(id);
-        if (!bookingDto.equals(bookingDtoFromDB)) {
-            bookingRepository.update(bookingMapper.bookingDtoToBookingEntity(bookingDto), id);
-        }
+        final Optional<BookingEntity> bookingEntity = bookingRepository.findById(id);
+        bookingEntity.ifPresentOrElse(
+                (booking) -> log.info("Booking with id = {} was found.", booking.getId()),
+                () -> log.info("Booking wasn't found."));
+        return bookingMapper.bookingEntityToBookingViewDto(bookingEntity.orElseThrow());
     }
 
     @Override
     public void deleteBookingById(final int id) {
-        bookingRepository.markAsDeleted(id);
+        bookingRepository.markAsDeletedById(id);
+        log.info("Booking with id = {} was deleted.", id);
     }
 
     @Override
     public List<BookingViewDto> listBookings() {
-        return bookingMapper.bookingViewEntitiesToBookingViewDtoList(bookingRepository.findAllViews());
+        final List<BookingEntity> bookingEntities = bookingRepository.findAll();
+        if (bookingEntities.size() != 0) {
+            log.info("Bookings were found.");
+        } else {
+            log.info("There aren't bookings.");
+        }
+        return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
     }
 
     @Override
     public List<BookingViewDto> listUserBookings(final int userId) {
-        return bookingMapper.bookingViewEntitiesToBookingViewDtoList(bookingRepository.findAllUserBookingViews(userId));
+        final List<BookingEntity> bookingEntities = bookingRepository.findAllByUserId(userId);
+        if (bookingEntities.size() != 0) {
+            log.info("Bookings were found.");
+        } else {
+            log.info("There aren't bookings.");
+        }
+        return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
     }
 
 }

@@ -1,10 +1,8 @@
 package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.mapper.UserMapper;
-import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,14 +24,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
-        final UserDetailsDto userDetailsDto = userMapper.userDetailsEntityToUserDetailsDto(
-                userRepository.findByEmail(email).orElseThrow(
-                        () -> new UsernameNotFoundException("No such user in the database!")));
-        return new User(
-                userDetailsDto.getEmail(),
-                userDetailsDto.getPassword(),
-                userDetailsDto.getAuthorities()
-        );
+        return userMapper.userDetailsEntityToUserDetailsDto(userRepository.findByEmail(email).orElseThrow(
+                () -> new UsernameNotFoundException("No such user in the database!")));
     }
 
 }

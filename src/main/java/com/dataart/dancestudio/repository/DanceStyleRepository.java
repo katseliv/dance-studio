@@ -1,6 +1,9 @@
 package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.DanceStyleEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface DanceStyleRepository extends Repository<DanceStyleEntity> {
+@Repository
+public interface DanceStyleRepository extends JpaRepository<DanceStyleEntity, Integer> {
 }

@@ -1,6 +1,9 @@
 package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.RoomEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface RoomRepository extends Repository<RoomEntity> {
+@Repository
+public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
 }

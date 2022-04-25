@@ -13,8 +13,6 @@ public interface BookingService {
 
     BookingViewDto getBookingViewById(int id);
 
-    void updateBookingById(BookingDto bookingDto, int id);
-
     void deleteBookingById(int id);
 
     List<BookingViewDto> listBookings();

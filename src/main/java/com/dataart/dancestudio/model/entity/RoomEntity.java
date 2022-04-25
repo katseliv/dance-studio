@@ -1,65 +1,37 @@
 package com.dataart.dancestudio.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
 
 @Getter
-@AllArgsConstructor
+@Setter
+@ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Entity(name = "rooms")
+@Where(clause = "is_deleted = false")
+@Table(name = "rooms", schema = "dancestudio")
 public class RoomEntity {
 
-    private final Integer id;
-    private final String name;
-    private final String description;
-    private final Integer studioId;
-    private final Boolean isDeleted;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
-    public static RoomEntityBuilder builder() {
-        return new RoomEntityBuilder();
-    }
+    @Column(name = "name")
+    private String name;
 
-    public static class RoomEntityBuilder {
+    @Column(name = "description")
+    private String description;
 
-        private Integer id;
-        private String name;
-        private String description;
-        private Integer studioId;
-        private Boolean isDeleted;
+    @ManyToOne
+    @JoinColumn(name = "studio_id", referencedColumnName = "id")
+    private StudioEntity studio;
 
-        public boolean isUsed = false;
-
-        public RoomEntityBuilder id(final Integer id) {
-            this.id = id;
-            return this;
-        }
-
-        public RoomEntityBuilder name(final String name) {
-            this.name = name;
-            return this;
-        }
-
-        public RoomEntityBuilder description(final String description) {
-            this.description = description;
-            return this;
-        }
-
-        public RoomEntityBuilder studioId(final Integer studioId) {
-            this.studioId = studioId;
-            return this;
-        }
-
-        public RoomEntityBuilder isDeleted(final Boolean isDeleted) {
-            this.isDeleted = isDeleted;
-            return this;
-        }
-
-        public RoomEntity build(){
-            if (!isUsed){
-                isUsed = true;
-                return new RoomEntity(id, name, description, studioId, isDeleted);
-            }
-            throw new RuntimeException("Builder already built");
-        }
-
-    }
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
 }

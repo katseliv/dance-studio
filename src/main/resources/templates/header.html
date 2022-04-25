@@ -43,7 +43,6 @@
                     <a class="nav-link" th:href="@{/users/__${session.userId}__/bookings}">Bookings</a>
                 </li>
             </ul>
-            <button type="button" onclick="history.go(-1)" class="btn btn-outline-primary mx-4">Return</button>
             <form class="d-flex" th:action="@{/users/logout}">
                 <button type="submit" class="btn btn-outline-danger">Logout</button>
             </form>

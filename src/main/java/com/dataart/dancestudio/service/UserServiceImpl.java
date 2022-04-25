@@ -42,7 +42,8 @@ public class UserServiceImpl implements UserService {
     public int createUser(final UserRegistrationDto userRegistrationDto) throws IOException, UserAlreadyExistsException {
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isEmpty()) {
             final String password = passwordEncoder.encode(userRegistrationDto.getPassword());
-            return userRepository.save(userMapper.userRegistrationDtoToUserRegistrationEntityWithPassword(userRegistrationDto, password));
+            return userRepository.save(
+                    userMapper.userRegistrationDtoToUserRegistrationEntityWithPassword(userRegistrationDto, password));
         }
         throw new UserAlreadyExistsException("User already exists in the database!");
     }
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
                 }
             }
         } catch (final IOException e) {
-            log.error(e.getMessage());
+            log.error("An exception occurred!", e);
         }
     }
 
