@@ -250,7 +250,6 @@ public class LessonServiceTest {
         final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listLessons(trainerName, danceStyleName, date, pageable);
 
         // then
-//        verify(lessonMapperImpl, times(1)).lessonEntitiesToLessonViewDtoList(lessonEntities);
         verify(lessonRepositoryMock, times(1)).findAll((Specification<LessonEntity>) any(), eq(pageable));
         assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
     }
