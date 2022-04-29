@@ -16,8 +16,8 @@ import java.util.Date;
 @Component
 public class JwtTokenUtil implements Serializable {
 
-    @Value("${jwt.validity}")
-    public long jwtTokenValidity;
+    @Value("${jwt.expirationInSeconds}")
+    public long jwtTokenExpirationInSeconds;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -30,7 +30,7 @@ public class JwtTokenUtil implements Serializable {
                 .withClaim("id", id)
                 .withClaim("email", email)
                 .withClaim("role", role)
-                .withExpiresAt(Date.from(Instant.now().plusSeconds(jwtTokenValidity)))
+                .withExpiresAt(Date.from(Instant.now().plusSeconds(jwtTokenExpirationInSeconds)))
                 .sign(Algorithm.HMAC256(secret));
     }
 
