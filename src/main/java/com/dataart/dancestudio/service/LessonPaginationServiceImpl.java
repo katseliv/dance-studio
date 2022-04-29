@@ -4,6 +4,7 @@ import com.dataart.dancestudio.model.dto.FilteredLessonViewListPage;
 import com.dataart.dancestudio.model.dto.UserLessonViewListPage;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,9 +17,12 @@ import java.util.Optional;
 @Service
 public class LessonPaginationServiceImpl implements LessonPaginationService {
 
-    private static final int defaultPageNumber = 1;
-    private static final int defaultPageSize = 5;
-    private static final int buttonLimit = 5;
+    @Value("${pagination.defaultPageNumber}")
+    private int defaultPageNumber;
+    @Value("${pagination.defaultPageSize}")
+    private int defaultPageSize;
+    @Value("${pagination.buttonLimit}")
+    private int buttonLimit;
 
     private final LessonService lessonService;
 
