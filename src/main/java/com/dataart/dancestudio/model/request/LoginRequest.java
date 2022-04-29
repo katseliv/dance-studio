@@ -1,16 +1,15 @@
-package com.dataart.dancestudio.model.dto;
+package com.dataart.dancestudio.model.request;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 @AllArgsConstructor
-public class UserDetailsTest {
+public class LoginRequest {
 
     private String email;
     private String password;
-
-    public UserDetailsTest() {
-    }
 
 }

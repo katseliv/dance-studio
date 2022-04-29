@@ -6,12 +6,15 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.dataart.dancestudio.model.dto.UserDetailsDto;
+import com.dataart.dancestudio.model.entity.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
+
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -22,14 +25,15 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.secret}")
     private String secret;
 
-    public String generateToken(final Integer id, final String email, final String role) throws IllegalArgumentException, JWTCreationException {
+    public String generateAccessToken(final UserDetailsDto userDetailsDto) throws IllegalArgumentException, JWTCreationException {
+        final Role role = userDetailsDto.getRoles().stream().findFirst().orElse(Role.USER);
         return JWT.create()
                 .withIssuer("Dance Studio")
                 .withIssuedAt(new Date())
                 .withSubject("User Details")
-                .withClaim("id", id)
-                .withClaim("email", email)
-                .withClaim("role", role)
+                .withClaim("id", userDetailsDto.getId())
+                .withClaim("email", userDetailsDto.getEmail())
+                .withClaim("role", role.name())
                 .withExpiresAt(Date.from(Instant.now().plusSeconds(jwtTokenExpirationInSeconds)))
                 .sign(Algorithm.HMAC256(secret));
     }
