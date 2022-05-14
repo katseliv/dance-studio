@@ -1,11 +1,11 @@
 package com.dataart.dancestudio.rest;
 
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
-import com.dataart.dancestudio.model.dto.UserRegistrationDto;
+import com.dataart.dancestudio.model.request.JwtRequest;
 import com.dataart.dancestudio.model.request.LoginRequest;
+import com.dataart.dancestudio.model.response.JwtResponse;
 import com.dataart.dancestudio.model.response.LoginResponse;
-import com.dataart.dancestudio.service.UserService;
-import com.dataart.dancestudio.utils.JwtTokenUtil;
+import com.dataart.dancestudio.service.AuthService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,31 +17,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.io.IOException;
+import javax.security.auth.message.AuthException;
 
 @RestController
 @RequestMapping("/api/v1")
 public class AuthRestController {
 
-    private final UserService userService;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final AuthService authService;
     private final SecurityContextFacade securityContextFacade;
     protected AuthenticationManager authenticationManager;
 
     @Autowired
-    public AuthRestController(final UserService userService, final JwtTokenUtil jwtTokenUtil,
-                              final SecurityContextFacade securityContextFacade,
+    public AuthRestController(final AuthService authService, final SecurityContextFacade securityContextFacade,
                               final AuthenticationManager authenticationManager) {
-        this.userService = userService;
-        this.jwtTokenUtil = jwtTokenUtil;
+        this.authService = authService;
         this.securityContextFacade = securityContextFacade;
         this.authenticationManager = authenticationManager;
-    }
-
-    @PostMapping("/register")
-    public int register(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) throws IOException {
-        return userService.createUser(userRegistrationDto);
     }
 
     @PostMapping("/login")
@@ -51,15 +42,27 @@ public class AuthRestController {
         securityContextFacade.getContext().setAuthentication(authentication);
 
         final UserDetailsDto userDetailsDto = (UserDetailsDto) authentication.getPrincipal();
-        final String jwtToken = jwtTokenUtil.generateAccessToken(userDetailsDto);
+        final LoginResponse loginResponse = authService.login(userDetailsDto);
+        return ResponseEntity.ok(loginResponse);
+    }
 
-        return ResponseEntity.ok(LoginResponse.builder().jwtToken(jwtToken).build());
+    @PostMapping("/newAccessToken")
+    public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody final JwtRequest jwtRequest) throws AuthException {
+        final JwtResponse jwtResponse = authService.getNewAccessToken(jwtRequest.getRefreshToken());
+        return ResponseEntity.ok(jwtResponse);
+    }
+
+    @PostMapping("/newRefreshToken")
+    public ResponseEntity<JwtResponse> getNewRefreshToken(@RequestBody final JwtRequest jwtRequest) throws AuthException {
+        final JwtResponse jwtResponse = authService.getNewRefreshToken(jwtRequest.getRefreshToken());
+        return ResponseEntity.ok(jwtResponse);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout() {
-        securityContextFacade.getContext().setAuthentication(null);
-        return ResponseEntity.ok("Log out successful");
+        final String email = (String) securityContextFacade.getContext().getAuthentication().getPrincipal();
+        authService.logout(email);
+        return ResponseEntity.ok("Logged out successfully!!!");
     }
 
 }
