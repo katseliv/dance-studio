@@ -35,7 +35,7 @@ public class AuthRestController {
         this.authenticationManager = authenticationManager;
     }
 
-    @PostMapping("/login")
+    @PostMapping("/accessToken")
     public ResponseEntity<LoginResponse> login(@RequestBody final LoginRequest loginRequest) {
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
@@ -46,7 +46,7 @@ public class AuthRestController {
         return ResponseEntity.ok(loginResponse);
     }
 
-    @PostMapping("/accessToken")
+    @PostMapping("/newAccessToken")
     public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody final JwtRequest jwtRequest) throws AuthException {
         final JwtResponse jwtResponse = authService.getNewAccessToken(jwtRequest.getRefreshToken());
         return ResponseEntity.ok(jwtResponse);
