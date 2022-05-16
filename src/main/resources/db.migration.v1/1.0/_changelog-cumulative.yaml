@@ -26,3 +26,11 @@ databaseChangeLog:
         - sqlFile:
             path: PDS-001-202204041528.sql
             relativeToChangelogFile: true
+  - changeSet:
+      id: PDS-001-202204291730
+      author: EkaterinaSelivanova
+      comment: Create Jwt Token Table
+      changes:
+        - sqlFile:
+            path: PDS-001-202204291730.sql
+            relativeToChangelogFile: true

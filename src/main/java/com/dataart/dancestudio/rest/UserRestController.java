@@ -26,6 +26,11 @@ public class UserRestController {
         this.bookingService = bookingService;
     }
 
+    @PostMapping("/register")
+    public int register(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) throws IOException {
+        return userService.createUser(userRegistrationDto);
+    }
+
     @PostMapping
     public int createUser(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) throws IOException {
         return userService.createUser(userRegistrationDto);

@@ -83,7 +83,7 @@ public class BookingServiceImpl implements BookingService {
         if (bookingEntities.size() != 0) {
             log.info("Bookings were found.");
         } else {
-            log.info("There aren't bookings.");
+            log.info("There weren't bookings.");
         }
         return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
     }
@@ -94,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
         if (bookingEntities.size() != 0) {
             log.info("Bookings were found.");
         } else {
-            log.info("There aren't bookings.");
+            log.info("There weren't bookings.");
         }
         return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
     }

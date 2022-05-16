@@ -25,7 +25,7 @@ public interface LessonMapper {
     @Mapping(target = "trainerLastName", source = "userTrainer.lastName")
     @Mapping(target = "danceStyleName", source = "danceStyle.name")
     @Mapping(target = "startDatetime", source = "startDatetime")
-    LessonViewDto lessonEntityToLessonViewDto(LessonEntity lessonEntity);
+    LessonViewDto lessonEntityToLessonViewDto(LessonEntity entity);
 
     @Mapping(target = "userTrainer.id", source = "userTrainerId")
     @Mapping(target = "danceStyle.id", source = "danceStyleId")
@@ -35,12 +35,12 @@ public interface LessonMapper {
     LessonEntity lessonDtoToLessonEntity(LessonDto dto);
 
     @Named(value = "startDatetime")
-    default LocalDateTime mapStartDatetime(final LessonDto lessonDto) {
-        if (lessonDto.getTimeZone() == null) {
-            return LocalDateTime.parse(lessonDto.getStartDatetime());
+    default LocalDateTime mapStartDatetime(final LessonDto dto) {
+        if (dto.getTimeZone() == null) {
+            return LocalDateTime.parse(dto.getStartDatetime());
         }
-        final LocalDateTime localDateTime = LocalDateTime.parse(lessonDto.getStartDatetime());
-        final ZonedDateTime localDateTimeZoned = localDateTime.atZone(ZoneId.of(lessonDto.getTimeZone()));
+        final LocalDateTime localDateTime = LocalDateTime.parse(dto.getStartDatetime());
+        final ZonedDateTime localDateTimeZoned = localDateTime.atZone(ZoneId.of(dto.getTimeZone()));
         final ZonedDateTime utcZoned = localDateTimeZoned.withZoneSameInstant(ZoneId.of("UTC"));
         return utcZoned.toLocalDateTime();
     }

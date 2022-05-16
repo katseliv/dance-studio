@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
         if (userEntities.size() != 0) {
             log.info("Users were found.");
         } else {
-            log.info("There aren't users.");
+            log.info("There weren't users.");
         }
         return userMapper.userEntitiesToUserViewDtoList(userEntities);
     }
@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
         if (userEntities.size() != 0) {
             log.info("Users were found.");
         } else {
-            log.info("There aren't users.");
+            log.info("There weren't users.");
         }
         return userMapper.userEntitiesToUserViewDtoList(userEntities);
     }

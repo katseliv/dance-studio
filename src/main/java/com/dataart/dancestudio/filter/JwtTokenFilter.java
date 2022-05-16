@@ -1,7 +1,7 @@
 package com.dataart.dancestudio.filter;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.dataart.dancestudio.utils.JwtTokenUtil;
+import com.dataart.dancestudio.provider.JwtTokenProvider;
+import com.dataart.dancestudio.service.JwtTokenService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -23,14 +23,16 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final SecurityContextFacade securityContextFacade;
     private final UserDetailsService userDetailsService;
-    private final JwtTokenUtil jwtUtil;
+    private final JwtTokenService jwtTokenService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     public JwtTokenFilter(final SecurityContextFacade securityContextFacade, final UserDetailsService userDetailsService,
-                          final JwtTokenUtil jwtUtil) {
+                          final JwtTokenService jwtTokenService, final JwtTokenProvider jwtTokenProvider) {
         this.securityContextFacade = securityContextFacade;
         this.userDetailsService = userDetailsService;
-        this.jwtUtil = jwtUtil;
+        this.jwtTokenService = jwtTokenService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
@@ -38,12 +40,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                     @NonNull final FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")) {
-            final String jwt = authHeader.substring(7);
-            if (jwt.isBlank()) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JWT Token in Bearer Header");
+            final String jwtToken = authHeader.substring(7);
+            if (jwtToken.isBlank()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Jwt Token in Bearer Header!!!");
             } else {
-                try {
-                    final String email = jwtUtil.validateTokenAndRetrieveSubject(jwt);
+                if (jwtTokenProvider.validateAccessToken(jwtToken) && jwtTokenService.existsByToken(jwtToken)) {
+                    final String email = jwtTokenProvider.getEmail(jwtToken);
                     final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                     final UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(email, userDetails.getPassword(), userDetails.getAuthorities());
@@ -51,8 +53,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     if (securityContext.getAuthentication() == null) {
                         securityContext.setAuthentication(authToken);
                     }
-                } catch (final JWTVerificationException exc) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JWT Token");
+                } else {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Jwt Token!!!");
                 }
             }
         }

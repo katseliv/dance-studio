@@ -29,7 +29,7 @@ public interface UserMapper {
     }
 
     @Mapping(target = "roles", source = "role", qualifiedByName = "role")
-    UserDetailsDto userEntityToUserDetailsDto(UserEntity userEntity);
+    UserDetailsDto userEntityToUserDetailsDto(UserEntity entity);
 
     @Named(value = "role")
     default List<Role> mapRoles(final Role role) {
@@ -43,10 +43,10 @@ public interface UserMapper {
 
     @Mapping(target = "image", source = "multipartFile.bytes")
     @Mapping(target = "isDeleted", defaultValue = "false")
-    void mergeUserEntityAndUserDto(@MappingTarget UserEntity userEntity, UserDto dto) throws IOException;
+    void mergeUserEntityAndUserDto(@MappingTarget UserEntity entity, UserDto dto) throws IOException;
 
     @Mapping(target = "isDeleted", defaultValue = "false")
-    void mergeUserEntityAndUserDtoWithoutPicture(@MappingTarget UserEntity userEntity, UserDto dto);
+    void mergeUserEntityAndUserDtoWithoutPicture(@MappingTarget UserEntity entity, UserDto dto);
 
     List<UserViewDto> userEntitiesToUserViewDtoList(Iterable<UserEntity> entities);
 

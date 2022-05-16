@@ -67,7 +67,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/v1", "/api/v1/login", "/api/v1/register", "/api/v1/logout").permitAll()
+                .antMatchers("/api/v1/accessToken", "/api/v1/newAccessToken", "/api/v1/users/register").permitAll()
 
                 .antMatchers(HttpMethod.POST, "/api/v1/users").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/v1/users").hasRole("ADMIN")
@@ -88,17 +88,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                                 HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized"))
 
                 .and()
-                .logout()
-                .logoutUrl("/api/v1/logout")
-                .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK))
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .permitAll()
-
-
-                .and()
                 .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .headers()
                 .cacheControl();
