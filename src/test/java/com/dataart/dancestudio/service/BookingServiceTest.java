@@ -52,7 +52,6 @@ public class BookingServiceTest {
     private final BookingDto bookingDto = BookingDto.builder()
             .userId(userId)
             .lessonId(lessonId)
-            .isDeleted(isDeleted)
             .build();
     final UserEntity userEntity = UserEntity.builder().id(userId).build();
     final UserEntity newUserEntity = UserEntity.builder().id(newUserId).build();

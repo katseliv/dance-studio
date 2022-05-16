@@ -80,10 +80,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/api/v1/lessons/{id}").not().hasRole("USER")
 
                 .antMatchers(HttpMethod.GET, "/api/v1/lessons/{id}").authenticated()
+                .antMatchers(HttpMethod.POST, "/api/v1/bookings").authenticated()
                 .antMatchers(HttpMethod.PUT, "/api/v1/users/{id}").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/v1/users/{id}").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/v1/users/{id}/bookings").authenticated()
-                .antMatchers("/api/v1/bookings/{id}", "/api/v1/lessons", "/api/v1/logout").authenticated()
+                .antMatchers("/api/v1/bookings/{id}", "/api/v1/logout").authenticated()
+                .antMatchers(HttpMethod.GET,"/api/v1/lessons").authenticated()
 
                 .anyRequest().not().authenticated()
 

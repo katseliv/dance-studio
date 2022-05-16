@@ -30,6 +30,6 @@ public class BookingEntity {
     private LessonEntity lesson;
 
     @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    private boolean deleted;
 
 }

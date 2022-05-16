@@ -4,6 +4,7 @@ import com.dataart.dancestudio.mapper.LessonMapper;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.entity.LessonEntity;
+import com.dataart.dancestudio.repository.BookingRepository;
 import com.dataart.dancestudio.repository.LessonRepository;
 import com.dataart.dancestudio.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +23,15 @@ import java.util.Optional;
 public class LessonServiceImpl implements LessonService {
 
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
     private final LessonRepository lessonRepository;
     private final LessonMapper lessonMapper;
 
     @Autowired
-    public LessonServiceImpl(final UserRepository userRepository, final LessonRepository lessonRepository,
-                             final LessonMapper lessonMapper) {
+    public LessonServiceImpl(final UserRepository userRepository, final BookingRepository bookingRepository,
+                             final LessonRepository lessonRepository, final LessonMapper lessonMapper) {
         this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
         this.lessonRepository = lessonRepository;
         this.lessonMapper = lessonMapper;
     }

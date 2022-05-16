@@ -13,7 +13,6 @@ public interface BookingMapper {
 
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "lessonId", source = "lesson.id")
-    @Mapping(target = "isDeleted", defaultValue = "false")
     BookingDto bookingEntityToBookingDto(BookingEntity entity);
 
     @Mapping(target = "firstName", source = "user.firstName")
@@ -24,7 +23,6 @@ public interface BookingMapper {
 
     @Mapping(target = "user.id", source = "userId")
     @Mapping(target = "lesson.id", source = "lessonId")
-    @Mapping(target = "isDeleted", defaultValue = "false")
     BookingEntity bookingDtoToBookingEntity(BookingDto dto);
 
     List<BookingViewDto> bookingEntitiesToBookingViewDtoList(Iterable<BookingEntity> entities);

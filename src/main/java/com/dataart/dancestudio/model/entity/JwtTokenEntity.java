@@ -33,6 +33,6 @@ public class JwtTokenEntity {
     private UserEntity user;
 
     @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    private boolean deleted;
 
 }

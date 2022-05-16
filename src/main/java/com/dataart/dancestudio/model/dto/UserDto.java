@@ -1,5 +1,7 @@
 package com.dataart.dancestudio.model.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -8,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
+@JsonDeserialize(builder = UserDto.UserDtoBuilder.class)
 public class UserDto {
 
     private final Integer id;
@@ -19,12 +22,12 @@ public class UserDto {
     private final String phoneNumber;
     private final Integer roleId;
     private final String timeZone;
-    private final Boolean isDeleted;
 
     public static UserDtoBuilder builder() {
         return new UserDtoBuilder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static class UserDtoBuilder {
 
         private Integer id;
@@ -36,7 +39,6 @@ public class UserDto {
         private String phoneNumber;
         private Integer roleId;
         private String timeZone;
-        private Boolean isDeleted;
 
         private boolean isUsed;
 
@@ -88,15 +90,10 @@ public class UserDto {
             return this;
         }
 
-        public UserDtoBuilder isDeleted(final Boolean isDeleted) {
-            this.isDeleted = isDeleted;
-            return this;
-        }
-
         public UserDto build() {
             if (!isUsed) {
                 isUsed = true;
-                return new UserDto(id, username, firstName, lastName, multipartFile, email, phoneNumber, roleId, timeZone, isDeleted);
+                return new UserDto(id, username, firstName, lastName, multipartFile, email, phoneNumber, roleId, timeZone);
             }
             throw new RuntimeException("Builder already built");
         }

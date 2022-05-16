@@ -41,7 +41,7 @@ public class LessonEntity {
     private RoomEntity room;
 
     @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    private boolean deleted;
 
 }
 

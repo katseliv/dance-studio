@@ -15,6 +15,6 @@ public class ReviewEntity {
     private String text;
     private Instant creationDatetime;
     private Integer rate;
-    private Boolean isDeleted;
+    private boolean deleted;
 
 }

@@ -51,7 +51,7 @@ public class UserEntity {
     private String timeZone;
 
     @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    private boolean deleted;
 
     @Override
     public boolean equals(final Object o) {
@@ -63,12 +63,12 @@ public class UserEntity {
                 && Arrays.equals(image, that.image) && Objects.equals(email, that.email)
                 && Objects.equals(phoneNumber, that.phoneNumber) && Objects.equals(password, that.password)
                 && role == that.role && Objects.equals(timeZone, that.timeZone)
-                && Objects.equals(isDeleted, that.isDeleted);
+                && Objects.equals(deleted, that.deleted);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, username, firstName, lastName, email, phoneNumber, password, role, timeZone, isDeleted);
+        int result = Objects.hash(id, username, firstName, lastName, email, phoneNumber, password, role, timeZone, deleted);
         result = 31 * result + Arrays.hashCode(image);
         return result;
     }

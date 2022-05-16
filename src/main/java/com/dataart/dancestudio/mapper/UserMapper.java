@@ -38,14 +38,11 @@ public interface UserMapper {
 
     @Mapping(target = "image", source = "dto.multipartFile.bytes")
     @Mapping(target = "password", source = "password")
-    @Mapping(target = "isDeleted", defaultValue = "false")
     UserEntity userRegistrationDtoToUserEntityWithPassword(UserRegistrationDto dto, String password) throws IOException;
 
     @Mapping(target = "image", source = "multipartFile.bytes")
-    @Mapping(target = "isDeleted", defaultValue = "false")
     void mergeUserEntityAndUserDto(@MappingTarget UserEntity entity, UserDto dto) throws IOException;
 
-    @Mapping(target = "isDeleted", defaultValue = "false")
     void mergeUserEntityAndUserDtoWithoutPicture(@MappingTarget UserEntity entity, UserDto dto);
 
     List<UserViewDto> userEntitiesToUserViewDtoList(Iterable<UserEntity> entities);

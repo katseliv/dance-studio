@@ -77,7 +77,6 @@ public class LessonServiceTest {
             .startDatetime(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startDatetime))
             .duration(String.valueOf(duration))
             .roomId(roomId)
-            .isDeleted(isDeleted)
             .timeZone(timeZone)
             .build();
     private final LessonEntity lessonEntity = LessonEntity.builder()
@@ -87,7 +86,7 @@ public class LessonServiceTest {
             .startDatetime(utcZoned.toLocalDateTime())
             .duration(duration)
             .room(room)
-            .isDeleted(isDeleted)
+            .deleted(isDeleted)
             .build();
     private final LessonViewDto lessonViewDto = LessonViewDto.builder()
             .id(id)
@@ -97,13 +96,11 @@ public class LessonServiceTest {
             .startDatetime(utcZoned.toLocalDateTime())
             .build();
     private final LessonDto newLessonDto = LessonDto.builder()
-            .id(id)
             .userTrainerId(newUserTrainerId)
             .danceStyleId(danceStyleId)
             .startDatetime(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startDatetime))
             .duration(String.valueOf(duration))
             .roomId(roomId)
-            .isDeleted(isDeleted)
             .timeZone(timeZone)
             .build();
     private final LessonEntity newLessonEntity = LessonEntity.builder()
@@ -113,7 +110,7 @@ public class LessonServiceTest {
             .startDatetime(utcZoned.toLocalDateTime())
             .duration(duration)
             .room(room)
-            .isDeleted(isDeleted)
+            .deleted(isDeleted)
             .build();
 
     @Test
@@ -152,7 +149,6 @@ public class LessonServiceTest {
                 .startDatetime(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(utcZoned.toLocalDateTime()))
                 .duration(String.valueOf(duration))
                 .roomId(roomId)
-                .isDeleted(isDeleted)
                 .build();
 
         when(lessonMapperImpl.lessonEntityToLessonDto(lessonEntity)).thenReturn(lessonDtoWithUTCStartDatetime);

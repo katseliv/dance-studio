@@ -1,5 +1,7 @@
 package com.dataart.dancestudio.model.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,9 +14,8 @@ import javax.validation.constraints.Size;
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
+@JsonDeserialize(builder = UserRegistrationDto.UserRegistrationDtoBuilder.class)
 public class UserRegistrationDto {
-
-    private final Integer id;
 
     @NotBlank(message = "Username is blank.")
     private final String username;
@@ -41,15 +42,14 @@ public class UserRegistrationDto {
     private final String passwordConfirmation;
     private final Integer roleId;
     private final String timeZone;
-    private final Boolean isDeleted;
 
     public static UserRegistrationDtoBuilder builder() {
         return new UserRegistrationDtoBuilder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static class UserRegistrationDtoBuilder {
 
-        private Integer id;
         private String username;
         private String firstName;
         private String lastName;
@@ -60,16 +60,10 @@ public class UserRegistrationDto {
         private String passwordConfirmation;
         private Integer roleId;
         private String timeZone;
-        private Boolean isDeleted;
 
         private boolean isUsed;
 
         public UserRegistrationDtoBuilder() {
-        }
-
-        public UserRegistrationDtoBuilder id(final Integer id) {
-            this.id = id;
-            return this;
         }
 
         public UserRegistrationDtoBuilder username(final String username) {
@@ -122,16 +116,11 @@ public class UserRegistrationDto {
             return this;
         }
 
-        public UserRegistrationDtoBuilder isDeleted(final Boolean isDeleted) {
-            this.isDeleted = isDeleted;
-            return this;
-        }
-
         public UserRegistrationDto build() {
             if (!isUsed) {
                 isUsed = true;
-                return new UserRegistrationDto(id, username, firstName, lastName, multipartFile, email, phoneNumber, password,
-                        passwordConfirmation, roleId, timeZone, isDeleted);
+                return new UserRegistrationDto(username, firstName, lastName, multipartFile, email, phoneNumber, password,
+                        passwordConfirmation, roleId, timeZone);
             }
             throw new RuntimeException("Builder already built");
         }

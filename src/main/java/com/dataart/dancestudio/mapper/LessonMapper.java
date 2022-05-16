@@ -18,7 +18,6 @@ public interface LessonMapper {
     @Mapping(target = "userTrainerId", source = "userTrainer.id")
     @Mapping(target = "danceStyleId", source = "danceStyle.id")
     @Mapping(target = "roomId", source = "room.id")
-    @Mapping(target = "isDeleted", defaultValue = "false")
     LessonDto lessonEntityToLessonDto(LessonEntity entity);
 
     @Mapping(target = "trainerFirstName", source = "userTrainer.firstName")
@@ -30,7 +29,6 @@ public interface LessonMapper {
     @Mapping(target = "userTrainer.id", source = "userTrainerId")
     @Mapping(target = "danceStyle.id", source = "danceStyleId")
     @Mapping(target = "room.id", source = "roomId")
-    @Mapping(target = "isDeleted", defaultValue = "false")
     @Mapping(target = "startDatetime", source = ".", qualifiedByName = "startDatetime")
     LessonEntity lessonDtoToLessonEntity(LessonDto dto);
 

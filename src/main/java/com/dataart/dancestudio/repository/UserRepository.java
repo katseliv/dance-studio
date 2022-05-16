@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     @Modifying
-    @Query("UPDATE users SET isDeleted = TRUE WHERE id = ?1")
+    @Query("UPDATE users SET deleted = TRUE WHERE id = ?1")
     void markAsDeletedById(final int id);
 
     Optional<UserEntity> findByEmail(String email);

@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public interface LessonRepository extends JpaRepository<LessonEntity, Integer>, JpaSpecificationExecutor<LessonEntity> {
 
     @Modifying
-    @Query("UPDATE lessons SET isDeleted = TRUE WHERE id = ?1")
+    @Query("UPDATE lessons SET deleted = TRUE WHERE id = ?1")
     void markAsDeletedById(int id);
 
     @Override
