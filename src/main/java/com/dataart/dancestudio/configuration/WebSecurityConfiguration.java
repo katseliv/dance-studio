@@ -13,14 +13,14 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.http.HttpServletResponse;
+
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
@@ -62,26 +62,22 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                .cors()
+                .and()
                 .csrf()
                 .disable()
-                .formLogin()
-                .loginPage("/users/login")
-                .usernameParameter("email")
-                .defaultSuccessUrl("/home", true)
-                .failureUrl("/users/login?error")
-                .permitAll()
-
-                .and()
                 .authorizeRequests()
-                .antMatchers("/", "/users/login", "/users/register", "/token").permitAll()
+                .antMatchers("/api/v1", "/api/v1/login", "/api/v1/register", "/api/v1/logout").permitAll()
 
-                .antMatchers("/users", "/users/", "/users/create", "/bookings", "/bookings/").hasRole("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/users/{id}").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/v1/users").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/v1/users").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/v1/bookings").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/v1/users/{id}").hasRole("ADMIN")
 
-                .antMatchers("/lessons/create").not().hasRole("USER")
-                .antMatchers(HttpMethod.PUT, "/lessons/{id}").not().hasRole("USER")
-                .antMatchers(HttpMethod.DELETE, "/lessons/{id}").not().hasRole("USER")
-                .antMatchers("/trainers/{id}/lessons").hasRole("TRAINER")
+                .antMatchers("/api/v1/trainers/{id}/lessons").hasRole("TRAINER")
+                .antMatchers(HttpMethod.POST, "/api/v1/lessons").not().hasRole("USER")
+                .antMatchers(HttpMethod.PUT, "/api/v1/lessons/{id}").not().hasRole("USER")
+                .antMatchers(HttpMethod.DELETE, "/api/v1/lessons/{id}").not().hasRole("USER")
 
                 .anyRequest().authenticated()
 
@@ -89,19 +85,23 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .authenticationEntryPoint(
                         (request, response, authException) -> response.sendError(
-                                HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                                HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized"))
 
                 .and()
                 .logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
-                .permitAll()
-                .logoutSuccessUrl("/")
+                .logoutUrl("/api/v1/logout")
+                .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK))
+                .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
+                .permitAll()
+
+
                 .and()
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+
+                .headers()
+                .cacheControl();
     }
 
 }
