@@ -6,12 +6,14 @@ import com.dataart.dancestudio.model.entity.JwtTokenType;
 import com.dataart.dancestudio.model.response.JwtResponse;
 import com.dataart.dancestudio.model.response.LoginResponse;
 import com.dataart.dancestudio.provider.JwtTokenProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.message.AuthException;
 
+@Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -33,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
         if (jwtTokenService.existsByUserEmail(email)) {
             final String accessToken = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.ACCESS);
             final String refreshToken = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.REFRESH);
+            log.info("User was logged in with pre-existing tokens.");
             return new LoginResponse(accessToken, refreshToken);
         }
 
@@ -54,6 +57,7 @@ public class AuthServiceImpl implements AuthService {
 
         jwtTokenService.createJwtToken(jwtAccessTokenDto);
         jwtTokenService.createJwtToken(jwtRefreshTokenDto);
+        log.info("User was logged in with new tokens.");
         return new LoginResponse(accessToken, refreshToken);
     }
 
@@ -61,8 +65,10 @@ public class AuthServiceImpl implements AuthService {
     public JwtResponse getNewAccessToken(final String refreshToken) throws AuthException {
         if (jwtTokenProvider.validateRefreshToken(refreshToken)) {
             final String email = jwtTokenProvider.getEmail(refreshToken);
+            log.info("Refresh Token was valid.");
             if (!email.isEmpty() && !email.isBlank()) {
                 final String refreshTokenFromDB = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.REFRESH);
+                log.info("Email wasn't empty or blank.");
                 if (refreshTokenFromDB.equals(refreshToken)) {
                     final UserDetailsDto userDetailsDto = (UserDetailsDto) userDetailsService.loadUserByUsername(email);
                     final String accessToken = jwtTokenProvider.generateAccessToken(userDetailsDto);
@@ -83,12 +89,14 @@ public class AuthServiceImpl implements AuthService {
 
                     jwtTokenService.updateJwtToken(jwtAccessTokenDto);
                     jwtTokenService.updateJwtToken(jwtRefreshTokenDto);
+                    log.info("New Access Token was created.");
                     return new JwtResponse(accessToken, updatedRefreshToken);
                 }
             }
         } else {
             final String email = jwtTokenProvider.getEmail(refreshToken);
             jwtTokenService.deleteJwtTokensByEmail(email);
+            log.info("Refresh Token was invalid.");
         }
         throw new AuthException("Jwt Token Invalid!!!");
     }
@@ -96,6 +104,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(final String email) {
         jwtTokenService.deleteJwtTokensByEmail(email);
+        log.info("User was logged out.");
     }
 
 }

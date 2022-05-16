@@ -87,7 +87,7 @@ public class LessonServiceImpl implements LessonService {
         if (lessonEntities.size() != 0) {
             log.info("Lessons were found.");
         } else {
-            log.info("There aren't lessons.");
+            log.info("There weren't lessons.");
         }
         return lessonMapper.lessonEntitiesToLessonViewDtoList(lessonEntities);
     }
@@ -98,7 +98,7 @@ public class LessonServiceImpl implements LessonService {
         if (lessonEntities.size() != 0) {
             log.info("Lessons were found.");
         } else {
-            log.info("There aren't lessons.");
+            log.info("There weren't lessons.");
         }
         return lessonMapper.lessonEntitiesToLessonViewDtoList(lessonEntities);
     }
@@ -109,9 +109,9 @@ public class LessonServiceImpl implements LessonService {
                 trainerName, danceStyleName, date);
         final long numberOfFilteredLessons = lessonRepository.count(specification);
         if (numberOfFilteredLessons != 0) {
-            log.info("There are lessons.");
+            log.info("There were lessons.");
         } else {
-            log.info("There aren't lessons.");
+            log.info("There weren't lessons.");
         }
         return (int) numberOfFilteredLessons;
     }
@@ -120,9 +120,9 @@ public class LessonServiceImpl implements LessonService {
     public int numberOfUserLessons(final int userId) {
         final int numberOfUserLessons = lessonRepository.countAllByUserTrainerId(userId);
         if (numberOfUserLessons != 0) {
-            log.info("There are lessons.");
+            log.info("There were lessons.");
         } else {
-            log.info("There aren't lessons.");
+            log.info("There weren't lessons.");
         }
         return numberOfUserLessons;
     }

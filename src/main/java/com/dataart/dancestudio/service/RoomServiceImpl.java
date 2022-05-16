@@ -2,13 +2,17 @@ package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.mapper.RoomMapper;
 import com.dataart.dancestudio.model.dto.view.RoomViewDto;
+import com.dataart.dancestudio.model.entity.RoomEntity;
+import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.RoomRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Transactional
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -24,7 +28,13 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public List<RoomViewDto> listRooms() {
-        return roomMapper.roomEntitiesToRoomViewDtoList(roomRepository.findAll());
+        final List<RoomEntity> roomEntities = roomRepository.findAll();
+        if (roomEntities.size() != 0) {
+            log.info("Rooms were found.");
+        } else {
+            log.info("There weren't rooms.");
+        }
+        return roomMapper.roomEntitiesToRoomViewDtoList(roomEntities);
     }
 
 }
