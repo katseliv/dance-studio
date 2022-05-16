@@ -1,6 +1,5 @@
 package com.dataart.dancestudio.service;
 
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.dataart.dancestudio.model.dto.JwtTokenDto;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.entity.JwtTokenType;
@@ -30,9 +29,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(final UserDetailsDto userDetailsDto) {
+        final String email = userDetailsDto.getEmail();
+        if (jwtTokenService.existsByUserEmail(email)) {
+            final String accessToken = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.ACCESS);
+            final String refreshToken = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.REFRESH);
+            return new LoginResponse(accessToken, refreshToken);
+        }
+
         final String accessToken = jwtTokenProvider.generateAccessToken(userDetailsDto);
         final String refreshToken = jwtTokenProvider.generateRefreshToken(userDetailsDto);
-        final String email = userDetailsDto.getEmail();
 
         final JwtTokenDto jwtAccessTokenDto = JwtTokenDto.builder()
                 .token(accessToken)
@@ -54,36 +59,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtResponse getNewAccessToken(final String refreshToken) throws AuthException {
-        try {
-            if (jwtTokenProvider.validateRefreshToken(refreshToken)) {
-                final String email = jwtTokenProvider.getEmail(refreshToken);
-                if (!email.isEmpty() && !email.isBlank()) {
-                    final String refreshTokenFromDB = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.REFRESH);
-                    if (refreshTokenFromDB.equals(refreshToken)) {
-                        final UserDetailsDto userDetailsDto = (UserDetailsDto) userDetailsService.loadUserByUsername(email);
-                        final String accessToken = jwtTokenProvider.generateAccessToken(userDetailsDto);
-
-                        final JwtTokenDto jwtAccessTokenDto = JwtTokenDto.builder()
-                                .token(accessToken)
-                                .type(JwtTokenType.ACCESS)
-                                .email(email)
-                                .isDeleted(false)
-                                .build();
-
-                        jwtTokenService.updateJwtToken(jwtAccessTokenDto);
-                        return new JwtResponse(accessToken, refreshToken);
-                    }
-                }
-            }
-        } catch (final TokenExpiredException exception) {
-            final String email = jwtTokenProvider.getEmail(refreshToken);
-            jwtTokenService.deleteJwtTokenByEmail(email);
-        }
-        throw new AuthException("Jwt Token Invalid!!!");
-    }
-
-    @Override
-    public JwtResponse getNewRefreshToken(final String refreshToken) throws AuthException {
         if (jwtTokenProvider.validateRefreshToken(refreshToken)) {
             final String email = jwtTokenProvider.getEmail(refreshToken);
             if (!email.isEmpty() && !email.isBlank()) {
@@ -91,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
                 if (refreshTokenFromDB.equals(refreshToken)) {
                     final UserDetailsDto userDetailsDto = (UserDetailsDto) userDetailsService.loadUserByUsername(email);
                     final String accessToken = jwtTokenProvider.generateAccessToken(userDetailsDto);
-                    final String newRefreshToken = jwtTokenProvider.generateNewRefreshToken(userDetailsDto, refreshToken);
+                    final String updatedRefreshToken = jwtTokenProvider.updateIssuedAtOfRefreshToken(userDetailsDto, refreshToken);
 
                     final JwtTokenDto jwtAccessTokenDto = JwtTokenDto.builder()
                             .token(accessToken)
@@ -100,7 +75,7 @@ public class AuthServiceImpl implements AuthService {
                             .isDeleted(false)
                             .build();
                     final JwtTokenDto jwtRefreshTokenDto = JwtTokenDto.builder()
-                            .token(newRefreshToken)
+                            .token(updatedRefreshToken)
                             .type(JwtTokenType.REFRESH)
                             .email(email)
                             .isDeleted(false)
@@ -108,16 +83,19 @@ public class AuthServiceImpl implements AuthService {
 
                     jwtTokenService.updateJwtToken(jwtAccessTokenDto);
                     jwtTokenService.updateJwtToken(jwtRefreshTokenDto);
-                    return new JwtResponse(accessToken, newRefreshToken);
+                    return new JwtResponse(accessToken, updatedRefreshToken);
                 }
             }
+        } else {
+            final String email = jwtTokenProvider.getEmail(refreshToken);
+            jwtTokenService.deleteJwtTokensByEmail(email);
         }
         throw new AuthException("Jwt Token Invalid!!!");
     }
 
     @Override
     public void logout(final String email) {
-        jwtTokenService.deleteJwtTokenByEmail(email);
+        jwtTokenService.deleteJwtTokensByEmail(email);
     }
 
 }

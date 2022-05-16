@@ -46,6 +46,15 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
+    public boolean existsByUserEmail(final String email) {
+        return existsByUserEmailAndType(email, JwtTokenType.ACCESS) && existsByUserEmailAndType(email, JwtTokenType.REFRESH);
+    }
+
+    private boolean existsByUserEmailAndType(final String email, final JwtTokenType type) {
+        return jwtTokenRepository.existsByUserEmailAndType(email, type);
+    }
+
+    @Override
     public void updateJwtToken(final JwtTokenDto jwtTokenDto) {
         final JwtTokenEntity jwtTokenEntity = jwtTokenRepository.findByUserEmailAndType(
                 jwtTokenDto.getEmail(), jwtTokenDto.getType()).orElseThrow();
@@ -54,7 +63,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
-    public void deleteJwtTokenByEmail(final String email) {
+    public void deleteJwtTokensByEmail(final String email) {
         deleteJwtTokenByEmail(email, JwtTokenType.ACCESS);
         deleteJwtTokenByEmail(email, JwtTokenType.REFRESH);
     }

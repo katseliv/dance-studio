@@ -21,4 +21,6 @@ public interface JwtTokenRepository extends JpaRepository<JwtTokenEntity, Intege
 
     boolean existsByToken(String token);
 
+    boolean existsByUserEmailAndType(String email, JwtTokenType type);
+
 }

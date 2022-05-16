@@ -67,7 +67,7 @@ public class JwtTokenProvider implements Serializable {
                 .sign(Algorithm.HMAC256(refreshSecret));
     }
 
-    public String generateNewRefreshToken(final UserDetailsDto userDetailsDto, final String oldRefreshToken) {
+    public String updateIssuedAtOfRefreshToken(final UserDetailsDto userDetailsDto, final String oldRefreshToken) {
         final DecodedJWT jwt = JWT.decode(oldRefreshToken);
         final Date oldRefreshExpiration = jwt.getExpiresAt();
 
@@ -94,9 +94,9 @@ public class JwtTokenProvider implements Serializable {
             verifier.verify(token);
             return true;
         } catch (final TokenExpiredException exception) {
-            throw new TokenExpiredException(exception.getMessage());
+            return false;
         } catch (final JWTVerificationException exception) {
-            throw new JWTVerificationException("Token Invalid");
+            throw new JWTVerificationException("Token Invalid!!!");
         }
     }
 

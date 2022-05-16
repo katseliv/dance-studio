@@ -11,8 +11,10 @@ public interface JwtTokenService {
 
     boolean existsByToken(String token);
 
+    boolean existsByUserEmail(String email);
+
     void updateJwtToken(final JwtTokenDto jwtTokenDto);
 
-    void deleteJwtTokenByEmail(String email);
+    void deleteJwtTokensByEmail(String email);
 
 }

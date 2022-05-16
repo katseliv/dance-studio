@@ -46,15 +46,9 @@ public class AuthRestController {
         return ResponseEntity.ok(loginResponse);
     }
 
-    @PostMapping("/newAccessToken")
+    @PostMapping("/accessToken")
     public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody final JwtRequest jwtRequest) throws AuthException {
         final JwtResponse jwtResponse = authService.getNewAccessToken(jwtRequest.getRefreshToken());
-        return ResponseEntity.ok(jwtResponse);
-    }
-
-    @PostMapping("/newRefreshToken")
-    public ResponseEntity<JwtResponse> getNewRefreshToken(@RequestBody final JwtRequest jwtRequest) throws AuthException {
-        final JwtResponse jwtResponse = authService.getNewRefreshToken(jwtRequest.getRefreshToken());
         return ResponseEntity.ok(jwtResponse);
     }
 
