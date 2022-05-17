@@ -7,6 +7,7 @@ import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.service.BookingService;
 import com.dataart.dancestudio.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -42,8 +43,9 @@ public class UserRestController {
     }
 
     @PutMapping("/{id}")
-    public void updateUser(@RequestBody @Valid final UserDto userDto, @PathVariable final int id) {
+    public ResponseEntity<String> updateUser(@RequestBody @Valid final UserDto userDto, @PathVariable final int id) {
         userService.updateUserById(userDto, id);
+        return ResponseEntity.ok("Success");
     }
 
     @DeleteMapping("/{id}")

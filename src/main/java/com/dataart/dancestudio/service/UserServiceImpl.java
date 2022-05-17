@@ -46,6 +46,7 @@ public class UserServiceImpl implements UserService {
             final UserEntity userEntity = userMapper.userRegistrationDtoToUserEntityWithPassword(
                     userRegistrationDto, password);
             userEntity.setRole(Role.USER);
+
             final UserEntity newUserEntity = userRepository.save(userEntity);
             final Integer id = newUserEntity.getId();
             log.info("User with id = {} was created.", id);
@@ -86,7 +87,7 @@ public class UserServiceImpl implements UserService {
     public void updateUserById(final UserDto userDto, final int id) {
         try {
             final UserEntity userEntity = userRepository.findById(id).orElseThrow();
-            if (!userDto.getMultipartFile().isEmpty()) {
+            if (!userDto.getBase64StringImage().isEmpty()) {
                 userMapper.mergeUserEntityAndUserDto(userEntity, userDto);
                 userRepository.save(userEntity);
                 log.info("User with id = {} was updated with picture.", id);

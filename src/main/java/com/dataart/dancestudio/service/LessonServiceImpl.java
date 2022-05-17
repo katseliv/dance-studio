@@ -4,6 +4,8 @@ import com.dataart.dancestudio.mapper.LessonMapper;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.entity.LessonEntity;
+import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
 import com.dataart.dancestudio.repository.LessonRepository;
 import com.dataart.dancestudio.repository.UserRepository;
@@ -38,7 +40,8 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public int createLesson(final LessonDto lessonDto) {
-        if (userRepository.findById(lessonDto.getUserTrainerId()).isPresent()) {
+        final Optional<UserEntity> userEntity = userRepository.findById(lessonDto.getUserTrainerId());
+        if (userEntity.isPresent() && userEntity.get().getRole() == Role.TRAINER) {
             final LessonEntity lessonEntity = lessonRepository.save(lessonMapper.lessonDtoToLessonEntity(lessonDto));
             final int id = lessonEntity.getId();
             log.info(lessonEntity + " was created.");
@@ -78,6 +81,7 @@ public class LessonServiceImpl implements LessonService {
     @Override
     public void deleteLessonById(final int id) {
         lessonRepository.markAsDeletedById(id);
+        bookingRepository.markAsDeletedByLessonId(id);
         log.info("Lesson with id = {} was deleted.", id);
     }
 

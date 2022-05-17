@@ -15,6 +15,10 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Integer>
     @Query("UPDATE bookings SET deleted = TRUE WHERE id = ?1")
     void markAsDeletedById(int id);
 
+    @Modifying
+    @Query("UPDATE bookings SET deleted = TRUE WHERE lesson.id = ?1")
+    void markAsDeletedByLessonId(int lessonId);
+
     List<BookingEntity> findAllByUserId(int userId);
 
     List<BookingEntity> findAllByLessonId(int lessonId);

@@ -18,7 +18,6 @@ public class JwtTokenDto {
     private final String token;
     private final JwtTokenType type;
     private final String email;
-    private final Boolean isDeleted;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class JwtTokenDtoBuilder {

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -25,8 +24,6 @@ public class UserRegistrationDto {
 
     @NotBlank(message = "Last Name is blank.")
     private final String lastName;
-
-    private final MultipartFile multipartFile;
 
     @NotBlank(message = "Email is blank.")
     @Email(message = "Email invalid.")
@@ -53,7 +50,6 @@ public class UserRegistrationDto {
         private String username;
         private String firstName;
         private String lastName;
-        private MultipartFile multipartFile;
         private String email;
         private String phoneNumber;
         private String password;
@@ -78,11 +74,6 @@ public class UserRegistrationDto {
 
         public UserRegistrationDtoBuilder lastName(final String lastName) {
             this.lastName = lastName;
-            return this;
-        }
-
-        public UserRegistrationDtoBuilder multipartFile(final MultipartFile multipartFile) {
-            this.multipartFile = multipartFile;
             return this;
         }
 
@@ -119,7 +110,7 @@ public class UserRegistrationDto {
         public UserRegistrationDto build() {
             if (!isUsed) {
                 isUsed = true;
-                return new UserRegistrationDto(username, firstName, lastName, multipartFile, email, phoneNumber, password,
+                return new UserRegistrationDto(username, firstName, lastName, email, phoneNumber, password,
                         passwordConfirmation, roleId, timeZone);
             }
             throw new RuntimeException("Builder already built");

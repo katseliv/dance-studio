@@ -42,9 +42,10 @@
             <div class="mb-3">
                 <label for="image" class="form-label">Image</label>
                 <input class="form-control" type="file" id="image"
-                       th:field="*{multipartFile}" th:placeholder="*{multipartFile}"
+                       th:field="*{getBase64StringImage}" th:placeholder="*{getBase64StringImage}"
                        th:classappend="${#fields.hasErrors('multipartFile')} ? 'is-invalid' : ''">
-                <div class="invalid-feedback" th:if="${#fields.hasErrors('multipartFile')}" th:errors="*{multipartFile}"></div>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('multipartFile')}"
+                     th:errors="*{getBase64StringImage}"></div>
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
@@ -58,11 +59,13 @@
                 <input class="form-control" id="phoneNumber"
                        th:field="*{phoneNumber}" th:placeholder="*{phoneNumber}"
                        th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid' : ''">
-                <div class="invalid-feedback" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('phoneNumber')}"
+                     th:errors="*{phoneNumber}"></div>
             </div>
             <input th:field="*{timeZone}" class="form-control" type="hidden" id="timeZone"
                    name="timeZone">
-            <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-outline-success w-100 mt-2">Edit</button>
+            <button type="button" onclick="putTimeZone()" class="btn btn-lg btn-outline-success w-100 mt-2">Edit
+            </button>
         </form>
     </div>
 </div>
