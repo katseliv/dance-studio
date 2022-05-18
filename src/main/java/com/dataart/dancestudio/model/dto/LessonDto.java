@@ -1,12 +1,16 @@
 package com.dataart.dancestudio.model.dto;
 
+import com.dataart.dancestudio.annotation.DatetimeValid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @EqualsAndHashCode
@@ -21,13 +25,13 @@ public class LessonDto {
     private final Integer danceStyleId;
 
     @NotBlank(message = "Start Datetime is null.")
+    @DatetimeValid
     private final String startDatetime;
 
     @NotNull(message = "Duration is null.")
-    @Pattern(regexp = "-?[0-9]+", message = "Duration invalid.")
     @Min(value = 1, message = "Duration is too short.")
     @Max(value = 4, message = "Duration is too long.")
-    private final String duration;
+    private final Integer duration;
 
     @NotNull(message = "Room time is null")
     private final Integer roomId;
@@ -44,7 +48,7 @@ public class LessonDto {
         private Integer userTrainerId;
         private Integer danceStyleId;
         private String startDatetime;
-        private String duration;
+        private Integer duration;
         private Integer roomId;
         private String timeZone;
 
@@ -68,7 +72,7 @@ public class LessonDto {
             return this;
         }
 
-        public LessonDtoBuilder duration(final String duration) {
+        public LessonDtoBuilder duration(final Integer duration) {
             this.duration = duration;
             return this;
         }

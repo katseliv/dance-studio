@@ -1,10 +1,15 @@
 package com.dataart.dancestudio.model.dto;
 
+import com.dataart.dancestudio.annotation.ImageValid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Getter
 @EqualsAndHashCode
@@ -12,12 +17,26 @@ import lombok.Getter;
 @JsonDeserialize(builder = UserDto.UserDtoBuilder.class)
 public class UserDto {
 
+    @NotBlank(message = "Username is blank.")
     private final String username;
+
+    @NotBlank(message = "First Name is blank.")
     private final String firstName;
+
+    @NotBlank(message = "Last Name is blank.")
     private final String lastName;
+
+    @ImageValid
     private final String base64StringImage;
+
+    @NotBlank(message = "Email is blank.")
+    @Email(message = "Email invalid.")
     private final String email;
+
+    @NotBlank(message = "Phone Number is blank.")
+    @Size(min = 7, max = 11, message = "Phone Number is out of range {7, 11}.")
     private final String phoneNumber;
+
     private final Integer roleId;
     private final String timeZone;
 
