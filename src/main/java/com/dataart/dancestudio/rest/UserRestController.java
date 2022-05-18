@@ -7,11 +7,11 @@ import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.service.BookingService;
 import com.dataart.dancestudio.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -28,13 +28,15 @@ public class UserRestController {
     }
 
     @PostMapping("/register")
-    public int register(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) throws IOException {
-        return userService.createUser(userRegistrationDto);
+    public ResponseEntity<Integer> register(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) {
+        final int id = userService.createUser(userRegistrationDto);
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
     @PostMapping
-    public int createUser(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) throws IOException {
-        return userService.createUser(userRegistrationDto);
+    public ResponseEntity<Integer> createUser(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) {
+        final int id = userService.createUser(userRegistrationDto);
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
@@ -45,7 +47,7 @@ public class UserRestController {
     @PutMapping("/{id}")
     public ResponseEntity<String> updateUser(@RequestBody @Valid final UserDto userDto, @PathVariable final int id) {
         userService.updateUserById(userDto, id);
-        return ResponseEntity.ok("Success");
+        return new ResponseEntity<>("User was updated!", HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

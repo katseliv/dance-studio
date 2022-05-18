@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.http.HttpServletResponse;
@@ -85,15 +86,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/v1/users/{id}").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/v1/users/{id}/bookings").authenticated()
                 .antMatchers("/api/v1/bookings/{id}", "/api/v1/logout").authenticated()
-                .antMatchers(HttpMethod.GET,"/api/v1/lessons").authenticated()
+                .antMatchers(HttpMethod.GET, "/api/v1/lessons").authenticated()
 
                 .anyRequest().not().authenticated()
 
                 .and()
                 .exceptionHandling()
+                .accessDeniedHandler(new AccessDeniedHandlerImpl())
                 .authenticationEntryPoint(
                         (request, response, authException) -> response.sendError(
-                                HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized"))
+                                HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
 
                 .and()
                 .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))

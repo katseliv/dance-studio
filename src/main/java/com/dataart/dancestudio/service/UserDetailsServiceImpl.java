@@ -34,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 (user) -> log.info("User with id = {} was found.", user.getId()),
                 () -> log.info("User wasn't found."));
         return userMapper.userEntityToUserDetailsDto(userEntity.orElseThrow(
-                () -> new UsernameNotFoundException("No such user in the database!!!")));
+                () -> new UsernameNotFoundException("No such user in the database!")));
     }
 
 }

@@ -4,6 +4,8 @@ import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 import com.dataart.dancestudio.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +22,9 @@ public class BookingRestController {
     }
 
     @PostMapping
-    public int createBooking(@RequestBody final BookingDto bookingDto) {
-        return bookingService.createBooking(bookingDto);
+    public ResponseEntity<Integer> createBooking(@RequestBody final BookingDto bookingDto) {
+        final int id = bookingService.createBooking(bookingDto);
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

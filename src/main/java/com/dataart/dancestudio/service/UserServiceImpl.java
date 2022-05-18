@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,11 +39,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int createUser(final UserRegistrationDto userRegistrationDto) throws IOException {
+    public int createUser(final UserRegistrationDto userRegistrationDto) throws UserAlreadyExistsException {
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isEmpty()) {
             final String password = passwordEncoder.encode(userRegistrationDto.getPassword());
             final UserEntity userEntity = userMapper.userRegistrationDtoToUserEntityWithPassword(
                     userRegistrationDto, password);
+            userEntity.setImage(new byte[0]);
             userEntity.setRole(Role.USER);
 
             final UserEntity newUserEntity = userRepository.save(userEntity);
@@ -85,19 +85,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUserById(final UserDto userDto, final int id) {
-        try {
-            final UserEntity userEntity = userRepository.findById(id).orElseThrow();
-            if (!userDto.getBase64StringImage().isEmpty()) {
-                userMapper.mergeUserEntityAndUserDto(userEntity, userDto);
-                userRepository.save(userEntity);
-                log.info("User with id = {} was updated with picture.", id);
-            } else {
-                userMapper.mergeUserEntityAndUserDtoWithoutPicture(userEntity, userDto);
-                userRepository.save(userEntity);
-                log.info("User with id = {} was updated without picture.", id);
-            }
-        } catch (final IOException e) {
-            log.error("An exception occurred!", e);
+        final UserEntity userEntity = userRepository.findById(id).orElseThrow();
+        if (!userDto.getBase64StringImage().isEmpty()) {
+            userMapper.mergeUserEntityAndUserDto(userEntity, userDto);
+            userRepository.save(userEntity);
+            log.info("User with id = {} was updated with picture.", id);
+        } else {
+            userMapper.mergeUserEntityAndUserDtoWithoutPicture(userEntity, userDto);
+            userRepository.save(userEntity);
+            log.info("User with id = {} was updated without picture.", id);
         }
     }
 
@@ -108,7 +104,7 @@ public class UserServiceImpl implements UserService {
             log.info("User with id = {} was deleted.", id);
         } else {
             log.info("User with id = {} wasn't deleted.", id);
-            throw new UserCanNotBeDeletedException("User has lessons!!!");
+            throw new UserCanNotBeDeletedException("User has lessons!");
         }
     }
 

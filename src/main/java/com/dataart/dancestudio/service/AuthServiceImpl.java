@@ -94,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
             jwtTokenService.deleteJwtTokensByEmail(email);
             log.info("Refresh Token was invalid.");
         }
-        throw new AuthException("Jwt Token Invalid!!!");
+        throw new AuthException("Jwt Token Invalid!");
     }
 
     @Override

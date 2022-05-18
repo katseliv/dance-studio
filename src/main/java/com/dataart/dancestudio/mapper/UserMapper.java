@@ -11,7 +11,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
-import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 
@@ -36,10 +35,10 @@ public interface UserMapper {
         return List.of(role);
     }
 
-    UserEntity userRegistrationDtoToUserEntityWithPassword(UserRegistrationDto dto, String password) throws IOException;
+    UserEntity userRegistrationDtoToUserEntityWithPassword(UserRegistrationDto dto, String password);
 
     @Mapping(target = "image", source = "base64StringImage", qualifiedByName = "base64StringImage")
-    void mergeUserEntityAndUserDto(@MappingTarget UserEntity entity, UserDto dto) throws IOException;
+    void mergeUserEntityAndUserDto(@MappingTarget UserEntity entity, UserDto dto);
 
     @Named(value = "base64StringImage")
     default byte[] mapBase64StringImage(final String base64StringImage) {

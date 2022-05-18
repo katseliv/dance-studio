@@ -1,5 +1,6 @@
 package com.dataart.dancestudio.service;
 
+import com.dataart.dancestudio.exception.LessonException;
 import com.dataart.dancestudio.mapper.LessonMapper;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
@@ -47,8 +48,8 @@ public class LessonServiceImpl implements LessonService {
             log.info(lessonEntity + " was created.");
             return id;
         } else {
-            log.info("Lesson wasn't created");
-            throw new RuntimeException("Lesson wasn't created");
+            log.info("Lesson wasn't created.");
+            throw new LessonException("User doesn't have role TRAINER!");
         }
     }
 

@@ -6,12 +6,11 @@ import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
 
-    int createUser(UserRegistrationDto userRegistrationDto) throws IOException, UserAlreadyExistsException;
+    int createUser(UserRegistrationDto userRegistrationDto) throws UserAlreadyExistsException;
 
     UserDto getUserById(int id);
 

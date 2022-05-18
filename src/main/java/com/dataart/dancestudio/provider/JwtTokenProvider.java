@@ -96,7 +96,7 @@ public class JwtTokenProvider implements Serializable {
         } catch (final TokenExpiredException exception) {
             return false;
         } catch (final JWTVerificationException exception) {
-            throw new JWTVerificationException("Token Invalid!!!");
+            throw new JWTVerificationException("Token Invalid!");
         }
     }
 
