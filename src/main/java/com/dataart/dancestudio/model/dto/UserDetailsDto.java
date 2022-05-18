@@ -1,6 +1,8 @@
 package com.dataart.dancestudio.model.dto;
 
 import com.dataart.dancestudio.model.entity.Role;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,6 +15,7 @@ import java.util.List;
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
+@JsonDeserialize(builder = UserDetailsDto.UserDetailsDtoBuilder.class)
 public class UserDetailsDto implements UserDetails {
 
     private final Integer id;
@@ -54,6 +57,7 @@ public class UserDetailsDto implements UserDetails {
         return true;
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static class UserDetailsDtoBuilder {
 
         private Integer id;

@@ -14,6 +14,6 @@ public class PostEntity {
     private String image;
     private String text;
     private Instant creationDatetime;
-    private Boolean isDeleted;
+    private boolean deleted;
 
 }

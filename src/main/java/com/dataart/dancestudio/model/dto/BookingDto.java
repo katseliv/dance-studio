@@ -1,5 +1,7 @@
 package com.dataart.dancestudio.model.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -7,32 +9,25 @@ import lombok.Getter;
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
+@JsonDeserialize(builder = BookingDto.BookingDtoBuilder.class)
 public class BookingDto {
 
-    private final Integer id;
     private final Integer userId;
     private final Integer lessonId;
-    private final Boolean isDeleted;
 
     public static BookingDtoBuilder builder() {
         return new BookingDtoBuilder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static class BookingDtoBuilder {
 
-        private Integer id;
         private Integer userId;
         private Integer lessonId;
-        private Boolean isDeleted;
 
         private boolean isUsed = false;
 
         public BookingDtoBuilder() {
-        }
-
-        public BookingDtoBuilder id(final Integer id) {
-            this.id = id;
-            return this;
         }
 
         public BookingDtoBuilder userId(final Integer userId) {
@@ -45,15 +40,10 @@ public class BookingDto {
             return this;
         }
 
-        public BookingDtoBuilder isDeleted(final Boolean isDeleted) {
-            this.isDeleted = isDeleted;
-            return this;
-        }
-
-        public BookingDto build(){
+        public BookingDto build() {
             if (!isUsed) {
                 isUsed = true;
-                return new BookingDto(id, userId, lessonId, isDeleted);
+                return new BookingDto(userId, lessonId);
             }
             throw new RuntimeException("Builder already built");
         }

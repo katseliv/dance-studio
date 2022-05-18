@@ -1,51 +1,45 @@
 package com.dataart.dancestudio.model.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
+@JsonDeserialize(builder = UserDto.UserDtoBuilder.class)
 public class UserDto {
 
-    private final Integer id;
     private final String username;
     private final String firstName;
     private final String lastName;
-    private final MultipartFile multipartFile;
+    private final String base64StringImage;
     private final String email;
     private final String phoneNumber;
     private final Integer roleId;
     private final String timeZone;
-    private final Boolean isDeleted;
 
     public static UserDtoBuilder builder() {
         return new UserDtoBuilder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
     public static class UserDtoBuilder {
 
-        private Integer id;
         private String username;
         private String firstName;
         private String lastName;
-        private MultipartFile multipartFile;
+        private String base64StringImage;
         private String email;
         private String phoneNumber;
         private Integer roleId;
         private String timeZone;
-        private Boolean isDeleted;
 
         private boolean isUsed;
 
         public UserDtoBuilder() {
-        }
-
-        public UserDtoBuilder id(final Integer id) {
-            this.id = id;
-            return this;
         }
 
         public UserDtoBuilder username(final String username) {
@@ -63,8 +57,8 @@ public class UserDto {
             return this;
         }
 
-        public UserDtoBuilder multipartFile(final MultipartFile multipartFile) {
-            this.multipartFile = multipartFile;
+        public UserDtoBuilder base64StringImage(final String base64StringImage) {
+            this.base64StringImage = base64StringImage;
             return this;
         }
 
@@ -88,15 +82,10 @@ public class UserDto {
             return this;
         }
 
-        public UserDtoBuilder isDeleted(final Boolean isDeleted) {
-            this.isDeleted = isDeleted;
-            return this;
-        }
-
         public UserDto build() {
             if (!isUsed) {
                 isUsed = true;
-                return new UserDto(id, username, firstName, lastName, multipartFile, email, phoneNumber, roleId, timeZone, isDeleted);
+                return new UserDto(username, firstName, lastName, base64StringImage, email, phoneNumber, roleId, timeZone);
             }
             throw new RuntimeException("Builder already built");
         }

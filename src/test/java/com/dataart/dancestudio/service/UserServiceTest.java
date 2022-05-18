@@ -58,7 +58,7 @@ public class UserServiceTest {
     private final String email = "email@email.ru";
     private final String phoneNumber = "89085674534";
     private final String timeZone = "Europe/Moscow";
-    private final boolean isDeleted = false;
+    private final boolean deleted = false;
 
     @Test
     public void createUser() throws IOException, UserAlreadyExistsException {
@@ -81,19 +81,17 @@ public class UserServiceTest {
                 .password(encodePassword)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserRegistrationDto userRegistrationDto = UserRegistrationDto.builder()
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
-                .multipartFile(multipartFile)
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .password(password)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
                 .build();
 
         doReturn(userEntity).when(userMapperImpl).userRegistrationDtoToUserEntityWithPassword(userRegistrationDto, userEntity.getPassword());
@@ -126,19 +124,17 @@ public class UserServiceTest {
                 .password(encodePassword)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserRegistrationDto userRegistrationDto = UserRegistrationDto.builder()
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
-                .multipartFile(multipartFile)
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .password(password)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
                 .build();
 
         when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.of(userEntity));
@@ -167,10 +163,10 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserDto userDtoWithoutMultipartFile = UserDto.builder()
-                .id(id)
+//                .id(id)
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
@@ -178,7 +174,6 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
                 .build();
 
         when(userMapperImpl.userEntityToUserDto(userEntity)).thenReturn(userDtoWithoutMultipartFile);
@@ -206,7 +201,7 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
 
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
@@ -233,7 +228,7 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserViewDto userViewDto = UserViewDto.builder()
                 .username(username)
@@ -269,7 +264,7 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
 
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
@@ -350,7 +345,7 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserEntity newUserEntityWithUpdatedImage = UserEntity.builder()
                 .username(username)
@@ -361,18 +356,17 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserDto newUserDto = UserDto.builder()
                 .username(username)
                 .firstName(firstName)
                 .lastName(newLastName)
-                .multipartFile(multipartFile)
+                .base64StringImage(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
                 .build();
 
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 20, 30, 40});
@@ -400,7 +394,7 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserEntity userEntity = UserEntity.builder()
                 .username(username)
@@ -411,18 +405,17 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserDto newUserDto = UserDto.builder()
                 .username(username)
                 .firstName(firstName)
                 .lastName(newLastName)
-                .multipartFile(multipartFile)
+                .base64StringImage(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
                 .build();
 
         when(multipartFile.isEmpty()).thenReturn(true);
@@ -449,18 +442,17 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserDto newUserDto = UserDto.builder()
                 .username(username)
                 .firstName(firstName)
                 .lastName(newLastName)
-                .multipartFile(multipartFile)
+                .base64StringImage(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
                 .build();
 
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
@@ -485,18 +477,17 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserDto userDto = UserDto.builder()
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
-                .multipartFile(multipartFile)
+                .base64StringImage(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
                 .build();
         final UserEntity newUserEntity = UserEntity.builder()
                 .username(username)
@@ -507,7 +498,7 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
 
         when(multipartFile.isEmpty()).thenReturn(true);
@@ -529,12 +520,11 @@ public class UserServiceTest {
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
-                .multipartFile(multipartFile)
+                .base64StringImage(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
                 .build();
         final UserEntity newUserEntity = UserEntity.builder()
                 .username(username)
@@ -545,7 +535,7 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
 
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
@@ -594,7 +584,7 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserViewDto userViewDto = UserViewDto.builder()
                 .username(username)
@@ -634,7 +624,7 @@ public class UserServiceTest {
                 .phoneNumber(phoneNumber)
                 .role(Role.TRAINER)
                 .timeZone(timeZone)
-                .isDeleted(isDeleted)
+                .deleted(deleted)
                 .build();
         final UserViewDto userViewDto = UserViewDto.builder()
                 .username(username)

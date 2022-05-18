@@ -46,13 +46,11 @@ public class AuthServiceImpl implements AuthService {
                 .token(accessToken)
                 .type(JwtTokenType.ACCESS)
                 .email(email)
-                .isDeleted(false)
                 .build();
         final JwtTokenDto jwtRefreshTokenDto = JwtTokenDto.builder()
                 .token(refreshToken)
                 .type(JwtTokenType.REFRESH)
                 .email(email)
-                .isDeleted(false)
                 .build();
 
         jwtTokenService.createJwtToken(jwtAccessTokenDto);
@@ -78,13 +76,11 @@ public class AuthServiceImpl implements AuthService {
                             .token(accessToken)
                             .type(JwtTokenType.ACCESS)
                             .email(email)
-                            .isDeleted(false)
                             .build();
                     final JwtTokenDto jwtRefreshTokenDto = JwtTokenDto.builder()
                             .token(updatedRefreshToken)
                             .type(JwtTokenType.REFRESH)
                             .email(email)
-                            .isDeleted(false)
                             .build();
 
                     jwtTokenService.updateJwtToken(jwtAccessTokenDto);

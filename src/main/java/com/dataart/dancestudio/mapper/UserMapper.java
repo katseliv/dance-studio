@@ -6,13 +6,13 @@ import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -25,7 +25,7 @@ public interface UserMapper {
 
     @Named(value = "image")
     default String mapImage(final byte[] image) {
-        return Base64.encodeBase64String(image);
+        return Base64.getEncoder().encodeToString(image);
     }
 
     @Mapping(target = "roles", source = "role", qualifiedByName = "role")
@@ -36,16 +36,16 @@ public interface UserMapper {
         return List.of(role);
     }
 
-    @Mapping(target = "image", source = "dto.multipartFile.bytes")
-    @Mapping(target = "password", source = "password")
-    @Mapping(target = "isDeleted", defaultValue = "false")
     UserEntity userRegistrationDtoToUserEntityWithPassword(UserRegistrationDto dto, String password) throws IOException;
 
-    @Mapping(target = "image", source = "multipartFile.bytes")
-    @Mapping(target = "isDeleted", defaultValue = "false")
+    @Mapping(target = "image", source = "base64StringImage", qualifiedByName = "base64StringImage")
     void mergeUserEntityAndUserDto(@MappingTarget UserEntity entity, UserDto dto) throws IOException;
 
-    @Mapping(target = "isDeleted", defaultValue = "false")
+    @Named(value = "base64StringImage")
+    default byte[] mapBase64StringImage(final String base64StringImage) {
+        return Base64.getDecoder().decode(base64StringImage);
+    }
+
     void mergeUserEntityAndUserDtoWithoutPicture(@MappingTarget UserEntity entity, UserDto dto);
 
     List<UserViewDto> userEntitiesToUserViewDtoList(Iterable<UserEntity> entities);

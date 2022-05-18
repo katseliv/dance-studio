@@ -8,6 +8,6 @@ import lombok.Setter;
 public class LikeEntity {
 
     private LikeId id;
-    private Boolean isDeleted;
+    private boolean deleted;
 
 }

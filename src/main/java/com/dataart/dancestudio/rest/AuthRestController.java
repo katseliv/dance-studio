@@ -36,7 +36,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/accessToken")
-    public ResponseEntity<LoginResponse> login(@RequestBody final LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> accessToken(@RequestBody final LoginRequest loginRequest) {
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         securityContextFacade.getContext().setAuthentication(authentication);

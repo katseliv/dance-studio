@@ -4,6 +4,9 @@ import com.dataart.dancestudio.mapper.LessonMapper;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.entity.LessonEntity;
+import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.entity.UserEntity;
+import com.dataart.dancestudio.repository.BookingRepository;
 import com.dataart.dancestudio.repository.LessonRepository;
 import com.dataart.dancestudio.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -22,20 +25,23 @@ import java.util.Optional;
 public class LessonServiceImpl implements LessonService {
 
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
     private final LessonRepository lessonRepository;
     private final LessonMapper lessonMapper;
 
     @Autowired
-    public LessonServiceImpl(final UserRepository userRepository, final LessonRepository lessonRepository,
-                             final LessonMapper lessonMapper) {
+    public LessonServiceImpl(final UserRepository userRepository, final BookingRepository bookingRepository,
+                             final LessonRepository lessonRepository, final LessonMapper lessonMapper) {
         this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
         this.lessonRepository = lessonRepository;
         this.lessonMapper = lessonMapper;
     }
 
     @Override
     public int createLesson(final LessonDto lessonDto) {
-        if (userRepository.findById(lessonDto.getUserTrainerId()).isPresent()) {
+        final Optional<UserEntity> userEntity = userRepository.findById(lessonDto.getUserTrainerId());
+        if (userEntity.isPresent() && userEntity.get().getRole() == Role.TRAINER) {
             final LessonEntity lessonEntity = lessonRepository.save(lessonMapper.lessonDtoToLessonEntity(lessonDto));
             final int id = lessonEntity.getId();
             log.info(lessonEntity + " was created.");
@@ -75,6 +81,7 @@ public class LessonServiceImpl implements LessonService {
     @Override
     public void deleteLessonById(final int id) {
         lessonRepository.markAsDeletedById(id);
+        bookingRepository.markAsDeletedByLessonId(id);
         log.info("Lesson with id = {} was deleted.", id);
     }
 

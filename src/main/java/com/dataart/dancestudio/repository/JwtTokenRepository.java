@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface JwtTokenRepository extends JpaRepository<JwtTokenEntity, Integer> {
 
     @Modifying
-    @Query("UPDATE jwt_tokens SET isDeleted = TRUE " +
+    @Query("UPDATE jwt_tokens SET deleted = TRUE " +
             "WHERE user.id = (SELECT id FROM users WHERE email = ?1) AND type = ?2")
     void markAsDeletedByUserEmailAndType(String email, JwtTokenType type);
 
