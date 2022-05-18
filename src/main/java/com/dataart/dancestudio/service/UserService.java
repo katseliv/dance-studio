@@ -1,6 +1,6 @@
 package com.dataart.dancestudio.service;
 
-import com.dataart.dancestudio.exception.UserAlreadyExistsException;
+import com.dataart.dancestudio.exception.EntityAlreadyExistsException;
 import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface UserService {
 
-    int createUser(UserRegistrationDto userRegistrationDto) throws UserAlreadyExistsException;
+    int createUser(UserRegistrationDto userRegistrationDto) throws EntityAlreadyExistsException;
 
     UserDto getUserById(int id);
 

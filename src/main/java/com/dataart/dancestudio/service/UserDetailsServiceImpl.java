@@ -31,8 +31,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
         final Optional<UserEntity> userEntity = userRepository.findByEmail(email);
         userEntity.ifPresentOrElse(
-                (user) -> log.info("User with id = {} was found.", user.getId()),
-                () -> log.info("User wasn't found."));
+                (user) -> log.info("User for email = {} with id = {} was found.", email, user.getId()),
+                () -> log.warn("User for email = {} wasn't found.", email));
         return userMapper.userEntityToUserDetailsDto(userEntity.orElseThrow(
                 () -> new UsernameNotFoundException("No such user in the database!")));
     }
