@@ -30,9 +30,9 @@ public class RoomServiceImpl implements RoomService {
     public List<RoomViewDto> listRooms() {
         final List<RoomEntity> roomEntities = roomRepository.findAll();
         if (roomEntities.size() != 0) {
-            log.info("Rooms were found.");
+            log.info("Rooms have been found.");
         } else {
-            log.info("There weren't rooms.");
+            log.info("There haven't been rooms.");
         }
         return roomMapper.roomEntitiesToRoomViewDtoList(roomEntities);
     }
