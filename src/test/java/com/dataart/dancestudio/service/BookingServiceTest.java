@@ -1,6 +1,8 @@
 package com.dataart.dancestudio.service;
 
-import com.dataart.dancestudio.exception.BookingException;
+import com.dataart.dancestudio.exception.EntityAlreadyExistsException;
+import com.dataart.dancestudio.exception.EntityCreationException;
+import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.mapper.BookingMapperImpl;
 import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
@@ -18,11 +20,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +44,6 @@ public class BookingServiceTest {
     private final int userId = 13;
     private final int newUserId = 15;
     private final int lessonId = 14;
-    private final boolean isDeleted = false;
     private final String firstName = "Alex";
     private final String lastName = "Smirnov";
     private final String danceStyle = "Popping";
@@ -69,7 +68,7 @@ public class BookingServiceTest {
             .build();
 
     @Test
-    public void createBooking() throws BookingException {
+    public void createBooking() {
         // given
         when(bookingMapperImpl.bookingDtoToBookingEntity(bookingDto)).thenReturn(bookingEntity);
         when(bookingRepositoryMock.save(bookingEntity)).thenReturn(bookingEntity);
@@ -81,6 +80,57 @@ public class BookingServiceTest {
         // then
         verify(bookingRepositoryMock, times(1)).save(bookingEntity);
         assertEquals(id, bookingId);
+    }
+
+    @Test
+    public void createBookingAlreadyExists() {
+        // given
+        when(bookingRepositoryMock.existsByUserIdAndLessonId(userId, lessonId)).thenReturn(true);
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityAlreadyExistsException.class,
+                () -> bookingServiceImpl.createBooking(bookingDto));
+        verify(bookingRepositoryMock, never()).save(bookingEntity);
+        assertEquals(actualException.getMessage(), "Booking already exists!");
+    }
+
+    @Test
+    public void createBookingWhenLessonNotFound() {
+        // given
+        when(lessonRepositoryMock.findById(lessonId)).thenReturn(Optional.empty());
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityCreationException.class,
+                () -> bookingServiceImpl.createBooking(bookingDto));
+        verify(bookingRepositoryMock, never()).save(bookingEntity);
+        assertEquals(actualException.getMessage(), "Invalid lessonId. Can't create a booking!");
+    }
+
+    @Test
+    public void createBookingWhenBookingAlreadyExists() {
+        // given
+        when(bookingRepositoryMock.existsByUserIdAndLessonId(userId, lessonId)).thenReturn(true);
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityAlreadyExistsException.class,
+                () -> bookingServiceImpl.createBooking(bookingDto));
+        verify(bookingRepositoryMock, never()).save(bookingEntity);
+        assertEquals(actualException.getMessage(), "Booking already exists!");
+    }
+
+    @Test
+    public void createBookingWhenTheSameUserTrainerId() {
+        // given
+        final var build = LessonEntity.builder()
+                .userTrainer(UserEntity.builder().id(userId).build())
+                .build();
+        when(lessonRepositoryMock.findById(lessonId)).thenReturn(Optional.of(build));
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityCreationException.class,
+                () -> bookingServiceImpl.createBooking(bookingDto));
+        verify(bookingRepositoryMock, never()).save(bookingEntity);
+        assertEquals(actualException.getMessage(), "User can't sign up for a lesson with himself!");
     }
 
     @Test
@@ -103,7 +153,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> bookingServiceImpl.getBookingById(id));
+        assertThrows(EntityNotFoundException.class, () -> bookingServiceImpl.getBookingById(id));
 
         // then
         verify(bookingMapperImpl, never()).bookingEntityToBookingDto(bookingEntity);
@@ -130,7 +180,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> bookingServiceImpl.getBookingViewById(id));
+        assertThrows(EntityNotFoundException.class, () -> bookingServiceImpl.getBookingViewById(id));
 
         // then
         verify(bookingRepositoryMock, times(1)).findById(id);

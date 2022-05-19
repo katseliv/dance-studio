@@ -1,8 +1,8 @@
 package com.dataart.dancestudio.handler;
 
-import com.dataart.dancestudio.exception.BookingException;
-import com.dataart.dancestudio.exception.LessonException;
-import com.dataart.dancestudio.exception.UserAlreadyExistsException;
+import com.dataart.dancestudio.exception.EntityAlreadyExistsException;
+import com.dataart.dancestudio.exception.EntityCreationException;
+import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.model.dto.ApiErrorDto;
 import org.springframework.http.HttpHeaders;
@@ -18,9 +18,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.security.auth.message.AuthException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -36,8 +35,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(value = {
-            BookingException.class, LessonException.class,
-            UserCanNotBeDeletedException.class, UserAlreadyExistsException.class
+            EntityCreationException.class, EntityAlreadyExistsException.class, UserCanNotBeDeletedException.class
     })
     public ResponseEntity<ApiErrorDto> badRequestException(final RuntimeException runtimeException) {
         final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
@@ -48,7 +46,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(apiErrorDto, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = {NoSuchElementException.class, UsernameNotFoundException.class})
+    @ExceptionHandler(value = {EntityNotFoundException.class, UsernameNotFoundException.class})
     public ResponseEntity<ApiErrorDto> notFoundException(final RuntimeException runtimeException) {
         final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
                 .status(String.valueOf(HttpStatus.NOT_FOUND.value()))
@@ -73,10 +71,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   @NonNull final HttpHeaders headers,
                                                                   @NonNull final HttpStatus status,
                                                                   @NonNull final WebRequest request) {
-        final List<String> details = new ArrayList<>();
-        for (final ObjectError error : ex.getBindingResult().getAllErrors()) {
-            details.add(error.getDefaultMessage());
-        }
+        final List<String> details = ex.getBindingResult().getAllErrors().stream()
+                .map(ObjectError::getDefaultMessage)
+                .collect(Collectors.toList());
         final ApiErrorDto error = ApiErrorDto.builder()
                 .status(String.valueOf(HttpStatus.BAD_REQUEST.value()))
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())

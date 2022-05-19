@@ -1,9 +1,9 @@
 package com.dataart.dancestudio.service;
 
-import com.dataart.dancestudio.exception.UserAlreadyExistsException;
+import com.dataart.dancestudio.exception.EntityAlreadyExistsException;
+import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.mapper.UserMapper;
-import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int createUser(final UserRegistrationDto userRegistrationDto) throws UserAlreadyExistsException {
+    public int createUser(final UserRegistrationDto userRegistrationDto) throws EntityAlreadyExistsException {
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isEmpty()) {
             final String password = passwordEncoder.encode(userRegistrationDto.getPassword());
             final UserEntity userEntity = userMapper.userRegistrationDtoToUserEntityWithPassword(
@@ -49,61 +49,81 @@ public class UserServiceImpl implements UserService {
 
             final UserEntity newUserEntity = userRepository.save(userEntity);
             final Integer id = newUserEntity.getId();
-            log.info("User with id = {} was created.", id);
+            log.info("User with id = {} has been created.", id);
             return id;
         }
-        log.info("User wasn't created.");
-        throw new UserAlreadyExistsException("User already exists in the database!");
+        log.warn("User hasn't been created.");
+        throw new EntityAlreadyExistsException("User already exists in the database!");
     }
 
     @Override
     public UserDto getUserById(final int id) {
         final Optional<UserEntity> userEntity = userRepository.findById(id);
         userEntity.ifPresentOrElse(
-                (user) -> log.info("User with id = {} was found.", user.getId()),
-                () -> log.info("User wasn't found."));
-        return userMapper.userEntityToUserDto(userEntity.orElseThrow());
+                (user) -> log.info("User with id = {} has been found.", user.getId()),
+                () -> log.warn("User with id = {} hasn't been found.", id));
+        return userEntity.map(userMapper::userEntityToUserDto)
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
     }
 
     @Override
     public UserViewDto getUserViewById(final int id) {
         final Optional<UserEntity> userEntity = userRepository.findById(id);
         userEntity.ifPresentOrElse(
-                (user) -> log.info("User with id = {} was found.", user.getId()),
-                () -> log.info("User wasn't found."));
-        return userMapper.userEntityToUserViewDto(userEntity.orElseThrow());
+                (user) -> log.info("User with id = {} has been found.", user.getId()),
+                () -> log.warn("User with id = {} hasn't been found.", id));
+        return userEntity.map(userMapper::userEntityToUserViewDto)
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
     }
 
     @Override
     public int getUserIdByEmail(final String email) {
-        final UserDetailsDto userDetailsDto = userMapper.userEntityToUserDetailsDto(
-                userRepository.findByEmail(email).orElseThrow());
-        final Integer id = userDetailsDto.getId();
-        log.info("User with id = {} was found.", id);
-        return id;
+        final Optional<UserEntity> userEntity = userRepository.findByEmail(email);
+        userEntity.ifPresentOrElse(
+                (user) -> log.info("User with email = {} has been found.", email),
+                () -> log.warn("User with email = {} hasn't been found.", email));
+        return userEntity.map(userMapper::userEntityToUserDetailsDto)
+                .orElseThrow(() -> new EntityNotFoundException("User not found!")).getId();
     }
 
     @Override
     public void updateUserById(final UserDto userDto, final int id) {
-        final UserEntity userEntity = userRepository.findById(id).orElseThrow();
-        if (!userDto.getBase64StringImage().isEmpty()) {
-            userMapper.mergeUserEntityAndUserDto(userEntity, userDto);
-            userRepository.save(userEntity);
-            log.info("User with id = {} was updated with picture.", id);
+        final Optional<UserEntity> userEntity = userRepository.findById(id);
+        final UserEntity user;
+        if (userEntity.isPresent()) {
+            user = userEntity.get();
+            log.info("User with id = {} has been found.", id);
         } else {
-            userMapper.mergeUserEntityAndUserDtoWithoutPicture(userEntity, userDto);
-            userRepository.save(userEntity);
-            log.info("User with id = {} was updated without picture.", id);
+            log.warn("User with id = {} hasn't been found.", id);
+            throw new EntityNotFoundException("User not found!");
+        }
+
+        if (userDto.getBase64StringImage().isEmpty()) {
+            userMapper.mergeUserEntityAndUserDtoWithoutPicture(user, userDto);
+            userRepository.save(user);
+            log.info("User with id = {} has been updated without picture.", id);
+        } else {
+            userMapper.mergeUserEntityAndUserDto(user, userDto);
+            userRepository.save(user);
+            log.info("User with id = {} has been updated with picture.", id);
         }
     }
 
     @Override
     public void deleteUserById(final int id) {
+        final Optional<UserEntity> userEntity = userRepository.findById(id);
+        if (userEntity.isPresent()) {
+            log.info("User with id = {} has been found.", id);
+        } else {
+            log.warn("User with id = {} hasn't been found.", id);
+            throw new EntityNotFoundException("User not found!");
+        }
+
         if (lessonService.numberOfUserLessons(id) == 0) {
             userRepository.markAsDeletedById(id);
-            log.info("User with id = {} was deleted.", id);
+            log.info("User with id = {} has been deleted.", id);
         } else {
-            log.info("User with id = {} wasn't deleted.", id);
+            log.warn("User with id = {} hasn't been deleted.", id);
             throw new UserCanNotBeDeletedException("User has lessons!");
         }
     }
@@ -112,9 +132,9 @@ public class UserServiceImpl implements UserService {
     public List<UserViewDto> listUsers() {
         final List<UserEntity> userEntities = userRepository.findAll();
         if (userEntities.size() != 0) {
-            log.info("Users were found.");
+            log.info("Users have been found.");
         } else {
-            log.info("There weren't users.");
+            log.warn("There haven't been users.");
         }
         return userMapper.userEntitiesToUserViewDtoList(userEntities);
     }
@@ -123,9 +143,9 @@ public class UserServiceImpl implements UserService {
     public List<UserViewDto> listTrainers() {
         final List<UserEntity> userEntities = userRepository.findAllByRole(Role.TRAINER);
         if (userEntities.size() != 0) {
-            log.info("Users were found.");
+            log.info("Users have been found.");
         } else {
-            log.info("There weren't users.");
+            log.warn("There haven't been users.");
         }
         return userMapper.userEntitiesToUserViewDtoList(userEntities);
     }

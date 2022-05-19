@@ -1,5 +1,7 @@
 package com.dataart.dancestudio.service;
 
+import com.dataart.dancestudio.exception.EntityCreationException;
+import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.mapper.JwtTokenMapper;
 import com.dataart.dancestudio.model.dto.JwtTokenDto;
 import com.dataart.dancestudio.model.entity.JwtTokenEntity;
@@ -37,10 +39,12 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         if (userEntity.isPresent()) {
             final JwtTokenEntity jwtTokenEntity = jwtTokenMapper.jwtTokenDtoToJwtTokenEntity(jwtTokenDto);
             jwtTokenEntity.setUser(userEntity.get());
-            jwtTokenRepository.save(jwtTokenEntity);
-            log.info("Token was created.");
+            final JwtTokenEntity jwtTokenEntitySaved = jwtTokenRepository.save(jwtTokenEntity);
+            log.info("Token with type = {} for email = {} with id = {} has been created.",
+                    jwtTokenDto.getType(), jwtTokenDto.getEmail(), jwtTokenEntitySaved.getId());
         } else {
-            log.info("Token wasn't created.");
+            log.info("Token with type = {} for email = {} hasn't been created.",
+                    jwtTokenDto.getType(), jwtTokenDto.getEmail());
         }
     }
 
@@ -48,9 +52,9 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     public String getJwtTokenByEmail(final String email, final JwtTokenType type) {
         final Optional<JwtTokenEntity> jwtTokenEntity = jwtTokenRepository.findByUserEmailAndType(email, type);
         jwtTokenEntity.ifPresentOrElse(
-                (token) -> log.info("Token with id = {} was found.", token.getId()),
-                () -> log.info("Token wasn't found."));
-        return jwtTokenEntity.orElseThrow().getToken();
+                (token) -> log.info("Token with type = {} for email = {} with id = {} has been found.", type, email, token.getId()),
+                () -> log.info("Token with type = {} for email = {} hasn't been found.", type, email));
+        return jwtTokenEntity.orElseThrow(() -> new EntityNotFoundException("Token not found!")).getToken();
     }
 
     @Override
@@ -59,7 +63,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         if (existsByToken) {
             log.info("Token exists.");
         } else {
-            log.info("Token doesn't exist.");
+            log.warn("Token doesn't exist.");
         }
         return existsByToken;
     }
@@ -69,9 +73,9 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         final boolean existsByUserEmail = existsByUserEmailAndType(email, JwtTokenType.ACCESS)
                 && existsByUserEmailAndType(email, JwtTokenType.REFRESH);
         if (existsByUserEmail) {
-            log.info("Tokens exist.");
+            log.info("Tokens for email = {} exist.", email);
         } else {
-            log.info("Tokens don't exist.");
+            log.info("Tokens for email = {} don't exist.", email);
         }
         return existsByUserEmail;
     }
@@ -83,17 +87,27 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     @Override
     public void updateJwtToken(final JwtTokenDto jwtTokenDto) {
         final JwtTokenEntity jwtTokenEntity = jwtTokenRepository.findByUserEmailAndType(
-                jwtTokenDto.getEmail(), jwtTokenDto.getType()).orElseThrow();
+                jwtTokenDto.getEmail(), jwtTokenDto.getType()).orElseThrow(() -> {
+            log.warn("Token with type = {} for email = {} doesn't exist", jwtTokenDto.getType(), jwtTokenDto.getEmail());
+            throw new EntityCreationException("New access token hasn't been created!");
+        });
         jwtTokenMapper.mergeJwtTokenEntityAndJwtTokenDto(jwtTokenEntity, jwtTokenDto);
         final JwtTokenEntity updatedJwtTokenEntity = jwtTokenRepository.save(jwtTokenEntity);
-        log.info("Token with id = {} was updated.", updatedJwtTokenEntity.getId());
+        log.info("Token with type = {} for email = {} with id = {} has been updated.",
+                jwtTokenDto.getType(), jwtTokenDto.getEmail(), updatedJwtTokenEntity.getId());
     }
 
     @Override
     public void deleteJwtTokensByEmail(final String email) {
+        if (existsByUserEmailAndType(email, JwtTokenType.ACCESS) && existsByUserEmailAndType(email, JwtTokenType.REFRESH)) {
+            log.info("Tokens for email = {} have been found.", email);
+        } else {
+            log.warn("Tokens for email = {} haven't been found.", email);
+            throw new EntityNotFoundException("Tokens not found!");
+        }
         deleteJwtTokenByEmail(email, JwtTokenType.ACCESS);
         deleteJwtTokenByEmail(email, JwtTokenType.REFRESH);
-        log.info("Tokens were deleted.");
+        log.info("Tokens for email = {} have been deleted.", email);
     }
 
     private void deleteJwtTokenByEmail(final String email, final JwtTokenType type) {

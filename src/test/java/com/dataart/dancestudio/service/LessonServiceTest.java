@@ -1,12 +1,12 @@
 package com.dataart.dancestudio.service;
 
+import com.dataart.dancestudio.exception.EntityCreationException;
+import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.mapper.LessonMapperImpl;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
-import com.dataart.dancestudio.model.entity.DanceStyleEntity;
-import com.dataart.dancestudio.model.entity.LessonEntity;
-import com.dataart.dancestudio.model.entity.RoomEntity;
-import com.dataart.dancestudio.model.entity.UserEntity;
+import com.dataart.dancestudio.model.entity.*;
+import com.dataart.dancestudio.repository.BookingRepository;
 import com.dataart.dancestudio.repository.LessonRepository;
 import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,6 +40,9 @@ public class LessonServiceTest {
 
     @Mock
     private LessonRepository lessonRepositoryMock;
+
+    @Mock
+    private BookingRepository bookingRepositoryMock;
 
     @Mock
     private UserRepository userRepositoryMock;
@@ -67,6 +69,7 @@ public class LessonServiceTest {
             .id(userTrainerId)
             .firstName(firstName)
             .lastName(lastName)
+            .role(Role.TRAINER)
             .build();
     final UserEntity newUserTrainer = UserEntity.builder().id(newUserTrainerId).build();
     final DanceStyleEntity danceStyle = DanceStyleEntity.builder().id(danceStyleId).name(danceStyleName).build();
@@ -118,7 +121,8 @@ public class LessonServiceTest {
         // given
         when(lessonMapperImpl.lessonDtoToLessonEntity(lessonDto)).thenReturn(lessonEntity);
         when(lessonRepositoryMock.save(lessonEntity)).thenReturn(lessonEntity);
-        when(userRepositoryMock.findById(lessonDto.getUserTrainerId())).thenReturn(Optional.of(UserEntity.builder().build()));
+        when(userRepositoryMock.findById(lessonDto.getUserTrainerId()))
+                .thenReturn(Optional.of(UserEntity.builder().role(Role.TRAINER).build()));
 
         // when
         final int lessonId = lessonServiceImpl.createLesson(lessonDto);
@@ -134,7 +138,20 @@ public class LessonServiceTest {
         when(userRepositoryMock.findById(lessonDto.getUserTrainerId())).thenReturn(Optional.empty());
 
         // when
-        assertThrows(RuntimeException.class, () -> lessonServiceImpl.createLesson(lessonDto));
+        assertThrows(EntityCreationException.class, () -> lessonServiceImpl.createLesson(lessonDto));
+
+        // then
+        verify(lessonMapperImpl, never()).lessonDtoToLessonEntity(lessonDto);
+    }
+
+    @Test
+    public void createLessonWhenUserNotTrainer() {
+        // given
+        when(userRepositoryMock.findById(lessonDto.getUserTrainerId()))
+                .thenReturn(Optional.of(UserEntity.builder().role(Role.USER).build()));
+
+        // when
+        assertThrows(EntityCreationException.class, () -> lessonServiceImpl.createLesson(lessonDto));
 
         // then
         verify(lessonMapperImpl, never()).lessonDtoToLessonEntity(lessonDto);
@@ -168,7 +185,7 @@ public class LessonServiceTest {
         when(lessonRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> lessonServiceImpl.getLessonById(id));
+        assertThrows(EntityNotFoundException.class, () -> lessonServiceImpl.getLessonById(id));
 
         // then
         verify(lessonMapperImpl, never()).lessonEntityToLessonDto(lessonEntity);
@@ -195,7 +212,7 @@ public class LessonServiceTest {
         when(lessonRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> lessonServiceImpl.getLessonViewById(id));
+        assertThrows(EntityNotFoundException.class, () -> lessonServiceImpl.getLessonViewById(id));
 
         // then
         verify(lessonMapperImpl, never()).lessonEntityToLessonViewDto(lessonEntity);
