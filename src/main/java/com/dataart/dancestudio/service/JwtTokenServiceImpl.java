@@ -43,7 +43,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
             log.info("Token with type = {} for email = {} with id = {} has been created.",
                     jwtTokenDto.getType(), jwtTokenDto.getEmail(), jwtTokenEntitySaved.getId());
         } else {
-            log.info("Token with type = {} for email = {} hasn't been created.",
+            log.warn("Token with type = {} for email = {} hasn't been created.",
                     jwtTokenDto.getType(), jwtTokenDto.getEmail());
         }
     }
@@ -53,7 +53,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         final Optional<JwtTokenEntity> jwtTokenEntity = jwtTokenRepository.findByUserEmailAndType(email, type);
         jwtTokenEntity.ifPresentOrElse(
                 (token) -> log.info("Token with type = {} for email = {} with id = {} has been found.", type, email, token.getId()),
-                () -> log.info("Token with type = {} for email = {} hasn't been found.", type, email));
+                () -> log.warn("Token with type = {} for email = {} hasn't been found.", type, email));
         return jwtTokenEntity.orElseThrow(() -> new EntityNotFoundException("Token not found!")).getToken();
     }
 
@@ -75,7 +75,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         if (existsByUserEmail) {
             log.info("Tokens for email = {} exist.", email);
         } else {
-            log.info("Tokens for email = {} don't exist.", email);
+            log.warn("Tokens for email = {} don't exist.", email);
         }
         return existsByUserEmail;
     }

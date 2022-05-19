@@ -45,7 +45,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             final String jwtToken = authHeader.substring(7);
             if (jwtToken.isBlank()) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                log.info("Jwt Token invalid in Bearer Header!");
+                log.warn("Access Token invalid in Bearer Header! Can't get access to resource.");
                 return;
             }
             if (jwtTokenProvider.validateAccessToken(jwtToken) && jwtTokenService.existsByToken(jwtToken)) {
@@ -57,10 +57,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 if (securityContext.getAuthentication() == null) {
                     securityContext.setAuthentication(authToken);
                 }
-                log.info("Jwt Token valid!");
+                log.info("Access Token for email = {} valid.", email);
             } else {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                log.info("Jwt Token invalid!");
+                log.warn("Access Token invalid! Can't get access to resource.");
                 return;
             }
         }

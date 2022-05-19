@@ -1,5 +1,6 @@
 package com.dataart.dancestudio.service;
 
+import com.dataart.dancestudio.exception.EntityCreationException;
 import com.dataart.dancestudio.model.dto.JwtTokenDto;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.entity.JwtTokenType;
@@ -60,46 +61,46 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public JwtResponse getNewAccessToken(final String refreshToken) throws AuthException {
+    public JwtResponse getNewAccessToken(final String refreshToken) {
         final String email = jwtTokenProvider.getEmail(refreshToken);
         if (jwtTokenProvider.validateRefreshToken(refreshToken)) {
-            log.info("Token with type = {} for email = {} has been valid.", email, JwtTokenType.REFRESH);
+            log.info("Token with type = {} for email = {} is valid.", email, JwtTokenType.REFRESH);
         } else {
             jwtTokenService.deleteJwtTokensByEmail(email);
-            log.warn("Token with type = {} email = {} has been invalid.", email, JwtTokenType.REFRESH);
-            throw new AuthException("Jwt Token invalid!");
+            log.warn("Token with type = {} email = {} is invalid.", email, JwtTokenType.REFRESH);
+            throw new EntityCreationException("Refresh token is invalid. Can't create new access token.");
         }
 
         if (email.isEmpty() || email.isBlank()) {
             log.warn("Email is empty or blank.");
-            throw new AuthException("Jwt Token invalid!");
+            throw new EntityCreationException("Refresh token is invalid. Can't create new access token.");
         }
 
         final String refreshTokenFromDB = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.REFRESH);
-        if (refreshTokenFromDB.equals(refreshToken)) {
-            final UserDetailsDto userDetailsDto = (UserDetailsDto) userDetailsService.loadUserByUsername(email);
-            final String accessToken = jwtTokenProvider.generateAccessToken(userDetailsDto);
-            final String updatedRefreshToken = jwtTokenProvider.updateIssuedAtOfRefreshToken(userDetailsDto, refreshToken);
-
-            final JwtTokenDto jwtAccessTokenDto = JwtTokenDto.builder()
-                    .token(accessToken)
-                    .type(JwtTokenType.ACCESS)
-                    .email(email)
-                    .build();
-            final JwtTokenDto jwtRefreshTokenDto = JwtTokenDto.builder()
-                    .token(updatedRefreshToken)
-                    .type(JwtTokenType.REFRESH)
-                    .email(email)
-                    .build();
-
-            jwtTokenService.updateJwtToken(jwtAccessTokenDto);
-            jwtTokenService.updateJwtToken(jwtRefreshTokenDto);
-            log.info("New Access Token has been created.");
-            return new JwtResponse(accessToken, updatedRefreshToken);
-        } else {
-            log.warn("Token with type = {} email = {} has been invalid.", email, JwtTokenType.REFRESH);
-            throw new AuthException("Jwt Token invalid!");
+        if (!refreshTokenFromDB.equals(refreshToken)) {
+            log.warn("Token with type = {} email = {} not equal to existed token in DB.", email, JwtTokenType.REFRESH);
+            throw new EntityCreationException("Refresh token is invalid. Can't create new access token.");
         }
+
+        final UserDetailsDto userDetailsDto = (UserDetailsDto) userDetailsService.loadUserByUsername(email);
+        final String accessToken = jwtTokenProvider.generateAccessToken(userDetailsDto);
+        final String updatedRefreshToken = jwtTokenProvider.updateIssuedAtOfRefreshToken(userDetailsDto, refreshToken);
+
+        final JwtTokenDto jwtAccessTokenDto = JwtTokenDto.builder()
+                .token(accessToken)
+                .type(JwtTokenType.ACCESS)
+                .email(email)
+                .build();
+        final JwtTokenDto jwtRefreshTokenDto = JwtTokenDto.builder()
+                .token(updatedRefreshToken)
+                .type(JwtTokenType.REFRESH)
+                .email(email)
+                .build();
+
+        jwtTokenService.updateJwtToken(jwtAccessTokenDto);
+        jwtTokenService.updateJwtToken(jwtRefreshTokenDto);
+        log.info("New Access Token has been created.");
+        return new JwtResponse(accessToken, updatedRefreshToken);
     }
 
     @Override
