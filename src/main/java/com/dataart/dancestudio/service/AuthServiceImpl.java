@@ -1,5 +1,6 @@
 package com.dataart.dancestudio.service;
 
+import com.dataart.dancestudio.exception.EntityCreationException;
 import com.dataart.dancestudio.model.dto.JwtTokenDto;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.entity.JwtTokenType;
@@ -35,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
         if (jwtTokenService.existsByUserEmail(email)) {
             final String accessToken = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.ACCESS);
             final String refreshToken = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.REFRESH);
-            log.info("User was logged in with pre-existing tokens.");
+            log.info("User with email = {} has been logged in with pre-existing tokens.", email);
             return new LoginResponse(accessToken, refreshToken);
         }
 
@@ -55,52 +56,57 @@ public class AuthServiceImpl implements AuthService {
 
         jwtTokenService.createJwtToken(jwtAccessTokenDto);
         jwtTokenService.createJwtToken(jwtRefreshTokenDto);
-        log.info("User was logged in with new tokens.");
+        log.info("User with email = {} has been logged in with new tokens.", email);
         return new LoginResponse(accessToken, refreshToken);
     }
 
     @Override
-    public JwtResponse getNewAccessToken(final String refreshToken) throws AuthException {
+    public JwtResponse getNewAccessToken(final String refreshToken) {
+        final String email = jwtTokenProvider.getEmail(refreshToken);
         if (jwtTokenProvider.validateRefreshToken(refreshToken)) {
-            final String email = jwtTokenProvider.getEmail(refreshToken);
-            log.info("Refresh Token was valid.");
-            if (!email.isEmpty() && !email.isBlank()) {
-                final String refreshTokenFromDB = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.REFRESH);
-                log.info("Email wasn't empty or blank.");
-                if (refreshTokenFromDB.equals(refreshToken)) {
-                    final UserDetailsDto userDetailsDto = (UserDetailsDto) userDetailsService.loadUserByUsername(email);
-                    final String accessToken = jwtTokenProvider.generateAccessToken(userDetailsDto);
-                    final String updatedRefreshToken = jwtTokenProvider.updateIssuedAtOfRefreshToken(userDetailsDto, refreshToken);
-
-                    final JwtTokenDto jwtAccessTokenDto = JwtTokenDto.builder()
-                            .token(accessToken)
-                            .type(JwtTokenType.ACCESS)
-                            .email(email)
-                            .build();
-                    final JwtTokenDto jwtRefreshTokenDto = JwtTokenDto.builder()
-                            .token(updatedRefreshToken)
-                            .type(JwtTokenType.REFRESH)
-                            .email(email)
-                            .build();
-
-                    jwtTokenService.updateJwtToken(jwtAccessTokenDto);
-                    jwtTokenService.updateJwtToken(jwtRefreshTokenDto);
-                    log.info("New Access Token was created.");
-                    return new JwtResponse(accessToken, updatedRefreshToken);
-                }
-            }
+            log.info("Token with type = {} for email = {} is valid.", email, JwtTokenType.REFRESH);
         } else {
-            final String email = jwtTokenProvider.getEmail(refreshToken);
             jwtTokenService.deleteJwtTokensByEmail(email);
-            log.info("Refresh Token was invalid.");
+            log.warn("Token with type = {} email = {} is invalid.", email, JwtTokenType.REFRESH);
+            throw new EntityCreationException("Refresh token is invalid. Can't create new access token.");
         }
-        throw new AuthException("Jwt Token Invalid!!!");
+
+        if (email.isEmpty() || email.isBlank()) {
+            log.warn("Email is empty or blank.");
+            throw new EntityCreationException("Refresh token is invalid. Can't create new access token.");
+        }
+
+        final String refreshTokenFromDB = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.REFRESH);
+        if (!refreshTokenFromDB.equals(refreshToken)) {
+            log.warn("Token with type = {} email = {} not equal to existed token in DB.", email, JwtTokenType.REFRESH);
+            throw new EntityCreationException("Refresh token is invalid. Can't create new access token.");
+        }
+
+        final UserDetailsDto userDetailsDto = (UserDetailsDto) userDetailsService.loadUserByUsername(email);
+        final String accessToken = jwtTokenProvider.generateAccessToken(userDetailsDto);
+        final String updatedRefreshToken = jwtTokenProvider.updateIssuedAtOfRefreshToken(userDetailsDto, refreshToken);
+
+        final JwtTokenDto jwtAccessTokenDto = JwtTokenDto.builder()
+                .token(accessToken)
+                .type(JwtTokenType.ACCESS)
+                .email(email)
+                .build();
+        final JwtTokenDto jwtRefreshTokenDto = JwtTokenDto.builder()
+                .token(updatedRefreshToken)
+                .type(JwtTokenType.REFRESH)
+                .email(email)
+                .build();
+
+        jwtTokenService.updateJwtToken(jwtAccessTokenDto);
+        jwtTokenService.updateJwtToken(jwtRefreshTokenDto);
+        log.info("New Access Token has been created.");
+        return new JwtResponse(accessToken, updatedRefreshToken);
     }
 
     @Override
     public void logout(final String email) {
         jwtTokenService.deleteJwtTokensByEmail(email);
-        log.info("User was logged out.");
+        log.info("User with email = {} has been logged out.", email);
     }
 
 }

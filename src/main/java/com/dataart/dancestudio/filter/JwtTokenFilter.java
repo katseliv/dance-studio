@@ -3,6 +3,7 @@ package com.dataart.dancestudio.filter;
 import com.dataart.dancestudio.provider.JwtTokenProvider;
 import com.dataart.dancestudio.service.JwtTokenService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
 
@@ -42,20 +44,24 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")) {
             final String jwtToken = authHeader.substring(7);
             if (jwtToken.isBlank()) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Jwt Token in Bearer Header!!!");
-            } else {
-                if (jwtTokenProvider.validateAccessToken(jwtToken) && jwtTokenService.existsByToken(jwtToken)) {
-                    final String email = jwtTokenProvider.getEmail(jwtToken);
-                    final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                    final UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(email, userDetails.getPassword(), userDetails.getAuthorities());
-                    final SecurityContext securityContext = securityContextFacade.getContext();
-                    if (securityContext.getAuthentication() == null) {
-                        securityContext.setAuthentication(authToken);
-                    }
-                } else {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Jwt Token!!!");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                log.warn("Access Token invalid in Bearer Header! Can't get access to resource.");
+                return;
+            }
+            if (jwtTokenProvider.validateAccessToken(jwtToken) && jwtTokenService.existsByToken(jwtToken)) {
+                final String email = jwtTokenProvider.getEmail(jwtToken);
+                final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                final UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(email, userDetails.getPassword(), userDetails.getAuthorities());
+                final SecurityContext securityContext = securityContextFacade.getContext();
+                if (securityContext.getAuthentication() == null) {
+                    securityContext.setAuthentication(authToken);
                 }
+                log.info("Access Token for email = {} valid.", email);
+            } else {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                log.warn("Access Token invalid! Can't get access to resource.");
+                return;
             }
         }
         filterChain.doFilter(request, response);

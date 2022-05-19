@@ -6,6 +6,8 @@ import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.service.LessonPaginationService;
 import com.dataart.dancestudio.service.LessonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,8 +28,9 @@ public class LessonRestController {
     }
 
     @PostMapping
-    public int createLesson(@RequestBody @Valid final LessonDto lessonDto) {
-        return lessonService.createLesson(lessonDto);
+    public ResponseEntity<Integer> createLesson(@RequestBody @Valid final LessonDto lessonDto) {
+        final int id = lessonService.createLesson(lessonDto);
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
@@ -36,8 +39,9 @@ public class LessonRestController {
     }
 
     @PutMapping("/{id}")
-    public void updateLesson(@RequestBody @Valid final LessonDto lessonDto, @PathVariable final int id) {
+    public ResponseEntity<String> updateLesson(@RequestBody @Valid final LessonDto lessonDto, @PathVariable final int id) {
         lessonService.updateLessonById(lessonDto, id);
+        return new ResponseEntity<>("Lesson was updated!", HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

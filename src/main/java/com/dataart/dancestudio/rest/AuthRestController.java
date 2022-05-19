@@ -8,6 +8,7 @@ import com.dataart.dancestudio.model.response.LoginResponse;
 import com.dataart.dancestudio.service.AuthService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,20 +44,20 @@ public class AuthRestController {
 
         final UserDetailsDto userDetailsDto = (UserDetailsDto) authentication.getPrincipal();
         final LoginResponse loginResponse = authService.login(userDetailsDto);
-        return ResponseEntity.ok(loginResponse);
+        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
 
     @PostMapping("/newAccessToken")
     public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody final JwtRequest jwtRequest) throws AuthException {
         final JwtResponse jwtResponse = authService.getNewAccessToken(jwtRequest.getRefreshToken());
-        return ResponseEntity.ok(jwtResponse);
+        return new ResponseEntity<>(jwtResponse, HttpStatus.CREATED);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout() {
         final String email = (String) securityContextFacade.getContext().getAuthentication().getPrincipal();
         authService.logout(email);
-        return ResponseEntity.ok("Logged out successfully!!!");
+        return new ResponseEntity<>("Logged out successfully!", HttpStatus.OK);
     }
 
 }

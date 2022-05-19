@@ -1,6 +1,7 @@
 package com.dataart.dancestudio.service;
 
-import com.dataart.dancestudio.exception.UserAlreadyExistsException;
+import com.dataart.dancestudio.exception.EntityAlreadyExistsException;
+import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.mapper.UserMapperImpl;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
@@ -22,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,7 +61,7 @@ public class UserServiceTest {
     private final boolean deleted = false;
 
     @Test
-    public void createUser() throws IOException, UserAlreadyExistsException {
+    public void createUser() throws IOException, EntityAlreadyExistsException {
         // given
         final String password = "45";
         final String encodePassword = bCryptPasswordEncoder.encode(password);
@@ -140,7 +140,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.of(userEntity));
 
         // when
-        assertThrows(UserAlreadyExistsException.class, () -> userServiceImpl.createUser(userRegistrationDto));
+        assertThrows(EntityAlreadyExistsException.class, () -> userServiceImpl.createUser(userRegistrationDto));
 
         // then
         verify(userMapperImpl, never()).userRegistrationDtoToUserEntityWithPassword(
@@ -207,7 +207,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> userServiceImpl.getUserById(id));
+        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.getUserById(id));
 
         // then
         verify(userMapperImpl, never()).userEntityToUserDto(userEntity);
@@ -270,7 +270,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> userServiceImpl.getUserViewById(id));
+        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.getUserViewById(id));
 
         // then
         verify(userMapperImpl, never()).userEntityToUserViewDto(userEntity);
@@ -323,7 +323,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findByEmail(email)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> userServiceImpl.getUserIdByEmail(email));
+        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.getUserIdByEmail(email));
 
         // then
         verify(userMapperImpl, never()).userEntityToUserDetailsDto(userEntity);
@@ -332,15 +332,13 @@ public class UserServiceTest {
 
 
     @Test
-    public void updateUserByIdWithChangedFieldAndImage() throws IOException {
+    public void updateUserByIdWithChangedFieldAndImage() {
         // given
-        when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
-
         final UserEntity userEntity = UserEntity.builder()
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
-                .image(multipartFile.getBytes())
+                .image(new byte[]{1, 2, 5, 7})
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
@@ -362,14 +360,13 @@ public class UserServiceTest {
                 .username(username)
                 .firstName(firstName)
                 .lastName(newLastName)
-                .base64StringImage(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
+                .base64StringImage(Base64.getEncoder().encodeToString(new byte[]{1, 20, 30, 40}))
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
                 .build();
 
-        when(multipartFile.getBytes()).thenReturn(new byte[]{1, 20, 30, 40});
         when(userRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(userEntity));
         when(userRepositoryMock.save(newUserEntityWithUpdatedImage)).thenReturn(newUserEntityWithUpdatedImage);
 
@@ -418,7 +415,6 @@ public class UserServiceTest {
                 .timeZone(timeZone)
                 .build();
 
-        when(multipartFile.isEmpty()).thenReturn(true);
         when(userRepositoryMock.findById(id)).thenReturn(Optional.of(userEntity));
 
         // when
@@ -458,7 +454,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> userServiceImpl.updateUserById(newUserDto, id));
+        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.updateUserById(newUserDto, id));
 
         // then
         verify(userRepositoryMock, never()).save(newUserEntity);
@@ -501,7 +497,6 @@ public class UserServiceTest {
                 .deleted(deleted)
                 .build();
 
-        when(multipartFile.isEmpty()).thenReturn(true);
         when(userRepositoryMock.findById(id)).thenReturn(Optional.of(userEntity));
 
         // when
@@ -541,7 +536,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> userServiceImpl.updateUserById(userDto, id));
+        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.updateUserById(userDto, id));
 
         // then
         verify(userRepositoryMock, never()).save(newUserEntity);

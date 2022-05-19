@@ -31,9 +31,9 @@ public class DanceStyleServiceImpl implements DanceStyleService {
     public List<DanceStyleViewDto> listDanceStyleViews() {
         final List<DanceStyleEntity> danceStyleEntities = danceStyleRepository.findAll();
         if (danceStyleEntities.size() != 0) {
-            log.info("Dance Styles were found.");
+            log.info("Dance Styles have been found.");
         } else {
-            log.info("There weren't dance styles.");
+            log.info("There haven't been dance styles.");
         }
         return danceStyleMapper.danceStyleEntitiesToDanceStyleViewDtoList(danceStyleEntities);
     }
