@@ -78,7 +78,7 @@ public class LessonServiceTest {
             .userTrainerId(userTrainerId)
             .danceStyleId(danceStyleId)
             .startDatetime(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startDatetime))
-            .duration(String.valueOf(duration))
+            .duration(duration)
             .roomId(roomId)
             .timeZone(timeZone)
             .build();
@@ -102,7 +102,7 @@ public class LessonServiceTest {
             .userTrainerId(newUserTrainerId)
             .danceStyleId(danceStyleId)
             .startDatetime(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startDatetime))
-            .duration(String.valueOf(duration))
+            .duration(duration)
             .roomId(roomId)
             .timeZone(timeZone)
             .build();
@@ -164,7 +164,7 @@ public class LessonServiceTest {
                 .userTrainerId(userTrainerId)
                 .danceStyleId(danceStyleId)
                 .startDatetime(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(utcZoned.toLocalDateTime()))
-                .duration(String.valueOf(duration))
+                .duration(duration)
                 .roomId(roomId)
                 .build();
 

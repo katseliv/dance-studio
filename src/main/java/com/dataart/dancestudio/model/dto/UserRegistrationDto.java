@@ -1,5 +1,7 @@
 package com.dataart.dancestudio.model.dto;
 
+import com.dataart.dancestudio.annotation.PasswordMatch;
+import com.dataart.dancestudio.annotation.PasswordValid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
@@ -10,6 +12,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+@PasswordMatch
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
@@ -30,12 +33,13 @@ public class UserRegistrationDto {
     private final String email;
 
     @NotBlank(message = "Phone Number is blank.")
-    @Size(min = 7, max = 11, message = "Phone Number is out of range.")
+    @Size(min = 7, max = 11, message = "Phone Number is out of range {7, 11}.")
     private final String phoneNumber;
 
-    @NotBlank(message = "Password is blank.")
+    @PasswordValid
     private final String password;
 
+    @PasswordValid
     private final String passwordConfirmation;
     private final Integer roleId;
     private final String timeZone;
