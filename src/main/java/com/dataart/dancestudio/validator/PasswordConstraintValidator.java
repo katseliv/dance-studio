@@ -23,16 +23,12 @@ public class PasswordConstraintValidator implements ConstraintValidator<Password
         ));
 
         final RuleResult result = validator.validate(new PasswordData(password));
-        if (result.isValid()) {
-            return true;
-        }
-
         final List<String> messages = validator.getMessages(result);
         final String messageTemplate = String.join(", ", messages);
         context.buildConstraintViolationWithTemplate(messageTemplate)
                 .addConstraintViolation()
                 .disableDefaultConstraintViolation();
-        return false;
+        return messages.size() == 0;
     }
 
 }

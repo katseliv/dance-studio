@@ -12,6 +12,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+@DatetimeValid
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
@@ -25,7 +26,6 @@ public class LessonDto {
     private final Integer danceStyleId;
 
     @NotBlank(message = "Start Datetime is null.")
-    @DatetimeValid
     private final String startDatetime;
 
     @NotNull(message = "Duration is null.")
