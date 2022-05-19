@@ -31,7 +31,7 @@ public class DatetimeValidator implements ConstraintValidator<DatetimeValid, Les
         }
 
         if (datetimeInstant.isBefore(nowInstant)) {
-            messages.add("Datetime must be no later than 1 day before the event.");
+            messages.add("Datetime must be no later than " + limitDays + " day before the event.");
         }
 
         final String messageTemplate = String.join(", ", messages);
