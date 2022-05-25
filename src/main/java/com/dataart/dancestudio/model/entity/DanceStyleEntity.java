@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "dance_styles", schema = "dancestudio")
+@Table(name = "dance_styles")
 @Entity(name = "dance_styles")
 public class DanceStyleEntity {
 

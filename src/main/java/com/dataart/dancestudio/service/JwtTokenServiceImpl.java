@@ -9,15 +9,15 @@ import com.dataart.dancestudio.model.entity.JwtTokenType;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.JwtTokenRepository;
 import com.dataart.dancestudio.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Slf4j
-@Transactional
+@RequiredArgsConstructor
 @Service
 public class JwtTokenServiceImpl implements JwtTokenService {
 
@@ -25,30 +25,32 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     private final UserRepository userRepository;
     private final JwtTokenMapper jwtTokenMapper;
 
-    @Autowired
-    public JwtTokenServiceImpl(final JwtTokenRepository jwtTokenRepository, final UserRepository userRepository,
-                               final JwtTokenMapper jwtTokenMapper) {
-        this.jwtTokenRepository = jwtTokenRepository;
-        this.userRepository = userRepository;
-        this.jwtTokenMapper = jwtTokenMapper;
-    }
-
     @Override
+    @Transactional
     public void createJwtToken(final JwtTokenDto jwtTokenDto) {
         final Optional<UserEntity> userEntity = userRepository.findByEmail(jwtTokenDto.getEmail());
-        if (userEntity.isPresent()) {
-            final JwtTokenEntity jwtTokenEntity = jwtTokenMapper.jwtTokenDtoToJwtTokenEntity(jwtTokenDto);
-            jwtTokenEntity.setUser(userEntity.get());
-            final JwtTokenEntity jwtTokenEntitySaved = jwtTokenRepository.save(jwtTokenEntity);
-            log.info("Token with type = {} for email = {} with id = {} has been created.",
-                    jwtTokenDto.getType(), jwtTokenDto.getEmail(), jwtTokenEntitySaved.getId());
-        } else {
-            log.warn("Token with type = {} for email = {} hasn't been created.",
-                    jwtTokenDto.getType(), jwtTokenDto.getEmail());
-        }
+        userEntity.ifPresentOrElse(
+                (user) -> {
+                    final JwtTokenEntity jwtTokenEntity = Optional.of(jwtTokenDto)
+                            .map(jwtTokenMapper::jwtTokenDtoToJwtTokenEntity)
+                            .map((jwtToken) -> {
+                                jwtToken.setUser(user);
+                                return jwtTokenRepository.save(jwtToken);
+                            })
+                            .orElseThrow(() -> new EntityCreationException("Token not created!"));
+                    log.info("Token with type = {} for email = {} with id = {} has been created.",
+                            jwtTokenDto.getType(), jwtTokenDto.getEmail(), jwtTokenEntity.getId());
+                },
+                () -> {
+                    log.warn("Token with type = {} for email = {} hasn't been created.",
+                            jwtTokenDto.getType(), jwtTokenDto.getEmail());
+                    throw new EntityCreationException("Token not created!");
+                }
+        );
     }
 
     @Override
+    @Transactional(readOnly = true)
     public String getJwtTokenByEmail(final String email, final JwtTokenType type) {
         final Optional<JwtTokenEntity> jwtTokenEntity = jwtTokenRepository.findByUserEmailAndType(email, type);
         jwtTokenEntity.ifPresentOrElse(
@@ -58,6 +60,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean existsByToken(final String token) {
         final boolean existsByToken = jwtTokenRepository.existsByToken(token);
         if (existsByToken) {
@@ -69,6 +72,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean existsByUserEmail(final String email) {
         final boolean existsByUserEmail = existsByUserEmailAndType(email, JwtTokenType.ACCESS)
                 && existsByUserEmailAndType(email, JwtTokenType.REFRESH);
@@ -85,6 +89,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
+    @Transactional
     public void updateJwtToken(final JwtTokenDto jwtTokenDto) {
         final JwtTokenEntity jwtTokenEntity = jwtTokenRepository.findByUserEmailAndType(
                 jwtTokenDto.getEmail(), jwtTokenDto.getType()).orElseThrow(() -> {
@@ -98,6 +103,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
+    @Transactional
     public void deleteJwtTokensByEmail(final String email) {
         if (existsByUserEmailAndType(email, JwtTokenType.ACCESS) && existsByUserEmailAndType(email, JwtTokenType.REFRESH)) {
             log.info("Tokens for email = {} have been found.", email);

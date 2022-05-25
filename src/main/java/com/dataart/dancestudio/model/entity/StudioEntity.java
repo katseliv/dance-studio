@@ -12,7 +12,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "studios")
-@Table(name = "studios", schema = "dancestudio")
+@Table(name = "studios")
 public class StudioEntity {
 
     @Id

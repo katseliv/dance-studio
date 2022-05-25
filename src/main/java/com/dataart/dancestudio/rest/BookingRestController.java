@@ -2,27 +2,27 @@ package com.dataart.dancestudio.rest;
 
 import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
+import com.dataart.dancestudio.model.dto.view.ViewListPage;
 import com.dataart.dancestudio.service.BookingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dataart.dancestudio.service.PaginationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.validation.Valid;
+import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/bookings")
 public class BookingRestController {
 
     private final BookingService bookingService;
-
-    @Autowired
-    public BookingRestController(final BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
+    private final PaginationService<BookingViewDto> bookingPaginationService;
 
     @PostMapping
-    public ResponseEntity<Integer> createBooking(@RequestBody final BookingDto bookingDto) {
+    public ResponseEntity<Integer> createBooking(@RequestBody @Valid final BookingDto bookingDto) {
         final int id = bookingService.createBooking(bookingDto);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
@@ -38,8 +38,8 @@ public class BookingRestController {
     }
 
     @GetMapping
-    public List<BookingViewDto> getBookings() {
-        return bookingService.listBookings();
+    public ViewListPage<BookingViewDto> getBookings(@RequestParam(required = false) final Map<String, String> allParams) {
+        return bookingPaginationService.getViewListPage(allParams.get("page"), allParams.get("size"));
     }
 
 }

@@ -15,7 +15,7 @@ import java.util.Objects;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "users")
 @Where(clause = "is_deleted = false")
-@Table(name = "users", schema = "dancestudio")
+@Table(name = "users")
 public class UserEntity {
 
     @Id

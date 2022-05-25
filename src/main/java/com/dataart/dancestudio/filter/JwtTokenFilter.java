@@ -3,8 +3,8 @@ package com.dataart.dancestudio.filter;
 import com.dataart.dancestudio.provider.JwtTokenProvider;
 import com.dataart.dancestudio.service.JwtTokenService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
 
@@ -28,42 +29,35 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtTokenService jwtTokenService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    public JwtTokenFilter(final SecurityContextFacade securityContextFacade, final UserDetailsService userDetailsService,
-                          final JwtTokenService jwtTokenService, final JwtTokenProvider jwtTokenProvider) {
-        this.securityContextFacade = securityContextFacade;
-        this.userDetailsService = userDetailsService;
-        this.jwtTokenService = jwtTokenService;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
-
     @Override
     protected void doFilterInternal(final HttpServletRequest request, @NonNull final HttpServletResponse response,
                                     @NonNull final FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")) {
-            final String jwtToken = authHeader.substring(7);
-            if (jwtToken.isBlank()) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                log.warn("Access Token invalid in Bearer Header! Can't get access to resource.");
-                return;
-            }
-            if (jwtTokenProvider.validateAccessToken(jwtToken) && jwtTokenService.existsByToken(jwtToken)) {
-                final String email = jwtTokenProvider.getEmail(jwtToken);
-                final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                final UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(email, userDetails.getPassword(), userDetails.getAuthorities());
-                final SecurityContext securityContext = securityContextFacade.getContext();
-                if (securityContext.getAuthentication() == null) {
-                    securityContext.setAuthentication(authToken);
-                }
-                log.info("Access Token for email = {} valid.", email);
-            } else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                log.warn("Access Token invalid! Can't get access to resource.");
-                return;
-            }
+        final String bearer = "Bearer ";
+        if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith(bearer)) {
+            filterChain.doFilter(request, response);
+            return;
         }
+        final String jwtToken = authHeader.substring(bearer.length());
+        if (jwtToken.isBlank()) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            log.warn("Access Token invalid in Bearer Header! Can't get access to resource.");
+            return;
+        }
+        if (!jwtTokenProvider.validateAccessToken(jwtToken) || !jwtTokenService.existsByToken(jwtToken)) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            log.warn("Access Token invalid! Can't get access to resource.");
+            return;
+        }
+        final String email = jwtTokenProvider.getEmail(jwtToken);
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        final UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(email, userDetails.getPassword(), userDetails.getAuthorities());
+        final SecurityContext securityContext = securityContextFacade.getContext();
+        if (securityContext.getAuthentication() == null) {
+            securityContext.setAuthentication(authToken);
+        }
+        log.info("Access Token for email = {} valid.", email);
         filterChain.doFilter(request, response);
     }
 

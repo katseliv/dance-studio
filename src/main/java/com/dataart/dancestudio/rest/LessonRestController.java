@@ -1,31 +1,25 @@
 package com.dataart.dancestudio.rest;
 
-import com.dataart.dancestudio.model.dto.FilteredLessonViewListPage;
 import com.dataart.dancestudio.model.dto.LessonDto;
+import com.dataart.dancestudio.model.dto.view.FilteredLessonViewListPage;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
-import com.dataart.dancestudio.service.LessonPaginationService;
 import com.dataart.dancestudio.service.LessonService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dataart.dancestudio.service.PaginationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/lessons")
 public class LessonRestController {
 
     private final LessonService lessonService;
-    private final LessonPaginationService lessonPaginationService;
-
-    @Autowired
-    public LessonRestController(final LessonService lessonService, final LessonPaginationService lessonPaginationService) {
-        this.lessonService = lessonService;
-        this.lessonPaginationService = lessonPaginationService;
-    }
+    private final PaginationService<LessonViewDto> lessonPaginationService;
 
     @PostMapping
     public ResponseEntity<Integer> createLesson(@RequestBody @Valid final LessonDto lessonDto) {
@@ -50,11 +44,10 @@ public class LessonRestController {
     }
 
     @GetMapping
-    public List<LessonViewDto> getLessons(@RequestParam(required = false) final Map<String, String> allParams) {
-        final FilteredLessonViewListPage filteredLessonViewListPage = lessonPaginationService
+    public FilteredLessonViewListPage getLessons(@RequestParam(required = false) final Map<String, String> allParams) {
+        return lessonPaginationService
                 .getFilteredLessonViewListPage(allParams.get("page"), allParams.get("size"),
                         allParams.get("trainerName"), allParams.get("styleName"), allParams.get("date"));
-        return filteredLessonViewListPage.getLessonViewDtoList();
     }
 
 }

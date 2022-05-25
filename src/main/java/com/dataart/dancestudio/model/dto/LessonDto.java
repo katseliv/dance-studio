@@ -9,8 +9,8 @@ import lombok.Getter;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 @DatetimeValid
 @Getter
@@ -20,12 +20,13 @@ import javax.validation.constraints.NotNull;
 public class LessonDto {
 
     @NotNull(message = "Trainer is null.")
+    @Positive(message = "Trainer Id is negative or zero.")
     private final Integer userTrainerId;
 
     @NotNull(message = "Dance Style is null.")
+    @Positive(message = "Dance Style Id is negative or zero.")
     private final Integer danceStyleId;
 
-    @NotBlank(message = "Start Datetime is null.")
     private final String startDatetime;
 
     @NotNull(message = "Duration is null.")
@@ -33,7 +34,8 @@ public class LessonDto {
     @Max(value = 4, message = "Duration is too long.")
     private final Integer duration;
 
-    @NotNull(message = "Room time is null")
+    @NotNull(message = "Room is null")
+    @Positive(message = "Room Id is negative or zero.")
     private final Integer roomId;
 
     private final String timeZone;

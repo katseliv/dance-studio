@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "rooms")
 @Where(clause = "is_deleted = false")
-@Table(name = "rooms", schema = "dancestudio")
+@Table(name = "rooms")
 public class RoomEntity {
 
     @Id

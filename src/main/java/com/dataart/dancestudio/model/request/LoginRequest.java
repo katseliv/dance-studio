@@ -7,6 +7,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -14,7 +18,12 @@ import lombok.NoArgsConstructor;
 @JsonDeserialize(builder = LoginRequest.LoginRequestBuilder.class)
 public class LoginRequest {
 
+    @NotNull(message = "Email is null.")
+    @NotBlank(message = "Email is blank.")
     private String email;
+
+    @NotNull(message = "Password is null.")
+    @NotBlank(message = "Password is blank.")
     private String password;
 
     @JsonPOJOBuilder(withPrefix = "")

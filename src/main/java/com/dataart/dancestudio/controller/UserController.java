@@ -4,10 +4,13 @@ import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
-import com.dataart.dancestudio.service.BookingService;
+import com.dataart.dancestudio.model.dto.view.BookingViewDto;
+import com.dataart.dancestudio.model.dto.view.UserForListDto;
+import com.dataart.dancestudio.model.dto.view.ViewListPage;
+import com.dataart.dancestudio.service.PaginationService;
 import com.dataart.dancestudio.service.UserService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,26 +22,19 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 
+@AllArgsConstructor
 @Controller
 @RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
-    private final BookingService bookingService;
+    private final PaginationService<UserForListDto> userPaginationService;
+    private final PaginationService<BookingViewDto> bookingPaginationService;
     private final SecurityContextFacade securityContextFacade;
     protected AuthenticationManager authenticationManager;
-
-    @Autowired
-    public UserController(final UserService userService, final BookingService bookingService,
-                          final SecurityContextFacade securityContextFacade, final AuthenticationManager authenticationManager) {
-        this.userService = userService;
-        this.bookingService = bookingService;
-        this.securityContextFacade = securityContextFacade;
-        this.authenticationManager = authenticationManager;
-    }
 
     @GetMapping("/login")
     public String loginUser(final Model model) {
@@ -50,8 +46,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerUser(final Model model, @ModelAttribute("user") @Valid final UserRegistrationDto userRegistrationDto,
-                               final BindingResult bindingResult) throws IOException {
+    public String registerUser(@ModelAttribute("user") @Valid final UserRegistrationDto userRegistrationDto,
+                               final Model model, final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "registration";
         }
@@ -80,7 +76,7 @@ public class UserController {
 
     @PostMapping("/create")
     public String createUser(@ModelAttribute("user") @Valid final UserRegistrationDto userRegistrationDto,
-                             final BindingResult bindingResult) throws IOException {
+                             final BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             return "forms/user_form";
@@ -96,14 +92,14 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public String getUser(final Model model, @PathVariable final int id) {
+    public String getUser(@PathVariable final int id, final Model model) {
         model.addAttribute("user_view", userService.getUserViewById(id));
         return "infos/user_info";
     }
 
     @PutMapping("/{id}")
-    public String updateUser(final Model model, @ModelAttribute("user") @Valid final UserDto userDto,
-                             @PathVariable final int id, final BindingResult bindingResult) {
+    public String updateUser(@ModelAttribute("user") @Valid final UserDto userDto, @PathVariable final int id,
+                             final Model model, final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "forms/user_edit";
         }
@@ -113,7 +109,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/update")
-    public String updateUser(final Model model, @PathVariable final int id) {
+    public String updateUser(@PathVariable final int id, final Model model) {
         model.addAttribute("user", userService.getUserById(id));
         return "forms/user_edit";
     }
@@ -129,17 +125,23 @@ public class UserController {
     }
 
     @GetMapping
-    public String getUsers(final Model model) {
+    public String getUsers(@RequestParam(required = false) final Map<String, String> allParams, final Model model) {
         final Authentication authentication = securityContextFacade.getContext().getAuthentication();
         final String email = authentication.getName();
+
+        final ViewListPage<UserForListDto> userForListDtoViewListPage = userPaginationService
+                .getViewListPage(allParams.get("page"), allParams.get("size"));
         model.addAttribute("id", userService.getUserIdByEmail(email));
-        model.addAttribute("users", userService.listUsers());
+        model.addAttribute("users", userForListDtoViewListPage.getViewDtoList());
         return "lists/user_list";
     }
 
     @GetMapping("/{id}/bookings")
-    public String getUserBookings(final Model model, @PathVariable final int id) {
-        model.addAttribute("bookings", bookingService.listUserBookings(id));
+    public String getUserBookings(@RequestParam(required = false) final Map<String, String> allParams,
+                                  @PathVariable final int id, final Model model) {
+        final ViewListPage<BookingViewDto> bookingViewDtoViewListPage = bookingPaginationService
+                .getUserViewListPage(id, allParams.get("page"), allParams.get("size"));
+        model.addAttribute("bookings", bookingViewDtoViewListPage.getViewDtoList());
         return "lists/booking_list";
     }
 

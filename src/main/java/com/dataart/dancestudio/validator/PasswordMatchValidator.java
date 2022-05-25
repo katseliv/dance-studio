@@ -12,7 +12,6 @@ public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch
     public boolean isValid(final UserRegistrationDto userRegistrationDto, final ConstraintValidatorContext context) {
         final String password = userRegistrationDto.getPassword();
         final String passwordConfirmation = userRegistrationDto.getPasswordConfirmation();
-
         return password != null && password.equals(passwordConfirmation);
     }
 

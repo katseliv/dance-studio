@@ -1,15 +1,14 @@
 package com.dataart.dancestudio.controller;
 
 import com.dataart.dancestudio.model.dto.BookingDto;
-import com.dataart.dancestudio.model.dto.FilteredLessonViewListPage;
 import com.dataart.dancestudio.model.dto.LessonDto;
-import com.dataart.dancestudio.model.dto.view.DanceStyleViewDto;
-import com.dataart.dancestudio.model.dto.view.RoomViewDto;
-import com.dataart.dancestudio.model.dto.view.UserViewDto;
+import com.dataart.dancestudio.model.dto.view.*;
 import com.dataart.dancestudio.model.entity.Role;
-import com.dataart.dancestudio.service.*;
+import com.dataart.dancestudio.service.LessonService;
+import com.dataart.dancestudio.service.PaginationService;
+import com.dataart.dancestudio.service.UserService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,40 +19,30 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @Controller
 @RequestMapping("/lessons")
 public class LessonController {
 
     private final LessonService lessonService;
     private final UserService userService;
-    private final DanceStyleService danceStyleService;
-    private final RoomService roomService;
-    private final LessonPaginationService lessonPaginationService;
+    private final PaginationService<UserForListDto> userPaginationService;
+    private final PaginationService<DanceStyleViewDto> danceStylePaginationService;
+    private final PaginationService<RoomViewDto> roomPaginationService;
     private final SecurityContextFacade securityContextFacade;
 
-    @Autowired
-    public LessonController(final LessonService lessonService, final UserService userService,
-                            final DanceStyleService danceStyleService, final RoomService roomService,
-                            final LessonPaginationService lessonPaginationService,
-                            final SecurityContextFacade securityContextFacade) {
-        this.lessonService = lessonService;
-        this.userService = userService;
-        this.danceStyleService = danceStyleService;
-        this.roomService = roomService;
-        this.lessonPaginationService = lessonPaginationService;
-        this.securityContextFacade = securityContextFacade;
-    }
-
     @PostMapping("/create")
-    public String createLesson(final Model model, @ModelAttribute("lesson") @Valid final LessonDto lessonDto,
+    public String createLesson(@RequestParam(required = false) final Map<String, String> allParams,
+                               @ModelAttribute("lesson") @Valid final LessonDto lessonDto, final Model model,
                                final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            prepareModel(model);
+            prepareModel(allParams, model);
             if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
                 return "forms/trainer_lesson_form";
             } else {
-                final List<UserViewDto> users = userService.listTrainers();
-                model.addAttribute("trainers", users);
+                final ViewListPage<UserForListDto> userViewListPage = userPaginationService
+                        .getViewListPage(allParams.get("page"), allParams.get("size"));
+                model.addAttribute("trainers", userViewListPage.getViewDtoList());
                 return "forms/lesson_form";
             }
         }
@@ -62,20 +51,21 @@ public class LessonController {
     }
 
     @GetMapping("/create")
-    public String createLesson(final Model model) {
-        prepareModel(model);
+    public String createLesson(@RequestParam(required = false) final Map<String, String> allParams, final Model model) {
+        prepareModel(allParams, model);
         model.addAttribute("lesson", LessonDto.builder().build());
         if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
             return "forms/trainer_lesson_form";
         } else {
-            final List<UserViewDto> users = userService.listTrainers();
-            model.addAttribute("trainers", users);
+            final ViewListPage<UserForListDto> userViewListPage = userPaginationService
+                    .getViewListPage(allParams.get("page"), allParams.get("size"));
+            model.addAttribute("trainers", userViewListPage.getViewDtoList());
             return "forms/lesson_form";
         }
     }
 
     @GetMapping("/{id}")
-    public String getLesson(final Model model, @PathVariable final int id) {
+    public String getLesson(@PathVariable final int id, final Model model) {
         model.addAttribute("lesson_view", lessonService.getLessonViewById(id));
         final Authentication authentication = securityContextFacade.getContext().getAuthentication();
         if (authentication.getAuthorities().contains(Role.ADMIN)) {
@@ -86,15 +76,17 @@ public class LessonController {
     }
 
     @PutMapping("/{id}")
-    public String updateLesson(final Model model, @ModelAttribute("lesson") @Valid final LessonDto lessonDto,
-                               @PathVariable final int id, final BindingResult bindingResult) {
+    public String updateLesson(@RequestParam(required = false) final Map<String, String> allParams,
+                               @PathVariable final int id, @ModelAttribute("lesson") @Valid final LessonDto lessonDto,
+                               final Model model, final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            prepareModel(model);
+            prepareModel(allParams, model);
             if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
                 return "forms/trainer_lesson_edit";
             } else {
-                final List<UserViewDto> users = userService.listTrainers();
-                model.addAttribute("trainers", users);
+                final ViewListPage<UserForListDto> userViewListPage = userPaginationService
+                        .getViewListPage(allParams.get("page"), allParams.get("size"));
+                model.addAttribute("trainers", userViewListPage.getViewDtoList());
                 return "forms/lesson_edit";
             }
         }
@@ -103,14 +95,16 @@ public class LessonController {
     }
 
     @GetMapping("/{id}/update")
-    public String updateLesson(final Model model, @PathVariable final int id) {
-        prepareModel(model);
+    public String updateLesson(@RequestParam(required = false) final Map<String, String> allParams,
+                               @PathVariable final int id, final Model model) {
+        prepareModel(allParams, model);
         model.addAttribute("lesson", lessonService.getLessonById(id));
         if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
             return "forms/trainer_lesson_edit";
         } else {
-            final List<UserViewDto> users = userService.listTrainers();
-            model.addAttribute("trainers", users);
+            final ViewListPage<UserForListDto> userViewListPage = userPaginationService
+                    .getViewListPage(allParams.get("page"), allParams.get("size"));
+            model.addAttribute("trainers", userViewListPage.getViewDtoList());
             return "forms/lesson_edit";
         }
     }
@@ -129,13 +123,15 @@ public class LessonController {
 
     @GetMapping
     public String getLessons(@RequestParam(required = false) final Map<String, String> allParams, final Model model) {
-        final FilteredLessonViewListPage filteredLessonViewListPage = lessonPaginationService
+        final FilteredLessonViewListPage filteredLessonViewListPage = userPaginationService
                 .getFilteredLessonViewListPage(allParams.get("page"), allParams.get("size"),
                         allParams.get("trainerName"), allParams.get("styleName"), allParams.get("date"));
+        final ViewListPage<DanceStyleViewDto> danceStyleViewListPage = danceStylePaginationService
+                .getViewListPage(allParams.get("page"), allParams.get("size"));
 
         model.addAttribute("lessonPage", filteredLessonViewListPage);
         model.addAttribute("booking", BookingDto.builder().build());
-        model.addAttribute("styles", danceStyleService.listDanceStyleViews());
+        model.addAttribute("styles", danceStyleViewListPage.getViewDtoList());
 
         if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.ADMIN)) {
             return "lists/admin_lesson_list";
@@ -144,9 +140,13 @@ public class LessonController {
         }
     }
 
-    private void prepareModel(final Model model) {
-        final List<DanceStyleViewDto> styles = danceStyleService.listDanceStyleViews();
-        final List<RoomViewDto> rooms = roomService.listRooms();
+    private void prepareModel(final Map<String, String> allParams, final Model model) {
+        final ViewListPage<DanceStyleViewDto> danceStyleViewListPage = danceStylePaginationService
+                .getViewListPage(allParams.get("page"), allParams.get("size"));
+        final ViewListPage<RoomViewDto> roomViewListPage = roomPaginationService
+                .getViewListPage(allParams.get("page"), allParams.get("size"));
+        final List<DanceStyleViewDto> styles = danceStyleViewListPage.getViewDtoList();
+        final List<RoomViewDto> rooms = roomViewListPage.getViewDtoList();
         model.addAttribute("styles", styles);
         model.addAttribute("rooms", rooms);
     }

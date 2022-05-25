@@ -3,29 +3,27 @@ package com.dataart.dancestudio.rest;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
+import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
-import com.dataart.dancestudio.service.BookingService;
+import com.dataart.dancestudio.model.dto.view.ViewListPage;
+import com.dataart.dancestudio.service.PaginationService;
 import com.dataart.dancestudio.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
+import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserRestController {
 
     private final UserService userService;
-    private final BookingService bookingService;
-
-    @Autowired
-    public UserRestController(final UserService userService, final BookingService bookingService) {
-        this.userService = userService;
-        this.bookingService = bookingService;
-    }
+    private final PaginationService<UserForListDto> userPaginationService;
+    private final PaginationService<BookingViewDto> bookingPaginationService;
 
     @PostMapping("/register")
     public ResponseEntity<Integer> register(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) {
@@ -56,13 +54,14 @@ public class UserRestController {
     }
 
     @GetMapping("/{id}/bookings")
-    public List<BookingViewDto> getUserBookings(@PathVariable final int id) {
-        return bookingService.listUserBookings(id);
+    public ViewListPage<BookingViewDto> getUserBookings(@RequestParam(required = false) final Map<String, String> allParams,
+                                                        @PathVariable final int id) {
+        return bookingPaginationService.getUserViewListPage(id, allParams.get("page"), allParams.get("size"));
     }
 
     @GetMapping
-    public List<UserViewDto> getUsers() {
-        return userService.listUsers();
+    public ViewListPage<UserForListDto> getUsers(@RequestParam(required = false) final Map<String, String> allParams) {
+        return userPaginationService.getViewListPage(allParams.get("page"), allParams.get("size"));
     }
 
 }

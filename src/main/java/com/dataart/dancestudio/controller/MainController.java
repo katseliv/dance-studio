@@ -2,6 +2,7 @@ package com.dataart.dancestudio.controller;
 
 import com.dataart.dancestudio.service.UserService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -10,17 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
 
+@RequiredArgsConstructor
 @Controller
 @RequestMapping
 public class MainController {
 
     private final UserService userService;
     private final SecurityContextFacade securityContextFacade;
-
-    public MainController(final UserService userService, final SecurityContextFacade securityContextFacade) {
-        this.userService = userService;
-        this.securityContextFacade = securityContextFacade;
-    }
 
     @GetMapping("/")
     public String index() {

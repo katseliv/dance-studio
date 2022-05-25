@@ -3,8 +3,8 @@ package com.dataart.dancestudio.service;
 import com.dataart.dancestudio.mapper.UserMapper;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,20 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Slf4j
-@Transactional
+@RequiredArgsConstructor
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    @Autowired
-    public UserDetailsServiceImpl(final UserRepository userRepository, final UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
-
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
         final Optional<UserEntity> userEntity = userRepository.findByEmail(email);
         userEntity.ifPresentOrElse(

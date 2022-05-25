@@ -7,16 +7,22 @@ import com.dataart.dancestudio.mapper.BookingMapperImpl;
 import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 import com.dataart.dancestudio.model.entity.BookingEntity;
+import com.dataart.dancestudio.model.entity.DanceStyleEntity;
 import com.dataart.dancestudio.model.entity.LessonEntity;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
 import com.dataart.dancestudio.repository.LessonRepository;
+import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +39,9 @@ public class BookingServiceTest {
 
     @Mock
     private BookingRepository bookingRepositoryMock;
+
+    @Mock
+    private UserRepository userRepositoryMock;
 
     @Mock
     private LessonRepository lessonRepositoryMock;
@@ -52,15 +61,33 @@ public class BookingServiceTest {
             .userId(userId)
             .lessonId(lessonId)
             .build();
-    final UserEntity userEntity = UserEntity.builder().id(userId).build();
-    final UserEntity newUserEntity = UserEntity.builder().id(newUserId).build();
-    final LessonEntity lessonEntity = LessonEntity.builder().id(lessonId).userTrainer(newUserEntity).build();
+    final UserEntity userEntity = UserEntity.builder()
+            .id(userId)
+            .firstName(firstName)
+            .lastName(lastName)
+            .build();
+    final DanceStyleEntity danceStyleEntity = DanceStyleEntity.builder()
+            .id(userId)
+            .name(danceStyle)
+            .build();
+    final UserEntity newUserEntity = UserEntity.builder()
+            .id(newUserId)
+            .firstName(firstName)
+            .lastName(lastName)
+            .build();
+    final LessonEntity lessonEntity = LessonEntity.builder()
+            .id(lessonId)
+            .userTrainer(newUserEntity)
+            .danceStyle(danceStyleEntity)
+            .startDatetime(startDatetime)
+            .build();
     private final BookingEntity bookingEntity = BookingEntity.builder()
             .id(id)
             .user(userEntity)
             .lesson(lessonEntity)
             .build();
     private final BookingViewDto bookingViewDto = BookingViewDto.builder()
+            .id(id)
             .firstName(firstName)
             .lastName(lastName)
             .danceStyle(danceStyle)
@@ -72,6 +99,7 @@ public class BookingServiceTest {
         // given
         when(bookingMapperImpl.bookingDtoToBookingEntity(bookingDto)).thenReturn(bookingEntity);
         when(bookingRepositoryMock.save(bookingEntity)).thenReturn(bookingEntity);
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userEntity));
         when(lessonRepositoryMock.findById(lessonId)).thenReturn(Optional.of(lessonEntity));
 
         // when
@@ -98,6 +126,7 @@ public class BookingServiceTest {
     public void createBookingWhenLessonNotFound() {
         // given
         when(lessonRepositoryMock.findById(lessonId)).thenReturn(Optional.empty());
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.ofNullable(userEntity));
 
         // when then
         final var actualException = assertThrowsExactly(EntityCreationException.class,
@@ -125,6 +154,7 @@ public class BookingServiceTest {
                 .userTrainer(UserEntity.builder().id(userId).build())
                 .build();
         when(lessonRepositoryMock.findById(lessonId)).thenReturn(Optional.of(build));
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userEntity));
 
         // when then
         final var actualException = assertThrowsExactly(EntityCreationException.class,
@@ -189,6 +219,7 @@ public class BookingServiceTest {
     @Test
     public void deleteBookingById() {
         // given
+        when(bookingRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(bookingEntity));
         doNothing().when(bookingRepositoryMock).markAsDeletedById(id);
 
         // when
@@ -201,35 +232,43 @@ public class BookingServiceTest {
     @Test
     public void listBookings() {
         // given
-        final List<BookingViewDto> bookingViewDtoListExpected = List.of(bookingViewDto);
-        final List<BookingEntity> bookingEntities = List.of(bookingEntity);
+        final int pageNumber = 1;
+        final int pageSize = 5;
 
-        when(bookingMapperImpl.bookingEntitiesToBookingViewDtoList(bookingEntities)).thenReturn(bookingViewDtoListExpected);
-        when(bookingRepositoryMock.findAll()).thenReturn(bookingEntities);
+        final List<BookingViewDto> bookingViewDtoListExpected = List.of(bookingViewDto);
+        final Page<BookingEntity> bookingEntities = new PageImpl<>(List.of(bookingEntity));
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(bookingRepositoryMock.findAll(eq(pageable))).thenReturn(bookingEntities);
 
         // when
-        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listBookings();
+        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listEntities(pageable);
 
         // then
-        verify(bookingRepositoryMock, times(1)).findAll();
+        verify(bookingRepositoryMock, times(1)).findAll(eq(pageable));
         assertEquals(bookingViewDtoListExpected, bookingViewDtoListActual);
     }
 
     @Test
     public void listUserBookings() {
         // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
         final List<BookingViewDto> bookingViewDtoListExpected = List.of(bookingViewDto);
         final List<BookingEntity> bookingEntities = List.of(bookingEntity);
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         final int userId = 1;
         when(bookingMapperImpl.bookingEntitiesToBookingViewDtoList(bookingEntities)).thenReturn(bookingViewDtoListExpected);
-        when(bookingRepositoryMock.findAllByUserId(userId)).thenReturn(bookingEntities);
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.ofNullable(UserEntity.builder().build()));
+        when(bookingRepositoryMock.findAllByUserId(userId, pageable)).thenReturn(bookingEntities);
 
         // when
-        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listUserBookings(userId);
+        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listUserEntities(userId, pageable);
 
         // then
-        verify(bookingRepositoryMock, times(1)).findAllByUserId(userId);
+        verify(bookingRepositoryMock, times(1)).findAllByUserId(userId, pageable);
         assertEquals(bookingViewDtoListExpected, bookingViewDtoListActual);
     }
 

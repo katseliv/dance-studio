@@ -138,7 +138,7 @@ public class LessonServiceTest {
         when(userRepositoryMock.findById(lessonDto.getUserTrainerId())).thenReturn(Optional.empty());
 
         // when
-        assertThrows(EntityCreationException.class, () -> lessonServiceImpl.createLesson(lessonDto));
+        assertThrows(EntityNotFoundException.class, () -> lessonServiceImpl.createLesson(lessonDto));
 
         // then
         verify(lessonMapperImpl, never()).lessonDtoToLessonEntity(lessonDto);
@@ -223,6 +223,7 @@ public class LessonServiceTest {
     public void updateLessonById() {
         // given
         when(lessonMapperImpl.lessonDtoToLessonEntity(newLessonDto)).thenReturn(newLessonEntity);
+        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(lessonEntity));
         when(lessonRepositoryMock.save(newLessonEntity)).thenReturn(newLessonEntity);
 
         // when
@@ -235,6 +236,7 @@ public class LessonServiceTest {
     @Test
     public void deleteLessonById() {
         // given
+        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(lessonEntity));
         doNothing().when(lessonRepositoryMock).markAsDeletedById(id);
 
         // when
@@ -280,10 +282,11 @@ public class LessonServiceTest {
         final int userId = 1;
 
         when(lessonMapperImpl.lessonEntitiesToLessonViewDtoList(lessonEntities)).thenReturn(lessonViewDtoListExpected);
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.ofNullable(UserEntity.builder().build()));
         when(lessonRepositoryMock.findAllByUserTrainerId(userId, pageable)).thenReturn(lessonEntities);
 
         // when
-        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listUserLessons(userId, pageable);
+        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listUserEntities(userId, pageable);
 
         // then
         verify(lessonRepositoryMock, times(1)).findAllByUserTrainerId(userId, pageable);
@@ -320,7 +323,7 @@ public class LessonServiceTest {
         when(lessonRepositoryMock.countAllByUserTrainerId(userId)).thenReturn(numberOfUserLessons);
 
         // when
-        final int numberOfFilteredLessonsActual = lessonServiceImpl.numberOfUserLessons(userId);
+        final int numberOfFilteredLessonsActual = lessonServiceImpl.numberOfUserEntities(userId);
 
         // then
         verify(lessonRepositoryMock, times(1)).countAllByUserTrainerId(userId);

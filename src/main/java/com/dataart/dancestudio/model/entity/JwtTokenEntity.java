@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "jwt_tokens")
 @Where(clause = "is_deleted = false")
-@Table(name = "jwt_tokens", schema = "dancestudio")
+@Table(name = "jwt_tokens")
 public class JwtTokenEntity {
 
     @Id

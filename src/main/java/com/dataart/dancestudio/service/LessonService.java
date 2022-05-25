@@ -20,10 +20,6 @@ public interface LessonService {
 
     List<LessonViewDto> listLessons(String trainerName, String danceStyleName, String date, Pageable pageable);
 
-    List<LessonViewDto> listUserLessons(int userId, Pageable pageable);
-
     int numberOfFilteredLessons(String trainerName, String danceStyleName, String date);
-
-    int numberOfUserLessons(int userId);
 
 }

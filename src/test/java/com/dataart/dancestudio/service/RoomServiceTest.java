@@ -11,6 +11,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -35,6 +39,7 @@ public class RoomServiceTest {
     private final String description = "Description";
 
     private final StudioEntity studioEntity = StudioEntity.builder()
+            .id(studioId)
             .name(name)
             .description(description)
             .build();
@@ -54,18 +59,21 @@ public class RoomServiceTest {
     @Test
     public void listRooms() {
         // given
-        final List<RoomViewDto> roomViewDtoListExpected = List.of(roomViewDto);
-        final List<RoomEntity> roomEntities = List.of(roomEntity);
+        final int pageNumber = 1;
+        final int pageSize = 5;
 
-        when(roomMapperImpl.roomEntitiesToRoomViewDtoList(roomEntities)).thenReturn(roomViewDtoListExpected);
-        when(roomRepositoryMock.findAll()).thenReturn(roomEntities);
+        final List<RoomViewDto> roomViewDtoListExpected = List.of(roomViewDto);
+        final Page<RoomEntity> roomEntities = new PageImpl<>(List.of(roomEntity));
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(roomRepositoryMock.findAll(eq(pageable))).thenReturn(roomEntities);
 
         // when
-        final List<RoomViewDto> bookingViewDtoListActual = roomServiceImpl.listRooms();
+        final List<RoomViewDto> roomViewDtoListActual = roomServiceImpl.listEntities(pageable);
 
         // then
-        verify(roomRepositoryMock, times(1)).findAll();
-        assertEquals(roomViewDtoListExpected, bookingViewDtoListActual);
+        verify(roomRepositoryMock, times(1)).findAll(eq(pageable));
+        assertEquals(roomViewDtoListExpected, roomViewDtoListActual);
     }
 
 }

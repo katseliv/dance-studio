@@ -58,6 +58,6 @@ public interface LessonRepository extends JpaRepository<LessonEntity, Integer>, 
 
     List<LessonEntity> findAllByUserTrainerId(int userId, Pageable pageable);
 
-    Integer countAllByUserTrainerId(int userId);
+    int countAllByUserTrainerId(int userId);
 
 }
