@@ -1,6 +1,9 @@
 package com.dataart.dancestudio.handler;
 
-import com.dataart.dancestudio.exception.*;
+import com.dataart.dancestudio.exception.EntityAlreadyExistsException;
+import com.dataart.dancestudio.exception.EntityCreationException;
+import com.dataart.dancestudio.exception.EntityNotFoundException;
+import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.model.dto.ApiErrorDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,8 +38,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(value = {
-            EntityCreationException.class, EntityAlreadyExistsException.class,
-            UserCanNotBeDeletedException.class, AuthorizationHeaderException.class
+            EntityCreationException.class, EntityAlreadyExistsException.class, UserCanNotBeDeletedException.class
     })
     public ResponseEntity<ApiErrorDto> badRequestException(final RuntimeException runtimeException) {
         final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
