@@ -25,6 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,7 +112,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    public void createBookingAlreadyExists() {
+    public void createBookingWhenBookingAlreadyExists() {
         // given
         when(bookingRepositoryMock.existsByUserIdAndLessonId(userId, lessonId)).thenReturn(true);
 
@@ -120,6 +121,18 @@ public class BookingServiceTest {
                 () -> bookingServiceImpl.createBooking(bookingDto));
         verify(bookingRepositoryMock, never()).save(bookingEntity);
         assertEquals(actualException.getMessage(), "Booking already exists!");
+    }
+
+    @Test
+    public void createBookingWhenUserNotFound() {
+        // given
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.empty());
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityCreationException.class,
+                () -> bookingServiceImpl.createBooking(bookingDto));
+        verify(bookingRepositoryMock, never()).save(bookingEntity);
+        assertEquals(actualException.getMessage(), "Invalid userId. Can't create a booking!");
     }
 
     @Test
@@ -133,18 +146,6 @@ public class BookingServiceTest {
                 () -> bookingServiceImpl.createBooking(bookingDto));
         verify(bookingRepositoryMock, never()).save(bookingEntity);
         assertEquals(actualException.getMessage(), "Invalid lessonId. Can't create a booking!");
-    }
-
-    @Test
-    public void createBookingWhenBookingAlreadyExists() {
-        // given
-        when(bookingRepositoryMock.existsByUserIdAndLessonId(userId, lessonId)).thenReturn(true);
-
-        // when then
-        final var actualException = assertThrowsExactly(EntityAlreadyExistsException.class,
-                () -> bookingServiceImpl.createBooking(bookingDto));
-        verify(bookingRepositoryMock, never()).save(bookingEntity);
-        assertEquals(actualException.getMessage(), "Booking already exists!");
     }
 
     @Test
@@ -230,6 +231,18 @@ public class BookingServiceTest {
     }
 
     @Test
+    public void deleteBookingByIdWhenBookingDoesNotExist() {
+        // given
+        when(bookingRepositoryMock.findById(id)).thenReturn(Optional.empty());
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityNotFoundException.class,
+                () -> bookingServiceImpl.deleteBookingById(id));
+        verify(bookingRepositoryMock, never()).markAsDeletedById(id);
+        assertEquals(actualException.getMessage(), "Booking not found!");
+    }
+
+    @Test
     public void listBookings() {
         // given
         final int pageNumber = 1;
@@ -237,6 +250,26 @@ public class BookingServiceTest {
 
         final List<BookingViewDto> bookingViewDtoListExpected = List.of(bookingViewDto);
         final Page<BookingEntity> bookingEntities = new PageImpl<>(List.of(bookingEntity));
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(bookingRepositoryMock.findAll(eq(pageable))).thenReturn(bookingEntities);
+
+        // when
+        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listEntities(pageable);
+
+        // then
+        verify(bookingRepositoryMock, times(1)).findAll(eq(pageable));
+        assertEquals(bookingViewDtoListExpected, bookingViewDtoListActual);
+    }
+
+    @Test
+    public void emptyListBookings() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
+        final List<BookingViewDto> bookingViewDtoListExpected = new ArrayList<>();
+        final Page<BookingEntity> bookingEntities = new PageImpl<>(new ArrayList<>());
         final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         when(bookingRepositoryMock.findAll(eq(pageable))).thenReturn(bookingEntities);
@@ -270,6 +303,106 @@ public class BookingServiceTest {
         // then
         verify(bookingRepositoryMock, times(1)).findAllByUserId(userId, pageable);
         assertEquals(bookingViewDtoListExpected, bookingViewDtoListActual);
+    }
+
+    @Test
+    public void listUserBookingsWhenUserDoesNotExist() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        final int userId = 1;
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.empty());
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityNotFoundException.class,
+                () -> bookingServiceImpl.listUserEntities(userId, pageable));
+        verify(bookingRepositoryMock, never()).findAllByUserId(userId, pageable);
+        assertEquals(actualException.getMessage(), "User not found!");
+    }
+
+    @Test
+    public void emptyListUserBookings() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
+        final List<BookingViewDto> bookingViewDtoListExpected = new ArrayList<>();
+        final List<BookingEntity> bookingEntities = new ArrayList<>();
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        final int userId = 1;
+        when(bookingMapperImpl.bookingEntitiesToBookingViewDtoList(bookingEntities)).thenReturn(bookingViewDtoListExpected);
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.ofNullable(UserEntity.builder().build()));
+        when(bookingRepositoryMock.findAllByUserId(userId, pageable)).thenReturn(bookingEntities);
+
+        // when
+        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listUserEntities(userId, pageable);
+
+        // then
+        verify(bookingRepositoryMock, times(1)).findAllByUserId(userId, pageable);
+        assertEquals(bookingViewDtoListExpected, bookingViewDtoListActual);
+    }
+
+    @Test
+    public void numberOfEntities() {
+        // given
+        final int amountExpected = 5;
+
+        when(bookingRepositoryMock.count()).thenReturn((long) amountExpected);
+
+        // when
+        final int amountActual = bookingServiceImpl.numberOfEntities();
+
+        // then
+        verify(bookingRepositoryMock, times(1)).count();
+        assertEquals(amountExpected, amountActual);
+    }
+
+    @Test
+    public void zeroNumberOfEntities() {
+        // given
+        final int amountExpected = 0;
+
+        when(bookingRepositoryMock.count()).thenReturn((long) amountExpected);
+
+        // when
+        final int amountActual = bookingServiceImpl.numberOfEntities();
+
+        // then
+        verify(bookingRepositoryMock, times(1)).count();
+        assertEquals(amountExpected, amountActual);
+    }
+
+    @Test
+    public void numberOfUserEntities() {
+        // given
+        final int amountExpected = 5;
+
+        when(bookingRepositoryMock.countAllByUserId(userId)).thenReturn(amountExpected);
+
+        // when
+        final int amountActual = bookingServiceImpl.numberOfUserEntities(userId);
+
+        // then
+        verify(bookingRepositoryMock, times(1)).countAllByUserId(userId);
+        assertEquals(amountExpected, amountActual);
+    }
+
+    @Test
+    public void zeroNumberOfUserEntities() {
+        // given
+        final int amountExpected = 0;
+
+        when(bookingRepositoryMock.countAllByUserId(userId)).thenReturn(amountExpected);
+
+        // when
+        final int amountActual = bookingServiceImpl.numberOfUserEntities(userId);
+
+        // then
+        verify(bookingRepositoryMock, times(1)).countAllByUserId(userId);
+        assertEquals(amountExpected, amountActual);
     }
 
 }

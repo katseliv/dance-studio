@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -74,6 +75,56 @@ public class RoomServiceTest {
         // then
         verify(roomRepositoryMock, times(1)).findAll(eq(pageable));
         assertEquals(roomViewDtoListExpected, roomViewDtoListActual);
+    }
+
+    @Test
+    public void emptyListRooms() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
+        final List<RoomViewDto> roomViewDtoListExpected = new ArrayList<>();
+        final Page<RoomEntity> roomEntities = new PageImpl<>(new ArrayList<>());
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(roomRepositoryMock.findAll(eq(pageable))).thenReturn(roomEntities);
+
+        // when
+        final List<RoomViewDto> roomViewDtoListActual = roomServiceImpl.listEntities(pageable);
+
+        // then
+        verify(roomRepositoryMock, times(1)).findAll(eq(pageable));
+        assertEquals(roomViewDtoListExpected, roomViewDtoListActual);
+    }
+
+    @Test
+    public void numberOfEntities() {
+        // given
+        final int amountExpected = 5;
+
+        when(roomRepositoryMock.count()).thenReturn((long) amountExpected);
+
+        // when
+        final int amountActual = roomServiceImpl.numberOfEntities();
+
+        // then
+        verify(roomRepositoryMock, times(1)).count();
+        assertEquals(amountExpected, amountActual);
+    }
+
+    @Test
+    public void zeroNumberOfEntities() {
+        // given
+        final int amountExpected = 0;
+
+        when(roomRepositoryMock.count()).thenReturn((long) amountExpected);
+
+        // when
+        final int amountActual = roomServiceImpl.numberOfEntities();
+
+        // then
+        verify(roomRepositoryMock, times(1)).count();
+        assertEquals(amountExpected, amountActual);
     }
 
 }

@@ -27,8 +27,8 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse login(final UserDetailsDto userDetailsDto) {
         final String email = userDetailsDto.getEmail();
         if (jwtTokenService.existsByUserEmail(email)) {
-            final String accessToken = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.ACCESS);
-            final String refreshToken = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.REFRESH);
+            final String accessToken = jwtTokenService.getJwtTokenByEmailAndType(email, JwtTokenType.ACCESS);
+            final String refreshToken = jwtTokenService.getJwtTokenByEmailAndType(email, JwtTokenType.REFRESH);
             log.info("User with email = {} has been logged in with pre-existing tokens.", email);
             return new LoginResponse(accessToken, refreshToken);
         }
@@ -57,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public JwtResponse getNewAccessToken(final String refreshToken) {
         final String email = jwtTokenProvider.getEmail(refreshToken);
-        if (email.isEmpty() || email.isBlank()) {
+        if (email.isBlank()) {
             log.warn("Email is empty or blank.");
             throw new EntityCreationException("Refresh token is invalid. Can't create new access token.");
         }
@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
             throw new EntityCreationException("Refresh token is invalid. Can't create new access token.");
         }
 
-        final String refreshTokenFromDB = jwtTokenService.getJwtTokenByEmail(email, JwtTokenType.REFRESH);
+        final String refreshTokenFromDB = jwtTokenService.getJwtTokenByEmailAndType(email, JwtTokenType.REFRESH);
         if (!refreshTokenFromDB.equals(refreshToken)) {
             log.warn("Token with type = {} email = {} not equal to existed token in DB.", email, JwtTokenType.REFRESH);
             throw new EntityCreationException("Refresh token is invalid. Can't create new access token.");

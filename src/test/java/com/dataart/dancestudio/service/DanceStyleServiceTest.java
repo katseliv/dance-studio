@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,6 +66,56 @@ public class DanceStyleServiceTest {
         // then
         verify(danceStyleRepositoryMock, times(1)).findAll(eq(pageable));
         assertEquals(danceStyleViewDtoListExpected, danceStyleViewDtoListActual);
+    }
+
+    @Test
+    public void emptyListDanceStyles() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
+        final List<DanceStyleViewDto> danceStyleViewDtoListExpected = new ArrayList<>();
+        final Page<DanceStyleEntity> danceStyleEntities = new PageImpl<>(new ArrayList<>());
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(danceStyleRepositoryMock.findAll(eq(pageable))).thenReturn(danceStyleEntities);
+
+        // when
+        final List<DanceStyleViewDto> danceStyleViewDtoListActual = danceStyleServiceImpl.listEntities(pageable);
+
+        // then
+        verify(danceStyleRepositoryMock, times(1)).findAll(eq(pageable));
+        assertEquals(danceStyleViewDtoListExpected, danceStyleViewDtoListActual);
+    }
+
+    @Test
+    public void numberOfEntities() {
+        // given
+        final int amountExpected = 5;
+
+        when(danceStyleRepositoryMock.count()).thenReturn((long) amountExpected);
+
+        // when
+        final int amountActual = danceStyleServiceImpl.numberOfEntities();
+
+        // then
+        verify(danceStyleRepositoryMock, times(1)).count();
+        assertEquals(amountExpected, amountActual);
+    }
+
+    @Test
+    public void zeroNumberOfEntities() {
+        // given
+        final int amountExpected = 0;
+
+        when(danceStyleRepositoryMock.count()).thenReturn((long) amountExpected);
+
+        // when
+        final int amountActual = danceStyleServiceImpl.numberOfEntities();
+
+        // then
+        verify(danceStyleRepositoryMock, times(1)).count();
+        assertEquals(amountExpected, amountActual);
     }
 
 }
