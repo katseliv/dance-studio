@@ -60,11 +60,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ApiErrorDto> backendException(final Exception exception) {
+    public ResponseEntity<ApiErrorDto> backendException() {
         final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
                 .status(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .messages(List.of(exception.getMessage()))
+                .messages(List.of("Oops... Something went wrong!"))
                 .build();
         return new ResponseEntity<>(apiErrorDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
