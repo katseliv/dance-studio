@@ -6,6 +6,7 @@ import java.util.List;
 
 @Getter
 @Builder
+@ToString
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class FilteredLessonViewListPage {

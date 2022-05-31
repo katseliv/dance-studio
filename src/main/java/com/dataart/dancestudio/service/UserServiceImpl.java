@@ -5,6 +5,7 @@ import com.dataart.dancestudio.exception.EntityCreationException;
 import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.mapper.UserMapper;
+import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
@@ -16,6 +17,7 @@ import com.dataart.dancestudio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,6 +89,16 @@ public class UserServiceImpl implements UserService, EntityService<UserForListDt
                 () -> log.warn("User with email = {} hasn't been found.", email));
         return userEntity.map(userMapper::userEntityToUserDetailsDto)
                 .orElseThrow(() -> new EntityNotFoundException("User not found!")).getId();
+    }
+
+    @Override
+    public UserDetailsDto getUserByEmail(final String email) {
+        final Optional<UserEntity> userEntity = userRepository.findByEmail(email);
+        userEntity.ifPresentOrElse(
+                (user) -> log.info("User for email = {} with id = {} has been found.", email, user.getId()),
+                () -> log.warn("User for email = {} hasn't been found.", email));
+        return userMapper.userEntityToUserDetailsDto(userEntity.orElseThrow(
+                () -> new UsernameNotFoundException("No such user in the database!")));
     }
 
     @Override

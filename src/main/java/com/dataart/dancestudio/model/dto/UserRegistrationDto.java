@@ -6,16 +6,14 @@ import com.dataart.dancestudio.annotation.TimeZoneValid;
 import com.dataart.dancestudio.annotation.UsernameValid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 import javax.validation.constraints.*;
 
 @PasswordMatch
 @Getter
 @Builder
+@ToString
 @EqualsAndHashCode
 @AllArgsConstructor
 @JsonDeserialize(builder = UserRegistrationDto.UserRegistrationDtoBuilder.class)

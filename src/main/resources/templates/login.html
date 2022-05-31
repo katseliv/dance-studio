@@ -38,7 +38,20 @@
             </div>
             <button type="submit" class="btn btn-lg btn-outline-success w-100 mt-2">Submit</button>
         </form>
-        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-outline-primary w-100 mt-2">Return</button>
+        <button type="button" onclick="history.go(-1)" class="btn btn-lg btn-outline-primary w-100 mt-2 mb-5">Return
+        </button>
+    </div>
+    <h1 class="h3 mb-5 fw-normal text-center">Login with </h1>
+    <div class="container w-25">
+        <form th:action="@{/api/v1/login/google}">
+            <button type="submit" class="btn btn-lg btn-outline-success w-100 mt-2">My Google</button>
+        </form>
+        <form th:action="@{/oauth2/authorization/google}">
+            <button type="submit" class="btn btn-lg btn-outline-secondary w-100 mt-2">Google</button>
+        </form>
+        <form th:action="@{/oauth2/authorization/vk}">
+            <button type="submit" class="btn btn-lg btn-outline-primary w-100 mt-2">VK</button>
+        </form>
     </div>
 </div>
 </body>

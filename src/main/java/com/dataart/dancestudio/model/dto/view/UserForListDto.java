@@ -1,12 +1,10 @@
 package com.dataart.dancestudio.model.dto.view;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
 @Builder
+@ToString
 @EqualsAndHashCode
 @AllArgsConstructor
 public class UserForListDto {

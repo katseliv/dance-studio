@@ -47,6 +47,9 @@ public class UserEntity {
     @Column(name = "role_id")
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
+
     @Column(name = "time_zone")
     private String timeZone;
 

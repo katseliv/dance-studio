@@ -2,6 +2,7 @@ package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.exception.EntityAlreadyExistsException;
 import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
+import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
@@ -19,6 +20,8 @@ public interface UserService {
     UserViewDto getUserViewById(int id);
 
     int getUserIdByEmail(String email);
+
+    UserDetailsDto getUserByEmail(final String email);
 
     void updateUserById(UserDto userDto, int id);
 

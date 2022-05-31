@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
+@ToString
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class LessonViewDto {

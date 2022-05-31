@@ -27,6 +27,16 @@ spring:
         enabled: true
     pathmatch:
       matching-strategy: ant-path-matcher
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 129877534425-6qk9a3sms10kicovojosigkjdagkomob.apps.googleusercontent.com
+            clientSecret: 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
+            scope:
+              - email
+              - profile
 logging:
   level:
     org.springframework.web: DEBUG

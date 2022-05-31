@@ -3,7 +3,6 @@ package com.dataart.dancestudio.mapper;
 import com.dataart.dancestudio.model.dto.JwtTokenDto;
 import com.dataart.dancestudio.model.entity.JwtTokenEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")

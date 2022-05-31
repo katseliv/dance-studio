@@ -3,9 +3,7 @@ package com.dataart.dancestudio.model.dto;
 import com.dataart.dancestudio.model.entity.Role;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,6 +11,8 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
+@Builder
+@ToString
 @EqualsAndHashCode
 @AllArgsConstructor
 @JsonDeserialize(builder = UserDetailsDto.UserDetailsDtoBuilder.class)
@@ -59,44 +59,6 @@ public class UserDetailsDto implements UserDetails {
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class UserDetailsDtoBuilder {
-
-        private Integer id;
-        private String email;
-        private List<Role> roles;
-        private String password;
-
-        private boolean isUsed = false;
-
-        public UserDetailsDtoBuilder() {
-        }
-
-        public UserDetailsDtoBuilder id(final Integer id) {
-            this.id = id;
-            return this;
-        }
-
-        public UserDetailsDtoBuilder email(final String email) {
-            this.email = email;
-            return this;
-        }
-
-        public UserDetailsDtoBuilder roles(final List<Role> roles) {
-            this.roles = roles;
-            return this;
-        }
-
-        public UserDetailsDtoBuilder password(final String password) {
-            this.password = password;
-            return this;
-        }
-
-        public UserDetailsDto build() {
-            if (!isUsed) {
-                isUsed = true;
-                return new UserDetailsDto(id, email, roles, password);
-            }
-            throw new RuntimeException("Builder already built");
-        }
 
     }
 
