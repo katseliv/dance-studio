@@ -23,10 +23,6 @@ public class BookingDto {
     @Positive(message = "Lesson Id is negative ot zero.")
     private final Integer lessonId;
 
-    public static BookingDtoBuilder builder() {
-        return new BookingDtoBuilder();
-    }
-
     @JsonPOJOBuilder(withPrefix = "")
     public static class BookingDtoBuilder {
 
