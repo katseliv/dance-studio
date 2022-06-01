@@ -7,7 +7,7 @@ import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
-import com.dataart.dancestudio.service.PaginationService;
+import com.dataart.dancestudio.service.BookingService;
 import com.dataart.dancestudio.service.UserService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
 import lombok.AllArgsConstructor;
@@ -31,8 +31,7 @@ import java.util.Objects;
 public class UserController {
 
     private final UserService userService;
-    private final PaginationService<UserForListDto> userPaginationService;
-    private final PaginationService<BookingViewDto> bookingPaginationService;
+    private final BookingService bookingService;
     private final SecurityContextFacade securityContextFacade;
     protected AuthenticationManager authenticationManager;
 
@@ -129,7 +128,7 @@ public class UserController {
         final Authentication authentication = securityContextFacade.getContext().getAuthentication();
         final String email = authentication.getName();
 
-        final ViewListPage<UserForListDto> userForListDtoViewListPage = userPaginationService
+        final ViewListPage<UserForListDto> userForListDtoViewListPage = userService
                 .getViewListPage(allParams.get("page"), allParams.get("size"));
         model.addAttribute("id", userService.getUserIdByEmail(email));
         model.addAttribute("users", userForListDtoViewListPage.getViewDtoList());
@@ -139,7 +138,7 @@ public class UserController {
     @GetMapping("/{id}/bookings")
     public String getUserBookings(@RequestParam(required = false) final Map<String, String> allParams,
                                   @PathVariable final int id, final Model model) {
-        final ViewListPage<BookingViewDto> bookingViewDtoViewListPage = bookingPaginationService
+        final ViewListPage<BookingViewDto> bookingViewDtoViewListPage = bookingService
                 .getUserViewListPage(id, allParams.get("page"), allParams.get("size"));
         model.addAttribute("bookings", bookingViewDtoViewListPage.getViewDtoList());
         return "lists/booking_list";

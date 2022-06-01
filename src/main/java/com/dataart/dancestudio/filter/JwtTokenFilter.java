@@ -24,6 +24,7 @@ import java.io.IOException;
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
 
+    private final static String BEARER = "Bearer ";
     private final SecurityContextFacade securityContextFacade;
     private final UserDetailsService userDetailsService;
     private final JwtTokenService jwtTokenService;
@@ -33,12 +34,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(final HttpServletRequest request, @NonNull final HttpServletResponse response,
                                     @NonNull final FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
-        final String bearer = "Bearer ";
-        if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith(bearer)) {
+        if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith(BEARER)) {
             filterChain.doFilter(request, response);
             return;
         }
-        final String jwtToken = authHeader.substring(bearer.length());
+        final String jwtToken = authHeader.substring(BEARER.length());
         if (jwtToken.isBlank()) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             log.warn("Access Token invalid in Bearer Header! Can't get access to resource.");

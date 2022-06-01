@@ -15,32 +15,24 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class DanceStyleServiceImpl implements EntityService<DanceStyleViewDto> {
+public class DanceStyleServiceImpl implements DanceStyleService {
 
     private final DanceStyleRepository danceStyleRepository;
     private final DanceStyleMapper danceStyleMapper;
 
     @Override
     @Transactional(readOnly = true)
-    public List<DanceStyleViewDto> listEntities(final Pageable pageable) {
+    public List<DanceStyleViewDto> listDanceStyles(final Pageable pageable) {
         final List<DanceStyleEntity> danceStyleEntities = danceStyleRepository.findAll(pageable).getContent();
-        if (danceStyleEntities.size() != 0) {
-            log.info("Dance Styles have been found.");
-        } else {
-            log.info("There haven't been dance styles.");
-        }
+        log.info("There have been found {} dance styles.", danceStyleEntities.size());
         return danceStyleMapper.danceStyleEntitiesToDanceStyleViewDtoList(danceStyleEntities);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public int numberOfEntities() {
+    public int numberOfDanceStyles() {
         final long numberOfDanceStyles = danceStyleRepository.count();
-        if (numberOfDanceStyles != 0) {
-            log.info("There have been dance styles.");
-        } else {
-            log.warn("There haven't been dance styles.");
-        }
+        log.info("There have been found {} dance styles.", numberOfDanceStyles);
         return (int) numberOfDanceStyles;
     }
 

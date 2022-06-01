@@ -7,7 +7,6 @@ import com.dataart.dancestudio.mapper.UserMapperImpl;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
-import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.entity.Role;
@@ -52,7 +51,7 @@ public class UserServiceTest {
     private UserRepository userRepositoryMock;
 
     @Mock
-    private UserEntityService<LessonViewDto> userLessonServiceMock;
+    private LessonServiceImpl lessonServiceMock;
 
     @InjectMocks
     private UserServiceImpl userServiceImpl;
@@ -553,7 +552,7 @@ public class UserServiceTest {
         // given
         doNothing().when(userRepositoryMock).markAsDeletedById(id);
         when(userRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(UserEntity.builder().build()));
-        when(userLessonServiceMock.numberOfUserEntities(id)).thenReturn(0);
+        when(lessonServiceMock.numberOfUserLessons(id)).thenReturn(0);
 
         // when
         userServiceImpl.deleteUserById(id);
@@ -575,7 +574,7 @@ public class UserServiceTest {
     public void deleteUserByIdWhenUserHasLessons() {
         // when
         when(userRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(UserEntity.builder().build()));
-        when(userLessonServiceMock.numberOfUserEntities(id)).thenReturn(1);
+        when(lessonServiceMock.numberOfUserLessons(id)).thenReturn(1);
         assertThrows(UserCanNotBeDeletedException.class, () -> userServiceImpl.deleteUserById(id));
 
         // then
@@ -674,7 +673,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findAll(pageable)).thenReturn(userEntities);
 
         // when
-        final List<UserForListDto> userViewDtoListActual = userServiceImpl.listEntities(pageable);
+        final List<UserForListDto> userViewDtoListActual = userServiceImpl.listUsers(pageable);
 
         // then
         verify(userRepositoryMock, times(1)).findAll(eq(pageable));
@@ -694,7 +693,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findAll(pageable)).thenReturn(userEntities);
 
         // when
-        final List<UserForListDto> userViewDtoListActual = userServiceImpl.listEntities(pageable);
+        final List<UserForListDto> userViewDtoListActual = userServiceImpl.listUsers(pageable);
 
         // then
         verify(userRepositoryMock, times(1)).findAll(eq(pageable));
@@ -709,7 +708,7 @@ public class UserServiceTest {
         when(userRepositoryMock.count()).thenReturn((long) amountExpected);
 
         // when
-        final int amountActual = userServiceImpl.numberOfEntities();
+        final int amountActual = userServiceImpl.numberOfUsers();
 
         // then
         verify(userRepositoryMock, times(1)).count();
@@ -724,7 +723,7 @@ public class UserServiceTest {
         when(userRepositoryMock.count()).thenReturn((long) amountExpected);
 
         // when
-        final int amountActual = userServiceImpl.numberOfEntities();
+        final int amountActual = userServiceImpl.numberOfUsers();
 
         // then
         verify(userRepositoryMock, times(1)).count();

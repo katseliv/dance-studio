@@ -11,8 +11,8 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity(name = "rooms")
 @Where(clause = "is_deleted = false")
+@Entity(name = "rooms")
 @Table(name = "rooms")
 public class RoomEntity {
 

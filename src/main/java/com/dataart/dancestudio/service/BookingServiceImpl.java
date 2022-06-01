@@ -6,15 +6,18 @@ import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.mapper.BookingMapper;
 import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
+import com.dataart.dancestudio.model.dto.view.ViewListPage;
 import com.dataart.dancestudio.model.entity.BookingEntity;
 import com.dataart.dancestudio.model.entity.LessonEntity;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
 import com.dataart.dancestudio.repository.LessonRepository;
 import com.dataart.dancestudio.repository.UserRepository;
+import com.dataart.dancestudio.utils.ParseUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +26,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Primary
 @RequiredArgsConstructor
 @Service
-public class BookingServiceImpl implements BookingService, EntityService<BookingViewDto>, UserEntityService<BookingViewDto> {
+public class BookingServiceImpl implements BookingService, PaginationService<BookingViewDto> {
+
+    @Value("${pagination.defaultPageNumber}")
+    private int defaultPageNumber;
+    @Value("${pagination.defaultPageSize}")
+    private int defaultPageSize;
+    @Value("${pagination.buttonLimit}")
+    private int buttonLimit;
 
     private final BookingRepository bookingRepository;
     private final LessonRepository lessonRepository;
@@ -111,33 +120,22 @@ public class BookingServiceImpl implements BookingService, EntityService<Booking
         log.info("Booking with id = {} has been deleted.", id);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public List<BookingViewDto> listEntities(final Pageable pageable) {
+    public List<BookingViewDto> listBookings(final Pageable pageable) {
         final List<BookingEntity> bookingEntities = bookingRepository.findAll(pageable).getContent();
-        if (bookingEntities.size() != 0) {
-            log.info("Bookings have been found.");
-        } else {
-            log.warn("There haven't been bookings.");
-        }
+        log.info("There have been found {} bookings.", bookingEntities.size());
         return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public int numberOfEntities() {
+    public int numberOfBookings() {
         final long numberOfBookings = bookingRepository.count();
-        if (numberOfBookings != 0) {
-            log.info("There have been bookings.");
-        } else {
-            log.warn("There haven't been bookings.");
-        }
+        log.info("There have been found {} bookings.", numberOfBookings);
         return (int) numberOfBookings;
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public List<BookingViewDto> listUserEntities(final int userId, final Pageable pageable) {
+    public List<BookingViewDto> listUserBookings(final int userId, final Pageable pageable) {
         final Optional<UserEntity> userEntity = userRepository.findById(userId);
         userEntity.ifPresentOrElse(
                 (booking) -> log.info("User with id = {} has been found.", userId),
@@ -147,24 +145,44 @@ public class BookingServiceImpl implements BookingService, EntityService<Booking
                 });
 
         final List<BookingEntity> bookingEntities = bookingRepository.findAllByUserId(userId, pageable);
-        if (bookingEntities.size() != 0) {
-            log.info("Bookings have been found.");
-        } else {
-            log.warn("There haven't been bookings.");
-        }
+        log.info("There have been found {} bookings for userId {}.", bookingEntities.size(), userId);
         return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public int numberOfUserEntities(final int userId) {
+    public int numberOfUserBookings(final int userId) {
         final int numberOfUserBookings = bookingRepository.countAllByUserId(userId);
-        if (numberOfUserBookings != 0) {
-            log.info("There have been bookings.");
-        } else {
-            log.warn("There haven't been bookings.");
-        }
+        log.info("There have been found {} bookings.", numberOfUserBookings);
         return numberOfUserBookings;
+    }
+
+    @Override
+    public ViewListPage<BookingViewDto> getViewListPage(final String page, final String size) {
+        final int pageNumber = Optional.ofNullable(page).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(size).map(ParseUtils::parsePositiveInteger).orElse(defaultPageSize);
+
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        final List<BookingViewDto> listBookings = listBookings(pageable);
+        final int totalAmount = numberOfBookings();
+
+        return getViewListPage(totalAmount, pageSize, pageNumber, listBookings);
+    }
+
+    @Override
+    public ViewListPage<BookingViewDto> getUserViewListPage(final int id, final String page, final String size) {
+        final int pageNumber = Optional.ofNullable(page).map(Integer::parseInt).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(size).map(Integer::parseInt).orElse(defaultPageSize);
+
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        final List<BookingViewDto> listUserBookings = listUserBookings(id, pageable);
+        final int totalAmount = numberOfUserBookings(id);
+
+        return getViewListPage(totalAmount, pageSize, pageNumber, listUserBookings);
+    }
+
+    @Override
+    public int getButtonLimit() {
+        return buttonLimit;
     }
 
 }

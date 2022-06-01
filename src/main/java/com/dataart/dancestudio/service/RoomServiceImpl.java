@@ -15,32 +15,22 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class RoomServiceImpl implements EntityService<RoomViewDto> {
+public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomMapper roomMapper;
 
-    @Override
     @Transactional(readOnly = true)
-    public List<RoomViewDto> listEntities(final Pageable pageable) {
+    public List<RoomViewDto> listRooms(final Pageable pageable) {
         final List<RoomEntity> roomEntities = roomRepository.findAll(pageable).getContent();
-        if (roomEntities.size() != 0) {
-            log.info("Rooms have been found.");
-        } else {
-            log.info("There haven't been rooms.");
-        }
+        log.info("There have been found {} rooms.", roomEntities.size());
         return roomMapper.roomEntitiesToRoomViewDtoList(roomEntities);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public int numberOfEntities() {
+    public int numberOfRooms() {
         final long numberOfRooms = roomRepository.count();
-        if (numberOfRooms != 0) {
-            log.info("There have been rooms.");
-        } else {
-            log.warn("There haven't been rooms.");
-        }
+        log.info("There have been found {} rooms.", numberOfRooms);
         return (int) numberOfRooms;
     }
 

@@ -70,7 +70,7 @@ public class RoomServiceTest {
         when(roomRepositoryMock.findAll(eq(pageable))).thenReturn(roomEntities);
 
         // when
-        final List<RoomViewDto> roomViewDtoListActual = roomServiceImpl.listEntities(pageable);
+        final List<RoomViewDto> roomViewDtoListActual = roomServiceImpl.listRooms(pageable);
 
         // then
         verify(roomRepositoryMock, times(1)).findAll(eq(pageable));
@@ -90,7 +90,7 @@ public class RoomServiceTest {
         when(roomRepositoryMock.findAll(eq(pageable))).thenReturn(roomEntities);
 
         // when
-        final List<RoomViewDto> roomViewDtoListActual = roomServiceImpl.listEntities(pageable);
+        final List<RoomViewDto> roomViewDtoListActual = roomServiceImpl.listRooms(pageable);
 
         // then
         verify(roomRepositoryMock, times(1)).findAll(eq(pageable));
@@ -105,7 +105,7 @@ public class RoomServiceTest {
         when(roomRepositoryMock.count()).thenReturn((long) amountExpected);
 
         // when
-        final int amountActual = roomServiceImpl.numberOfEntities();
+        final int amountActual = roomServiceImpl.numberOfRooms();
 
         // then
         verify(roomRepositoryMock, times(1)).count();
@@ -120,7 +120,7 @@ public class RoomServiceTest {
         when(roomRepositoryMock.count()).thenReturn((long) amountExpected);
 
         // when
-        final int amountActual = roomServiceImpl.numberOfEntities();
+        final int amountActual = roomServiceImpl.numberOfRooms();
 
         // then
         verify(roomRepositoryMock, times(1)).count();

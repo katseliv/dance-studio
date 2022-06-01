@@ -333,7 +333,48 @@ public class LessonServiceTest {
         when(lessonRepositoryMock.findAllByUserTrainerId(userId, pageable)).thenReturn(lessonEntities);
 
         // when
-        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listUserEntities(userId, pageable);
+        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listUserLessons(userId, pageable);
+
+        // then
+        verify(lessonRepositoryMock, times(1)).findAllByUserTrainerId(userId, pageable);
+        assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
+    }
+
+    @Test
+    public void listUserLessonsWhenUserDoesNotExist() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        final int userId = 1;
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.empty());
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityNotFoundException.class,
+                () -> lessonServiceImpl.listUserLessons(userId, pageable));
+        verify(bookingRepositoryMock, never()).findAllByUserId(userId, pageable);
+        assertEquals(actualException.getMessage(), "User not found!");
+    }
+
+    @Test
+    public void emptyListUserLessons() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
+        final List<LessonViewDto> lessonViewDtoListExpected = new ArrayList<>();
+        final List<LessonEntity> lessonEntities = new ArrayList<>();
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        final int userId = 1;
+
+        when(lessonMapperImpl.lessonEntitiesToLessonViewDtoList(lessonEntities)).thenReturn(lessonViewDtoListExpected);
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.ofNullable(UserEntity.builder().build()));
+        when(lessonRepositoryMock.findAllByUserTrainerId(userId, pageable)).thenReturn(lessonEntities);
+
+        // when
+        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listUserLessons(userId, pageable);
 
         // then
         verify(lessonRepositoryMock, times(1)).findAllByUserTrainerId(userId, pageable);
@@ -430,7 +471,25 @@ public class LessonServiceTest {
         when(lessonRepositoryMock.countAllByUserTrainerId(userId)).thenReturn(numberOfUserLessons);
 
         // when
-        final int numberOfFilteredLessonsActual = lessonServiceImpl.numberOfUserEntities(userId);
+        final int numberOfFilteredLessonsActual = lessonServiceImpl.numberOfUserLessons(userId);
+
+        // then
+        verify(lessonRepositoryMock, times(1)).countAllByUserTrainerId(userId);
+        assertEquals(numberOfUserLessonsExpected, numberOfFilteredLessonsActual);
+    }
+
+    @Test
+    public void zeroNumberOfUserLessons() {
+        final int userId = 1;
+
+        // given
+        final int numberOfUserLessons = 0;
+        final int numberOfUserLessonsExpected = 0;
+
+        when(lessonRepositoryMock.countAllByUserTrainerId(userId)).thenReturn(numberOfUserLessons);
+
+        // when
+        final int numberOfFilteredLessonsActual = lessonServiceImpl.numberOfUserLessons(userId);
 
         // then
         verify(lessonRepositoryMock, times(1)).countAllByUserTrainerId(userId);
