@@ -120,6 +120,7 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
         log.info("Booking with id = {} has been deleted.", id);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<BookingViewDto> listBookings(final Pageable pageable) {
         final List<BookingEntity> bookingEntities = bookingRepository.findAll(pageable).getContent();
@@ -127,6 +128,7 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
         return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public int numberOfBookings() {
         final long numberOfBookings = bookingRepository.count();
@@ -134,6 +136,7 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
         return (int) numberOfBookings;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<BookingViewDto> listUserBookings(final int userId, final Pageable pageable) {
         final Optional<UserEntity> userEntity = userRepository.findById(userId);
@@ -149,6 +152,7 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
         return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public int numberOfUserBookings(final int userId) {
         final int numberOfUserBookings = bookingRepository.countAllByUserId(userId);
@@ -157,6 +161,7 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ViewListPage<BookingViewDto> getViewListPage(final String page, final String size) {
         final int pageNumber = Optional.ofNullable(page).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
         final int pageSize = Optional.ofNullable(size).map(ParseUtils::parsePositiveInteger).orElse(defaultPageSize);
@@ -169,6 +174,7 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ViewListPage<BookingViewDto> getUserViewListPage(final int id, final String page, final String size) {
         final int pageNumber = Optional.ofNullable(page).map(Integer::parseInt).orElse(defaultPageNumber);
         final int pageSize = Optional.ofNullable(size).map(Integer::parseInt).orElse(defaultPageSize);
