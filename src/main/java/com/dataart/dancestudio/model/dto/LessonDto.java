@@ -40,10 +40,6 @@ public class LessonDto {
 
     private final String timeZone;
 
-    public static LessonDtoBuilder builder() {
-        return new LessonDtoBuilder();
-    }
-
     @JsonPOJOBuilder(withPrefix = "")
     public static class LessonDtoBuilder {
 
