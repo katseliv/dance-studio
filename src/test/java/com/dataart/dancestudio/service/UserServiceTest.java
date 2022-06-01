@@ -7,7 +7,6 @@ import com.dataart.dancestudio.mapper.UserMapperImpl;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
-import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.entity.Role;
@@ -27,6 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +51,7 @@ public class UserServiceTest {
     private UserRepository userRepositoryMock;
 
     @Mock
-    private UserEntityService<LessonViewDto> userLessonServiceMock;
+    private LessonServiceImpl lessonServiceMock;
 
     @InjectMocks
     private UserServiceImpl userServiceImpl;
@@ -172,7 +172,6 @@ public class UserServiceTest {
                 .deleted(deleted)
                 .build();
         final UserDto userDtoWithoutMultipartFile = UserDto.builder()
-//                .id(id)
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
@@ -414,7 +413,7 @@ public class UserServiceTest {
                 .username(username)
                 .firstName(firstName)
                 .lastName(newLastName)
-                .base64StringImage(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
+                .base64StringImage(Base64.getEncoder().encodeToString(new byte[0]))
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
@@ -553,7 +552,7 @@ public class UserServiceTest {
         // given
         doNothing().when(userRepositoryMock).markAsDeletedById(id);
         when(userRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(UserEntity.builder().build()));
-        when(userLessonServiceMock.numberOfUserEntities(id)).thenReturn(0);
+        when(lessonServiceMock.numberOfUserLessons(id)).thenReturn(0);
 
         // when
         userServiceImpl.deleteUserById(id);
@@ -563,7 +562,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void deleteUserByIdWhenUserHasLessons() {
+    public void deleteUserByIdWhenUserDoesNotExist() {
         // when
         assertThrows(EntityNotFoundException.class, () -> userServiceImpl.deleteUserById(id));
 
@@ -572,42 +571,14 @@ public class UserServiceTest {
     }
 
     @Test
-    public void listUsers() throws IOException {
-        // given
-        final UserEntity userEntity = UserEntity.builder()
-                .username(username)
-                .firstName(firstName)
-                .lastName(lastName)
-                .image(multipartFile.getBytes())
-                .email(email)
-                .phoneNumber(phoneNumber)
-                .role(Role.USER)
-                .timeZone(timeZone)
-                .deleted(deleted)
-                .build();
-        final UserForListDto userForListDto = UserForListDto.builder()
-                .username(username)
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .phoneNumber(phoneNumber)
-                .build();
-
-        final int pageNumber = 1;
-        final int pageSize = 5;
-
-        final List<UserForListDto> userViewDtoListExpected = List.of(userForListDto);
-        final Page<UserEntity> userEntities = new PageImpl<>(List.of(userEntity));
-        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-
-        when(userRepositoryMock.findAll(pageable)).thenReturn(userEntities);
-
+    public void deleteUserByIdWhenUserHasLessons() {
         // when
-        final List<UserForListDto> userViewDtoListActual = userServiceImpl.listEntities(pageable);
+        when(userRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(UserEntity.builder().build()));
+        when(lessonServiceMock.numberOfUserLessons(id)).thenReturn(1);
+        assertThrows(UserCanNotBeDeletedException.class, () -> userServiceImpl.deleteUserById(id));
 
         // then
-        verify(userRepositoryMock, times(1)).findAll(eq(pageable));
-        assertEquals(userViewDtoListExpected, userViewDtoListActual);
+        verify(userRepositoryMock, never()).markAsDeletedById(id);
     }
 
     @Test
@@ -647,6 +618,116 @@ public class UserServiceTest {
         verify(userMapperImpl, times(1)).userEntitiesToUserViewDtoList(userEntities);
         verify(userRepositoryMock, times(1)).findAllByRole(Role.TRAINER, pageable);
         assertEquals(userViewDtoListExpected, userViewDtoListActual);
+    }
+
+    @Test
+    public void emptyListTrainers() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
+        final List<UserForListDto> userViewDtoListExpected = new ArrayList<>();
+        final List<UserEntity> userEntities = new ArrayList<>();
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(userRepositoryMock.findAllByRole(Role.TRAINER, pageable)).thenReturn(userEntities);
+
+        // when
+        final List<UserForListDto> userViewDtoListActual = userServiceImpl.listTrainers(pageable);
+
+        // then
+        verify(userMapperImpl, times(1)).userEntitiesToUserViewDtoList(userEntities);
+        verify(userRepositoryMock, times(1)).findAllByRole(Role.TRAINER, pageable);
+        assertEquals(userViewDtoListExpected, userViewDtoListActual);
+    }
+
+    @Test
+    public void listUsers() throws IOException {
+        // given
+        final UserEntity userEntity = UserEntity.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .image(multipartFile.getBytes())
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .role(Role.USER)
+                .timeZone(timeZone)
+                .deleted(deleted)
+                .build();
+        final UserForListDto userForListDto = UserForListDto.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .build();
+
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
+        final List<UserForListDto> userViewDtoListExpected = List.of(userForListDto);
+        final Page<UserEntity> userEntities = new PageImpl<>(List.of(userEntity));
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(userRepositoryMock.findAll(pageable)).thenReturn(userEntities);
+
+        // when
+        final List<UserForListDto> userViewDtoListActual = userServiceImpl.listUsers(pageable);
+
+        // then
+        verify(userRepositoryMock, times(1)).findAll(eq(pageable));
+        assertEquals(userViewDtoListExpected, userViewDtoListActual);
+    }
+
+    @Test
+    public void emptyListUsers() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
+        final List<UserForListDto> userViewDtoListExpected = new ArrayList<>();
+        final Page<UserEntity> userEntities = new PageImpl<>(new ArrayList<>());
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(userRepositoryMock.findAll(pageable)).thenReturn(userEntities);
+
+        // when
+        final List<UserForListDto> userViewDtoListActual = userServiceImpl.listUsers(pageable);
+
+        // then
+        verify(userRepositoryMock, times(1)).findAll(eq(pageable));
+        assertEquals(userViewDtoListExpected, userViewDtoListActual);
+    }
+
+    @Test
+    public void numberOfEntities() {
+        // given
+        final int amountExpected = 5;
+
+        when(userRepositoryMock.count()).thenReturn((long) amountExpected);
+
+        // when
+        final int amountActual = userServiceImpl.numberOfUsers();
+
+        // then
+        verify(userRepositoryMock, times(1)).count();
+        assertEquals(amountExpected, amountActual);
+    }
+
+    @Test
+    public void zeroNumberOfEntities() {
+        // given
+        final int amountExpected = 0;
+
+        when(userRepositoryMock.count()).thenReturn((long) amountExpected);
+
+        // when
+        final int amountActual = userServiceImpl.numberOfUsers();
+
+        // then
+        verify(userRepositoryMock, times(1)).count();
+        assertEquals(amountExpected, amountActual);
     }
 
 }

@@ -3,6 +3,7 @@ package com.dataart.dancestudio.controller;
 import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
+import com.dataart.dancestudio.service.LessonService;
 import com.dataart.dancestudio.service.PaginationService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,13 +21,13 @@ import java.util.Map;
 @RequestMapping("/trainers")
 public class TrainerController {
 
-    private final PaginationService<LessonViewDto> lessonPaginationService;
+    private final LessonService lessonService;
     protected AuthenticationManager authenticationManager;
 
     @GetMapping(path = "/{id}/lessons")
     public String getTrainerLessons(@RequestParam(required = false) final Map<String, String> allParams,
                                     @PathVariable final int id, final Model model) {
-        final ViewListPage<LessonViewDto> lessonViewListPage = lessonPaginationService
+        final ViewListPage<LessonViewDto> lessonViewListPage = lessonService
                 .getUserViewListPage(id, allParams.get("page"), allParams.get("size"));
 
         model.addAttribute("lessonPage", lessonViewListPage);

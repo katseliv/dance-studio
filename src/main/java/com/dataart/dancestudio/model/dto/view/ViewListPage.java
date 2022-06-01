@@ -1,21 +1,22 @@
 package com.dataart.dancestudio.model.dto.view;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Getter
-@Builder
+@ToString
+@SuperBuilder
 @EqualsAndHashCode
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ViewListPage<T> {
 
-    private final int pageSize;
-    private final int totalPages;
-    private final int additive;
-    private final int startPageNumber;
-    private final int currentPageNumber;
-    private final int endPageNumber;
-    private final List<T> viewDtoList;
+    protected final int pageSize;
+    protected final int totalPages;
+    protected final int additive;
+    protected final int startPageNumber;
+    protected final int currentPageNumber;
+    protected final int endPageNumber;
+    protected final List<T> viewDtoList;
 
 }

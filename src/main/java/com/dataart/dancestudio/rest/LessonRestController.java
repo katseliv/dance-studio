@@ -1,10 +1,9 @@
 package com.dataart.dancestudio.rest;
 
 import com.dataart.dancestudio.model.dto.LessonDto;
-import com.dataart.dancestudio.model.dto.view.FilteredLessonViewListPage;
+import com.dataart.dancestudio.model.dto.view.FilteredViewListPage;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.service.LessonService;
-import com.dataart.dancestudio.service.PaginationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,6 @@ import java.util.Map;
 public class LessonRestController {
 
     private final LessonService lessonService;
-    private final PaginationService<LessonViewDto> lessonPaginationService;
 
     @PostMapping
     public ResponseEntity<Integer> createLesson(@RequestBody @Valid final LessonDto lessonDto) {
@@ -44,9 +42,8 @@ public class LessonRestController {
     }
 
     @GetMapping
-    public FilteredLessonViewListPage getLessons(@RequestParam(required = false) final Map<String, String> allParams) {
-        return lessonPaginationService
-                .getFilteredLessonViewListPage(allParams.get("page"), allParams.get("size"),
+    public FilteredViewListPage<LessonViewDto> getLessons(@RequestParam(required = false) final Map<String, String> allParams) {
+        return lessonService.getFilteredLessonViewListPage(allParams.get("page"), allParams.get("size"),
                         allParams.get("trainerName"), allParams.get("styleName"), allParams.get("date"));
     }
 

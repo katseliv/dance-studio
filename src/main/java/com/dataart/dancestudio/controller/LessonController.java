@@ -4,11 +4,15 @@ import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.*;
 import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.service.DanceStyleService;
 import com.dataart.dancestudio.service.LessonService;
-import com.dataart.dancestudio.service.PaginationService;
+import com.dataart.dancestudio.service.RoomService;
 import com.dataart.dancestudio.service.UserService;
+import com.dataart.dancestudio.utils.ParseUtils;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,17 +22,22 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/lessons")
 public class LessonController {
 
+    @Value("${pagination.defaultPageNumber}")
+    private int defaultPageNumber;
+    @Value("${pagination.defaultPageSize}")
+    private int defaultPageSize;
+
     private final LessonService lessonService;
     private final UserService userService;
-    private final PaginationService<UserForListDto> userPaginationService;
-    private final PaginationService<DanceStyleViewDto> danceStylePaginationService;
-    private final PaginationService<RoomViewDto> roomPaginationService;
+    private final DanceStyleService danceStyleService;
+    private final RoomService roomService;
     private final SecurityContextFacade securityContextFacade;
 
     @PostMapping("/create")
@@ -40,7 +49,7 @@ public class LessonController {
             if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
                 return "forms/trainer_lesson_form";
             } else {
-                final ViewListPage<UserForListDto> userViewListPage = userPaginationService
+                final ViewListPage<UserForListDto> userViewListPage = userService
                         .getViewListPage(allParams.get("page"), allParams.get("size"));
                 model.addAttribute("trainers", userViewListPage.getViewDtoList());
                 return "forms/lesson_form";
@@ -57,7 +66,7 @@ public class LessonController {
         if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
             return "forms/trainer_lesson_form";
         } else {
-            final ViewListPage<UserForListDto> userViewListPage = userPaginationService
+            final ViewListPage<UserForListDto> userViewListPage = userService
                     .getViewListPage(allParams.get("page"), allParams.get("size"));
             model.addAttribute("trainers", userViewListPage.getViewDtoList());
             return "forms/lesson_form";
@@ -84,7 +93,7 @@ public class LessonController {
             if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
                 return "forms/trainer_lesson_edit";
             } else {
-                final ViewListPage<UserForListDto> userViewListPage = userPaginationService
+                final ViewListPage<UserForListDto> userViewListPage = userService
                         .getViewListPage(allParams.get("page"), allParams.get("size"));
                 model.addAttribute("trainers", userViewListPage.getViewDtoList());
                 return "forms/lesson_edit";
@@ -102,7 +111,7 @@ public class LessonController {
         if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
             return "forms/trainer_lesson_edit";
         } else {
-            final ViewListPage<UserForListDto> userViewListPage = userPaginationService
+            final ViewListPage<UserForListDto> userViewListPage = userService
                     .getViewListPage(allParams.get("page"), allParams.get("size"));
             model.addAttribute("trainers", userViewListPage.getViewDtoList());
             return "forms/lesson_edit";
@@ -123,15 +132,17 @@ public class LessonController {
 
     @GetMapping
     public String getLessons(@RequestParam(required = false) final Map<String, String> allParams, final Model model) {
-        final FilteredLessonViewListPage filteredLessonViewListPage = userPaginationService
+        final int pageNumber = Optional.ofNullable(allParams.get("page")).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(allParams.get("size")).map(ParseUtils::parsePositiveInteger).orElse(defaultPageSize);
+        final FilteredViewListPage<LessonViewDto> filteredViewListPage = lessonService
                 .getFilteredLessonViewListPage(allParams.get("page"), allParams.get("size"),
                         allParams.get("trainerName"), allParams.get("styleName"), allParams.get("date"));
-        final ViewListPage<DanceStyleViewDto> danceStyleViewListPage = danceStylePaginationService
-                .getViewListPage(allParams.get("page"), allParams.get("size"));
+        final List<DanceStyleViewDto> danceStyleViewListPage = danceStyleService
+                .listDanceStyles(PageRequest.of(pageNumber, pageSize));
 
-        model.addAttribute("lessonPage", filteredLessonViewListPage);
+        model.addAttribute("lessonPage", filteredViewListPage);
         model.addAttribute("booking", BookingDto.builder().build());
-        model.addAttribute("styles", danceStyleViewListPage.getViewDtoList());
+        model.addAttribute("styles", danceStyleViewListPage);
 
         if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.ADMIN)) {
             return "lists/admin_lesson_list";
@@ -141,14 +152,14 @@ public class LessonController {
     }
 
     private void prepareModel(final Map<String, String> allParams, final Model model) {
-        final ViewListPage<DanceStyleViewDto> danceStyleViewListPage = danceStylePaginationService
-                .getViewListPage(allParams.get("page"), allParams.get("size"));
-        final ViewListPage<RoomViewDto> roomViewListPage = roomPaginationService
-                .getViewListPage(allParams.get("page"), allParams.get("size"));
-        final List<DanceStyleViewDto> styles = danceStyleViewListPage.getViewDtoList();
-        final List<RoomViewDto> rooms = roomViewListPage.getViewDtoList();
-        model.addAttribute("styles", styles);
-        model.addAttribute("rooms", rooms);
+        final int pageNumber = Optional.ofNullable(allParams.get("page")).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(allParams.get("size")).map(ParseUtils::parsePositiveInteger).orElse(defaultPageSize);
+        final List<DanceStyleViewDto> danceStyleViewListPage = danceStyleService
+                .listDanceStyles(PageRequest.of(pageNumber, pageSize));
+        final List<RoomViewDto> roomViewListPage = roomService
+                .listRooms(PageRequest.of(pageNumber, pageSize));
+        model.addAttribute("styles", danceStyleViewListPage);
+        model.addAttribute("rooms", roomViewListPage);
     }
 
 }

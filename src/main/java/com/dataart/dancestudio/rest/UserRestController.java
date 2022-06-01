@@ -6,7 +6,7 @@ import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
-import com.dataart.dancestudio.service.PaginationService;
+import com.dataart.dancestudio.service.BookingService;
 import com.dataart.dancestudio.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,8 +22,7 @@ import java.util.Map;
 public class UserRestController {
 
     private final UserService userService;
-    private final PaginationService<UserForListDto> userPaginationService;
-    private final PaginationService<BookingViewDto> bookingPaginationService;
+    private final BookingService bookingService;
 
     @PostMapping("/register")
     public ResponseEntity<Integer> register(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) {
@@ -56,12 +55,12 @@ public class UserRestController {
     @GetMapping("/{id}/bookings")
     public ViewListPage<BookingViewDto> getUserBookings(@RequestParam(required = false) final Map<String, String> allParams,
                                                         @PathVariable final int id) {
-        return bookingPaginationService.getUserViewListPage(id, allParams.get("page"), allParams.get("size"));
+        return bookingService.getUserViewListPage(id, allParams.get("page"), allParams.get("size"));
     }
 
     @GetMapping
     public ViewListPage<UserForListDto> getUsers(@RequestParam(required = false) final Map<String, String> allParams) {
-        return userPaginationService.getViewListPage(allParams.get("page"), allParams.get("size"));
+        return userService.getViewListPage(allParams.get("page"), allParams.get("size"));
     }
 
 }

@@ -4,27 +4,41 @@ import com.dataart.dancestudio.exception.EntityCreationException;
 import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.mapper.LessonMapper;
 import com.dataart.dancestudio.model.dto.LessonDto;
+import com.dataart.dancestudio.model.dto.view.FilteredViewListPage;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
+import com.dataart.dancestudio.model.dto.view.ViewListPage;
 import com.dataart.dancestudio.model.entity.LessonEntity;
 import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
 import com.dataart.dancestudio.repository.LessonRepository;
 import com.dataart.dancestudio.repository.UserRepository;
+import com.dataart.dancestudio.utils.ParseUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class LessonServiceImpl implements LessonService, UserEntityService<LessonViewDto> {
+public class LessonServiceImpl implements LessonService, PaginationService<LessonViewDto> {
+
+    @Value("${pagination.defaultPageNumber}")
+    private int defaultPageNumber;
+    @Value("${pagination.defaultPageSize}")
+    private int defaultPageSize;
+    @Value("${pagination.buttonLimit}")
+    private int buttonLimit;
 
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
@@ -119,11 +133,7 @@ public class LessonServiceImpl implements LessonService, UserEntityService<Lesso
         final Specification<LessonEntity> specification = LessonRepository.hasTrainerNameAndDanceStyleNameAndDate(
                 trainerName, danceStyleName, date);
         final List<LessonEntity> lessonEntities = lessonRepository.findAll(specification, pageable).getContent();
-        if (lessonEntities.size() != 0) {
-            log.info("Lessons have been found.");
-        } else {
-            log.warn("There haven't been lessons.");
-        }
+        log.info("There have been found {} lessons.", lessonEntities.size());
         return lessonMapper.lessonEntitiesToLessonViewDtoList(lessonEntities);
     }
 
@@ -133,17 +143,13 @@ public class LessonServiceImpl implements LessonService, UserEntityService<Lesso
         final Specification<LessonEntity> specification = LessonRepository.hasTrainerNameAndDanceStyleNameAndDate(
                 trainerName, danceStyleName, date);
         final long numberOfFilteredLessons = lessonRepository.count(specification);
-        if (numberOfFilteredLessons != 0) {
-            log.info("There have been lessons.");
-        } else {
-            log.warn("There haven't been lessons.");
-        }
+        log.info("There have been found {} lessons.", numberOfFilteredLessons);
         return (int) numberOfFilteredLessons;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<LessonViewDto> listUserEntities(final int userId, final Pageable pageable) {
+    public List<LessonViewDto> listUserLessons(final int userId, final Pageable pageable) {
         final Optional<UserEntity> userEntity = userRepository.findById(userId);
         userEntity.ifPresentOrElse(
                 (booking) -> log.info("User with id = {} has been found.", userId),
@@ -153,24 +159,64 @@ public class LessonServiceImpl implements LessonService, UserEntityService<Lesso
                 });
 
         final List<LessonEntity> lessonEntities = lessonRepository.findAllByUserTrainerId(userId, pageable);
-        if (lessonEntities.size() != 0) {
-            log.info("Lessons have been found.");
-        } else {
-            log.warn("There haven't been lessons.");
-        }
+        log.info("There have been found {} lessons for userId {}.", lessonEntities.size(), userId);
         return lessonMapper.lessonEntitiesToLessonViewDtoList(lessonEntities);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public int numberOfUserEntities(final int userId) {
+    public int numberOfUserLessons(final int userId) {
         final int numberOfUserLessons = lessonRepository.countAllByUserTrainerId(userId);
-        if (numberOfUserLessons != 0) {
-            log.info("There have been lessons.");
-        } else {
-            log.warn("There haven't been lessons.");
-        }
+        log.info("There have been found {} lessons for userId {}.", numberOfUserLessons, userId);
         return numberOfUserLessons;
+    }
+
+    @Override
+    public ViewListPage<LessonViewDto> getUserViewListPage(final int id, final String page, final String size) {
+        final int pageNumber = Optional.ofNullable(page).map(Integer::parseInt).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(size).map(Integer::parseInt).orElse(defaultPageSize);
+
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        final List<LessonViewDto> listUserBookings = listUserLessons(id, pageable);
+        final int totalAmount = numberOfUserLessons(id);
+
+        return getViewListPage(totalAmount, pageSize, pageNumber, listUserBookings);
+    }
+
+    @Override
+    public FilteredViewListPage<LessonViewDto> getFilteredLessonViewListPage(final String page, final String size, final String trainerName,
+                                                                             final String danceStyleName, final String date) {
+        final int pageNumber = Optional.ofNullable(page).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(size).map(ParseUtils::parsePositiveInteger).orElse(defaultPageSize);
+
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        final List<LessonViewDto> lessonViewDtoList = listLessons(trainerName, danceStyleName, date, pageable);
+        final int totalAmount = numberOfFilteredLessons(trainerName, danceStyleName, date);
+
+        final int totalPages = (int) Math.ceil((double) totalAmount / pageSize);
+        final int startPageNumber = getStartPageNumber(totalPages, pageNumber);
+        final int endPageNumber = Math.max(Math.min(pageNumber + buttonLimit / 2, totalPages), buttonLimit);
+        final int additive = (pageNumber - 1) * pageSize + 1;
+
+        final Map<String, String> filterParameters = new HashMap<>();
+        filterParameters.put("trainerName", trainerName);
+        filterParameters.put("danceStyleName", danceStyleName);
+        filterParameters.put("date", date);
+        return FilteredViewListPage.<LessonViewDto>builder()
+                .filerParameters(filterParameters)
+                .pageSize(pageSize)
+                .totalPages(totalPages)
+                .additive(additive)
+                .startPageNumber(startPageNumber)
+                .currentPageNumber(pageNumber)
+                .endPageNumber(endPageNumber)
+                .viewDtoList(lessonViewDtoList)
+                .build();
+    }
+
+    @Override
+    public int getButtonLimit() {
+        return buttonLimit;
     }
 
 }

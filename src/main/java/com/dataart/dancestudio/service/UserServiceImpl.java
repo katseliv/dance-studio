@@ -7,14 +7,16 @@ import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.mapper.UserMapper;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
-import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
+import com.dataart.dancestudio.model.dto.view.ViewListPage;
 import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,12 +28,19 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class UserServiceImpl implements UserService, EntityService<UserForListDto> {
+public class UserServiceImpl implements UserService, PaginationService<UserForListDto> {
 
+    @Value("${pagination.defaultPageNumber}")
+    private int defaultPageNumber;
+    @Value("${pagination.defaultPageSize}")
+    private int defaultPageSize;
+    @Value("${pagination.buttonLimit}")
+    private int buttonLimit;
+
+    private final LessonService lessonService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final UserEntityService<LessonViewDto> userLessonService;
 
     @Override
     @Transactional
@@ -115,7 +124,7 @@ public class UserServiceImpl implements UserService, EntityService<UserForListDt
                     log.warn("User with id = {} hasn't been found.", id);
                     throw new EntityNotFoundException("User not found!");
                 });
-        if (userLessonService.numberOfUserEntities(id) > 0) {
+        if (lessonService.numberOfUserLessons(id) > 0) {
             log.warn("User with id = {} hasn't been deleted.", id);
             throw new UserCanNotBeDeletedException("User has lessons!");
         }
@@ -127,36 +136,41 @@ public class UserServiceImpl implements UserService, EntityService<UserForListDt
     @Transactional(readOnly = true)
     public List<UserForListDto> listTrainers(final Pageable pageable) {
         final List<UserEntity> userEntities = userRepository.findAllByRole(Role.TRAINER, pageable);
-        if (userEntities.size() != 0) {
-            log.info("Users have been found.");
-        } else {
-            log.warn("There haven't been users.");
-        }
+        log.info("There have been found {} trainers.", userEntities.size());
         return userMapper.userEntitiesToUserViewDtoList(userEntities);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserForListDto> listEntities(final Pageable pageable) {
+    public List<UserForListDto> listUsers(final Pageable pageable) {
         final List<UserEntity> userEntities = userRepository.findAll(pageable).getContent();
-        if (userEntities.size() != 0) {
-            log.info("Users have been found.");
-        } else {
-            log.warn("There haven't been users.");
-        }
+        log.info("There have been found {} users.", userEntities.size());
         return userMapper.userEntitiesToUserViewDtoList(userEntities);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public int numberOfEntities() {
+    public int numberOfUsers() {
         final long numberOfUsers = userRepository.count();
-        if (numberOfUsers != 0) {
-            log.info("There have been users.");
-        } else {
-            log.warn("There haven't been users.");
-        }
+        log.info("There have been found {} users.", numberOfUsers);
         return (int) numberOfUsers;
+    }
+
+    @Override
+    public ViewListPage<UserForListDto> getViewListPage(final String page, final String size) {
+        final int pageNumber = Optional.ofNullable(page).map(Integer::parseInt).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(size).map(Integer::parseInt).orElse(defaultPageSize);
+
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        final List<UserForListDto> listBookings = listUsers(pageable);
+        final int totalAmount = numberOfUsers();
+
+        return getViewListPage(totalAmount, pageSize, pageNumber, listBookings);
+    }
+
+    @Override
+    public int getButtonLimit() {
+        return buttonLimit;
     }
 
 }
