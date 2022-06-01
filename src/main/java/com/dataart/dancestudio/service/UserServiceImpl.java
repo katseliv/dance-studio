@@ -157,6 +157,7 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ViewListPage<UserForListDto> getViewListPage(final String page, final String size) {
         final int pageNumber = Optional.ofNullable(page).map(Integer::parseInt).orElse(defaultPageNumber);
         final int pageSize = Optional.ofNullable(size).map(Integer::parseInt).orElse(defaultPageSize);
