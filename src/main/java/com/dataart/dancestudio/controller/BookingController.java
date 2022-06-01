@@ -4,7 +4,6 @@ import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
 import com.dataart.dancestudio.service.BookingService;
-import com.dataart.dancestudio.service.PaginationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +18,6 @@ import java.util.Map;
 public class BookingController {
 
     private final BookingService bookingService;
-    private final PaginationService<BookingViewDto> bookingPaginationService;
 
     @PostMapping("/create")
     public String createBooking(@ModelAttribute("booking") final BookingDto bookingDto) {
@@ -41,7 +39,7 @@ public class BookingController {
 
     @GetMapping
     public String getBookings(@RequestParam(required = false) final Map<String, String> allParams, final Model model) {
-        final ViewListPage<BookingViewDto> bookingViewListPage = bookingPaginationService
+        final ViewListPage<BookingViewDto> bookingViewListPage = bookingService
                 .getViewListPage(allParams.get("page"), allParams.get("size"));
         model.addAttribute("bookings", bookingViewListPage.getViewDtoList());
         return "lists/booking_list";

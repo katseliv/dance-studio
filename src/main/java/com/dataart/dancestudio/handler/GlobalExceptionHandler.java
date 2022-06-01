@@ -1,10 +1,8 @@
 package com.dataart.dancestudio.handler;
 
-import com.dataart.dancestudio.exception.EntityAlreadyExistsException;
-import com.dataart.dancestudio.exception.EntityCreationException;
-import com.dataart.dancestudio.exception.EntityNotFoundException;
-import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
+import com.dataart.dancestudio.exception.*;
 import com.dataart.dancestudio.model.dto.ApiErrorDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +18,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.security.auth.message.AuthException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -34,11 +32,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
                 .messages(List.of(authException.getMessage()))
                 .build();
+        log.error(authException.getMessage(), authException);
         return new ResponseEntity<>(apiErrorDto, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(value = {
-            EntityCreationException.class, EntityAlreadyExistsException.class, UserCanNotBeDeletedException.class
+            EntityCreationException.class, EntityAlreadyExistsException.class, UserCanNotBeDeletedException.class,
+            ParseInputException.class
     })
     public ResponseEntity<ApiErrorDto> badRequestException(final RuntimeException runtimeException) {
         final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
@@ -46,6 +46,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .messages(List.of(runtimeException.getMessage()))
                 .build();
+        log.error(runtimeException.getMessage(), runtimeException);
         return new ResponseEntity<>(apiErrorDto, HttpStatus.BAD_REQUEST);
     }
 
@@ -56,19 +57,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .error(HttpStatus.NOT_FOUND.getReasonPhrase())
                 .messages(List.of(runtimeException.getMessage()))
                 .build();
+        log.error(runtimeException.getMessage(), runtimeException);
         return new ResponseEntity<>(apiErrorDto, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ApiErrorDto> backendException() {
+    public ResponseEntity<ApiErrorDto> backendException(final Exception exception) {
         final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
                 .status(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
                 .messages(List.of("Oops... Something went wrong!"))
                 .build();
+        log.error(exception.getMessage(), exception);
         return new ResponseEntity<>(apiErrorDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @NonNull
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException exception,
                                                                   @NonNull final HttpHeaders headers,
@@ -82,33 +86,32 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .messages(details)
                 .build();
+        log.error(exception.getMessage(), exception);
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @NonNull
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(final HttpMessageNotReadableException exception,
                                                                   @NonNull final HttpHeaders headers,
                                                                   @NonNull final HttpStatus status,
                                                                   @NonNull final WebRequest request) {
         final String invalidInputMessage = "Invalid input.";
-        final String exceptionMessage = Optional.ofNullable(Objects.requireNonNull(exception.getRootCause()).getMessage())
+        final String exceptionMessage = Optional.ofNullable(exception.getRootCause())
+                .map(Throwable::getMessage)
+                .map(message -> message.split("at"))
+                .map(split -> split[0])
+                .map(String::trim)
+                .map(s -> s.isBlank() ? "Invalid input" : s)
+                .map(s -> s + ".")
                 .orElse(invalidInputMessage);
-        final String resultExceptionMessage;
-        if (!exceptionMessage.equals(invalidInputMessage)) {
-            final String at = " at";
-            final String lineBreak = "\n";
-            final int startIndex = 0;
-            final int endIndex = !exceptionMessage.contains(at) ? startIndex : exceptionMessage.indexOf(at);
-            resultExceptionMessage = exceptionMessage.substring(startIndex, endIndex).isBlank()
-                    ? invalidInputMessage : exceptionMessage.substring(0, endIndex - lineBreak.length()) + ".";
-        } else {
-            resultExceptionMessage = invalidInputMessage;
-        }
+
         final ApiErrorDto error = ApiErrorDto.builder()
                 .status(String.valueOf(HttpStatus.BAD_REQUEST.value()))
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .messages(List.of(resultExceptionMessage))
+                .messages(List.of(exceptionMessage))
                 .build();
+        log.error(exception.getMessage(), exception);
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 

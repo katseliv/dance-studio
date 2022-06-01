@@ -12,8 +12,8 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity(name = "jwt_tokens")
 @Where(clause = "is_deleted = false")
+@Entity(name = "jwt_tokens")
 @Table(name = "jwt_tokens")
 public class JwtTokenEntity {
 

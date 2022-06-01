@@ -255,7 +255,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.findAll(eq(pageable))).thenReturn(bookingEntities);
 
         // when
-        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listEntities(pageable);
+        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listBookings(pageable);
 
         // then
         verify(bookingRepositoryMock, times(1)).findAll(eq(pageable));
@@ -275,7 +275,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.findAll(eq(pageable))).thenReturn(bookingEntities);
 
         // when
-        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listEntities(pageable);
+        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listBookings(pageable);
 
         // then
         verify(bookingRepositoryMock, times(1)).findAll(eq(pageable));
@@ -298,7 +298,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.findAllByUserId(userId, pageable)).thenReturn(bookingEntities);
 
         // when
-        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listUserEntities(userId, pageable);
+        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listUserBookings(userId, pageable);
 
         // then
         verify(bookingRepositoryMock, times(1)).findAllByUserId(userId, pageable);
@@ -317,7 +317,7 @@ public class BookingServiceTest {
 
         // when then
         final var actualException = assertThrowsExactly(EntityNotFoundException.class,
-                () -> bookingServiceImpl.listUserEntities(userId, pageable));
+                () -> bookingServiceImpl.listUserBookings(userId, pageable));
         verify(bookingRepositoryMock, never()).findAllByUserId(userId, pageable);
         assertEquals(actualException.getMessage(), "User not found!");
     }
@@ -338,7 +338,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.findAllByUserId(userId, pageable)).thenReturn(bookingEntities);
 
         // when
-        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listUserEntities(userId, pageable);
+        final List<BookingViewDto> bookingViewDtoListActual = bookingServiceImpl.listUserBookings(userId, pageable);
 
         // then
         verify(bookingRepositoryMock, times(1)).findAllByUserId(userId, pageable);
@@ -353,7 +353,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.count()).thenReturn((long) amountExpected);
 
         // when
-        final int amountActual = bookingServiceImpl.numberOfEntities();
+        final int amountActual = bookingServiceImpl.numberOfBookings();
 
         // then
         verify(bookingRepositoryMock, times(1)).count();
@@ -368,7 +368,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.count()).thenReturn((long) amountExpected);
 
         // when
-        final int amountActual = bookingServiceImpl.numberOfEntities();
+        final int amountActual = bookingServiceImpl.numberOfBookings();
 
         // then
         verify(bookingRepositoryMock, times(1)).count();
@@ -383,7 +383,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.countAllByUserId(userId)).thenReturn(amountExpected);
 
         // when
-        final int amountActual = bookingServiceImpl.numberOfUserEntities(userId);
+        final int amountActual = bookingServiceImpl.numberOfUserBookings(userId);
 
         // then
         verify(bookingRepositoryMock, times(1)).countAllByUserId(userId);
@@ -398,7 +398,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.countAllByUserId(userId)).thenReturn(amountExpected);
 
         // when
-        final int amountActual = bookingServiceImpl.numberOfUserEntities(userId);
+        final int amountActual = bookingServiceImpl.numberOfUserBookings(userId);
 
         // then
         verify(bookingRepositoryMock, times(1)).countAllByUserId(userId);

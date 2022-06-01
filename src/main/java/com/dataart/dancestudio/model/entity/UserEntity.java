@@ -13,8 +13,8 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity(name = "users")
 @Where(clause = "is_deleted = false")
+@Entity(name = "users")
 @Table(name = "users")
 public class UserEntity {
 

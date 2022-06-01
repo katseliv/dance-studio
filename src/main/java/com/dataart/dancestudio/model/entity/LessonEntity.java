@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity(name = "lessons")
 @Where(clause = "is_deleted = false")
+@Entity(name = "lessons")
 @Table(name = "lessons")
 public class LessonEntity {
 

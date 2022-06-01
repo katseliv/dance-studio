@@ -1,7 +1,6 @@
 package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.LessonEntity;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,6 +25,7 @@ public interface LessonRepository extends JpaRepository<LessonEntity, Integer>, 
     @Query("UPDATE lessons SET deleted = TRUE WHERE id = ?1")
     void markAsDeletedById(int id);
 
+    @NonNull
     @Override
     Page<LessonEntity> findAll(Specification<LessonEntity> specification, @NonNull Pageable pageable);
 
@@ -33,7 +33,7 @@ public interface LessonRepository extends JpaRepository<LessonEntity, Integer>, 
                                                                               final String danceStyleName,
                                                                               final String date) {
         return (root, query, criteriaBuilder) -> {
-            final Predicate trainerNamePredicate = Strings.isBlank(trainerName) ? null : criteriaBuilder.or(
+            final Predicate trainerNamePredicate = trainerName.isBlank() ? null : criteriaBuilder.or(
                     criteriaBuilder.like(
                             root.join("userTrainer", JoinType.LEFT)
                                     .get("firstName"), "%" + trainerName + "%"),
@@ -41,11 +41,11 @@ public interface LessonRepository extends JpaRepository<LessonEntity, Integer>, 
                             root.join("userTrainer", JoinType.LEFT)
                                     .get("lastName"), "%" + trainerName + "%"));
 
-            final Predicate danceStyleNamePredicate = Strings.isBlank(danceStyleName) ? null : criteriaBuilder.like(
+            final Predicate danceStyleNamePredicate = danceStyleName.isBlank() ? null : criteriaBuilder.like(
                     root.join("danceStyle", JoinType.LEFT)
                             .get("name"), "%" + danceStyleName + "%");
 
-            final Predicate startDatetimePredicate = Strings.isBlank(date) ? null : criteriaBuilder.equal(
+            final Predicate startDatetimePredicate = date.isBlank() ? null : criteriaBuilder.equal(
                     root.get("startDatetime").as(LocalDate.class), LocalDate.parse(date));
 
             final Predicate[] objects = Stream.of(trainerNamePredicate, danceStyleNamePredicate, startDatetimePredicate)

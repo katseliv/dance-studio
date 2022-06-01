@@ -2,7 +2,7 @@ package com.dataart.dancestudio.rest;
 
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
-import com.dataart.dancestudio.service.PaginationService;
+import com.dataart.dancestudio.service.LessonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,12 +13,12 @@ import java.util.Map;
 @RequestMapping("/api/v1/trainers")
 public class TrainerRestController {
 
-    private final PaginationService<LessonViewDto> lessonPaginationService;
+    private final LessonService lessonService;
 
     @GetMapping(path = "/{id}/lessons")
     public ViewListPage<LessonViewDto> getTrainerLessons(@RequestParam(required = false) final Map<String, String> allParams,
                                                          @PathVariable final int id) {
-        return lessonPaginationService.getUserViewListPage(id, allParams.get("page"), allParams.get("size"));
+        return lessonService.getUserViewListPage(id, allParams.get("page"), allParams.get("size"));
     }
 
 }

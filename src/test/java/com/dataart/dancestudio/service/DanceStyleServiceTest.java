@@ -61,7 +61,7 @@ public class DanceStyleServiceTest {
         when(danceStyleRepositoryMock.findAll(eq(pageable))).thenReturn(danceStyleEntities);
 
         // when
-        final List<DanceStyleViewDto> danceStyleViewDtoListActual = danceStyleServiceImpl.listEntities(pageable);
+        final List<DanceStyleViewDto> danceStyleViewDtoListActual = danceStyleServiceImpl.listDanceStyles(pageable);
 
         // then
         verify(danceStyleRepositoryMock, times(1)).findAll(eq(pageable));
@@ -81,7 +81,7 @@ public class DanceStyleServiceTest {
         when(danceStyleRepositoryMock.findAll(eq(pageable))).thenReturn(danceStyleEntities);
 
         // when
-        final List<DanceStyleViewDto> danceStyleViewDtoListActual = danceStyleServiceImpl.listEntities(pageable);
+        final List<DanceStyleViewDto> danceStyleViewDtoListActual = danceStyleServiceImpl.listDanceStyles(pageable);
 
         // then
         verify(danceStyleRepositoryMock, times(1)).findAll(eq(pageable));
@@ -96,7 +96,7 @@ public class DanceStyleServiceTest {
         when(danceStyleRepositoryMock.count()).thenReturn((long) amountExpected);
 
         // when
-        final int amountActual = danceStyleServiceImpl.numberOfEntities();
+        final int amountActual = danceStyleServiceImpl.numberOfDanceStyles();
 
         // then
         verify(danceStyleRepositoryMock, times(1)).count();
@@ -111,7 +111,7 @@ public class DanceStyleServiceTest {
         when(danceStyleRepositoryMock.count()).thenReturn((long) amountExpected);
 
         // when
-        final int amountActual = danceStyleServiceImpl.numberOfEntities();
+        final int amountActual = danceStyleServiceImpl.numberOfDanceStyles();
 
         // then
         verify(danceStyleRepositoryMock, times(1)).count();
