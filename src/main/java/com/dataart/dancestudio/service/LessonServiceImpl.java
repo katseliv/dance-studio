@@ -172,6 +172,7 @@ public class LessonServiceImpl implements LessonService, PaginationService<Lesso
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ViewListPage<LessonViewDto> getUserViewListPage(final int id, final String page, final String size) {
         final int pageNumber = Optional.ofNullable(page).map(Integer::parseInt).orElse(defaultPageNumber);
         final int pageSize = Optional.ofNullable(size).map(Integer::parseInt).orElse(defaultPageSize);
@@ -184,6 +185,7 @@ public class LessonServiceImpl implements LessonService, PaginationService<Lesso
     }
 
     @Override
+    @Transactional(readOnly = true)
     public FilteredViewListPage<LessonViewDto> getFilteredLessonViewListPage(final String page, final String size, final String trainerName,
                                                                              final String danceStyleName, final String date) {
         final int pageNumber = Optional.ofNullable(page).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
