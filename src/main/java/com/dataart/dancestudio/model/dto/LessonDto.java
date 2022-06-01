@@ -4,6 +4,7 @@ import com.dataart.dancestudio.annotation.DatetimeValid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -14,6 +15,7 @@ import javax.validation.constraints.Positive;
 
 @DatetimeValid
 @Getter
+@Builder
 @EqualsAndHashCode
 @AllArgsConstructor
 @JsonDeserialize(builder = LessonDto.LessonDtoBuilder.class)
@@ -42,56 +44,6 @@ public class LessonDto {
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class LessonDtoBuilder {
-
-        private Integer userTrainerId;
-        private Integer danceStyleId;
-        private String startDatetime;
-        private Integer duration;
-        private Integer roomId;
-        private String timeZone;
-
-        private boolean isUsed = false;
-
-        public LessonDtoBuilder() {
-        }
-
-        public LessonDtoBuilder userTrainerId(final Integer userTrainerId) {
-            this.userTrainerId = userTrainerId;
-            return this;
-        }
-
-        public LessonDtoBuilder danceStyleId(final Integer danceStyleId) {
-            this.danceStyleId = danceStyleId;
-            return this;
-        }
-
-        public LessonDtoBuilder startDatetime(final String startDatetime) {
-            this.startDatetime = startDatetime;
-            return this;
-        }
-
-        public LessonDtoBuilder duration(final Integer duration) {
-            this.duration = duration;
-            return this;
-        }
-
-        public LessonDtoBuilder roomId(final Integer roomId) {
-            this.roomId = roomId;
-            return this;
-        }
-
-        public LessonDtoBuilder timeZone(final String timeZone) {
-            this.timeZone = timeZone;
-            return this;
-        }
-
-        public LessonDto build() {
-            if (!isUsed) {
-                isUsed = true;
-                return new LessonDto(userTrainerId, danceStyleId, startDatetime, duration, roomId, timeZone);
-            }
-            throw new RuntimeException("Builder already built");
-        }
 
     }
 
