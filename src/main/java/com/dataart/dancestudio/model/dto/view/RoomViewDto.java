@@ -4,6 +4,7 @@ import lombok.*;
 
 @Getter
 @Builder
+@ToString
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RoomViewDto {

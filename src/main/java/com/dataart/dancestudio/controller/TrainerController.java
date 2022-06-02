@@ -4,7 +4,6 @@ import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
 import com.dataart.dancestudio.service.LessonService;
-import com.dataart.dancestudio.service.PaginationService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;

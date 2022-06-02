@@ -3,10 +3,7 @@ package com.dataart.dancestudio.model.dto;
 import com.dataart.dancestudio.annotation.DatetimeValid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -16,6 +13,7 @@ import javax.validation.constraints.Positive;
 @DatetimeValid
 @Getter
 @Builder
+@ToString
 @EqualsAndHashCode
 @AllArgsConstructor
 @JsonDeserialize(builder = LessonDto.LessonDtoBuilder.class)

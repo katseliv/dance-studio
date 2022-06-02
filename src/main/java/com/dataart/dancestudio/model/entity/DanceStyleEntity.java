@@ -6,8 +6,8 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@ToString
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "dance_styles")
