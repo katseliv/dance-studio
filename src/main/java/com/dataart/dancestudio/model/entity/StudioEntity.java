@@ -7,8 +7,8 @@ import java.time.LocalTime;
 
 @Getter
 @Setter
-@ToString
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "studios")

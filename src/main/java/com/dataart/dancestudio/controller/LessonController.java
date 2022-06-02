@@ -46,14 +46,7 @@ public class LessonController {
                                final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             prepareModel(allParams, model);
-            if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
-                return "forms/trainer_lesson_form";
-            } else {
-                final ViewListPage<UserForListDto> userViewListPage = userService
-                        .getViewListPage(allParams.get("page"), allParams.get("size"));
-                model.addAttribute("trainers", userViewListPage.getViewDtoList());
-                return "forms/lesson_form";
-            }
+            return getFormCreateTemplate(allParams, model);
         }
         final int id = lessonService.createLesson(lessonDto);
         return "redirect:/lessons/" + id;
@@ -63,14 +56,7 @@ public class LessonController {
     public String createLesson(@RequestParam(required = false) final Map<String, String> allParams, final Model model) {
         prepareModel(allParams, model);
         model.addAttribute("lesson", LessonDto.builder().build());
-        if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
-            return "forms/trainer_lesson_form";
-        } else {
-            final ViewListPage<UserForListDto> userViewListPage = userService
-                    .getViewListPage(allParams.get("page"), allParams.get("size"));
-            model.addAttribute("trainers", userViewListPage.getViewDtoList());
-            return "forms/lesson_form";
-        }
+        return getFormCreateTemplate(allParams, model);
     }
 
     @GetMapping("/{id}")
@@ -90,14 +76,7 @@ public class LessonController {
                                final Model model, final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             prepareModel(allParams, model);
-            if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
-                return "forms/trainer_lesson_edit";
-            } else {
-                final ViewListPage<UserForListDto> userViewListPage = userService
-                        .getViewListPage(allParams.get("page"), allParams.get("size"));
-                model.addAttribute("trainers", userViewListPage.getViewDtoList());
-                return "forms/lesson_edit";
-            }
+            return getFormEditTemplate(allParams, model);
         }
         lessonService.updateLessonById(lessonDto, id);
         return "redirect:/lessons/" + id;
@@ -108,14 +87,7 @@ public class LessonController {
                                @PathVariable final int id, final Model model) {
         prepareModel(allParams, model);
         model.addAttribute("lesson", lessonService.getLessonById(id));
-        if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
-            return "forms/trainer_lesson_edit";
-        } else {
-            final ViewListPage<UserForListDto> userViewListPage = userService
-                    .getViewListPage(allParams.get("page"), allParams.get("size"));
-            model.addAttribute("trainers", userViewListPage.getViewDtoList());
-            return "forms/lesson_edit";
-        }
+        return getFormEditTemplate(allParams, model);
     }
 
     @DeleteMapping("/{id}")
@@ -148,6 +120,30 @@ public class LessonController {
             return "lists/admin_lesson_list";
         } else {
             return "lists/user_lesson_list";
+        }
+    }
+
+    private String getFormCreateTemplate(@RequestParam(required = false) final Map<String, String> allParams, final Model model) {
+        if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
+            return "forms/trainer_lesson_form";
+        } else {
+            final int pageNumber = Optional.ofNullable(allParams.get("page")).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
+            final int pageSize = Optional.ofNullable(allParams.get("size")).map(ParseUtils::parsePositiveInteger).orElse(defaultPageSize);
+            final List<UserForListDto> userForListDtoList = userService.listTrainers(PageRequest.of(pageNumber, pageSize));
+            model.addAttribute("trainers", userForListDtoList);
+            return "forms/lesson_form";
+        }
+    }
+
+    private String getFormEditTemplate(@RequestParam(required = false) final Map<String, String> allParams, final Model model) {
+        if (securityContextFacade.getContext().getAuthentication().getAuthorities().contains(Role.TRAINER)) {
+            return "forms/trainer_lesson_edit";
+        } else {
+            final int pageNumber = Optional.ofNullable(allParams.get("page")).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
+            final int pageSize = Optional.ofNullable(allParams.get("size")).map(ParseUtils::parsePositiveInteger).orElse(defaultPageSize);
+            final List<UserForListDto> userForListDtoList = userService.listTrainers(PageRequest.of(pageNumber, pageSize));
+            model.addAttribute("trainers", userForListDtoList);
+            return "forms/lesson_edit";
         }
     }
 
