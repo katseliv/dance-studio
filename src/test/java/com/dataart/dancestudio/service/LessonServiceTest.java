@@ -158,6 +158,21 @@ public class LessonServiceTest {
     }
 
     @Test
+    public void createLessonWhenLessonIsNull() {
+        // given
+        when(lessonMapperImpl.lessonDtoToLessonEntity(lessonDto)).thenReturn(lessonEntity);
+        when(userRepositoryMock.findById(lessonDto.getUserTrainerId()))
+                .thenReturn(Optional.of(UserEntity.builder().role(Role.TRAINER).build()));
+        when(lessonRepositoryMock.save(lessonEntity)).thenReturn(null);
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityCreationException.class,
+                () -> lessonServiceImpl.createLesson(lessonDto));
+        verify(lessonRepositoryMock, times(1)).save(lessonEntity);
+        assertEquals(actualException.getMessage(), "Lesson hasn't been created!");
+    }
+
+    @Test
     public void getLessonById() {
         // given
         final LessonDto lessonDtoWithUTCStartDatetime = LessonDto.builder()

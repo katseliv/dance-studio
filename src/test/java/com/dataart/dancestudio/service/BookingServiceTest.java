@@ -165,6 +165,21 @@ public class BookingServiceTest {
     }
 
     @Test
+    public void createBookingWhenBookingIsNull() {
+        // given
+        when(bookingMapperImpl.bookingDtoToBookingEntity(bookingDto)).thenReturn(bookingEntity);
+        when(lessonRepositoryMock.findById(lessonId)).thenReturn(Optional.of(lessonEntity));
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userEntity));
+        when(bookingRepositoryMock.save(bookingEntity)).thenReturn(null);
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityCreationException.class,
+                () -> bookingServiceImpl.createBooking(bookingDto));
+        verify(bookingRepositoryMock, times(1)).save(bookingEntity);
+        assertEquals(actualException.getMessage(), "Booking not created!");
+    }
+
+    @Test
     public void getBookingById() {
         // given
         when(bookingMapperImpl.bookingEntityToBookingDto(bookingEntity)).thenReturn(bookingDto);
