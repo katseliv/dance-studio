@@ -114,6 +114,20 @@ public class JwtTokenServiceTest {
     }
 
     @Test
+    public void createJwtTokenWhenJwtTokenIsNull() {
+        // given
+        when(userRepositoryMock.findByEmail(jwtTokenDto.getEmail())).thenReturn(Optional.ofNullable(userEntity));
+        when(jwtTokenMapperImpl.jwtTokenDtoToJwtTokenEntity(jwtTokenDto)).thenReturn(jwtTokenEntity);
+        when(jwtTokenRepositoryMock.save(jwtTokenEntity)).thenReturn(null);
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityCreationException.class,
+                () -> jwtTokenServiceImpl.createJwtToken(jwtTokenDto));
+        verify(jwtTokenRepositoryMock, times(1)).save(jwtTokenEntity);
+        assertEquals(actualException.getMessage(), "Token not created!");
+    }
+
+    @Test
     public void getJwtTokenByEmailAndType() {
         // given
         when(jwtTokenRepositoryMock.findByUserEmailAndType(email, JwtTokenType.ACCESS)).thenReturn(Optional.of(jwtTokenEntity));

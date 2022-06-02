@@ -14,6 +14,7 @@ import com.dataart.dancestudio.model.dto.view.ViewListPage;
 import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
+import com.dataart.dancestudio.utils.ParseUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -171,8 +172,8 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
     @Override
     @Transactional(readOnly = true)
     public ViewListPage<UserForListDto> getViewListPage(final String page, final String size) {
-        final int pageNumber = Optional.ofNullable(page).map(Integer::parseInt).orElse(defaultPageNumber);
-        final int pageSize = Optional.ofNullable(size).map(Integer::parseInt).orElse(defaultPageSize);
+        final int pageNumber = Optional.ofNullable(page).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
+        final int pageSize = Optional.ofNullable(size).map(ParseUtils::parsePositiveInteger).orElse(defaultPageSize);
 
         final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         final List<UserForListDto> listBookings = listUsers(pageable);
