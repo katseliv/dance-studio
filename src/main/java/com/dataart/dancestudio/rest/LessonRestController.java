@@ -44,7 +44,7 @@ public class LessonRestController {
     @GetMapping
     public FilteredViewListPage<LessonViewDto> getLessons(@RequestParam(required = false) final Map<String, String> allParams) {
         return lessonService.getFilteredLessonViewListPage(allParams.get("page"), allParams.get("size"),
-                        allParams.get("trainerName"), allParams.get("styleName"), allParams.get("date"));
+                        allParams.get("trainerName"), allParams.get("danceStyleName"), allParams.get("date"));
     }
 
 }

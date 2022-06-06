@@ -1,6 +1,6 @@
 package com.dataart.dancestudio.validator;
 
-import com.dataart.dancestudio.annotation.DatetimeValid;
+import com.dataart.dancestudio.annotation.LessonStartDatetimeValid;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -14,7 +14,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatetimeValidator implements ConstraintValidator<DatetimeValid, LessonDto> {
+public class LessonStartDatetimeValidator implements ConstraintValidator<LessonStartDatetimeValid, LessonDto> {
 
     @Value("${datetime.limitDays}")
     private int limitDays;

@@ -74,18 +74,14 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     @Override
     @Transactional(readOnly = true)
     public boolean existsByUserEmail(final String email) {
-        final boolean existsByUserEmail = existsByUserEmailAndType(email, JwtTokenType.ACCESS)
-                && existsByUserEmailAndType(email, JwtTokenType.REFRESH);
+        final boolean existsByUserEmail = jwtTokenRepository.existsByUserEmailAndType(email, JwtTokenType.ACCESS)
+                && jwtTokenRepository.existsByUserEmailAndType(email, JwtTokenType.REFRESH);
         if (existsByUserEmail) {
             log.info("Tokens for email = {} exist.", email);
         } else {
             log.warn("Tokens for email = {} don't exist.", email);
         }
         return existsByUserEmail;
-    }
-
-    private boolean existsByUserEmailAndType(final String email, final JwtTokenType type) {
-        return jwtTokenRepository.existsByUserEmailAndType(email, type);
     }
 
     @Override
@@ -105,19 +101,16 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     @Override
     @Transactional
     public void deleteJwtTokensByEmail(final String email) {
-        if (existsByUserEmailAndType(email, JwtTokenType.ACCESS) && existsByUserEmailAndType(email, JwtTokenType.REFRESH)) {
+        if (jwtTokenRepository.existsByUserEmailAndType(email, JwtTokenType.ACCESS)
+                && jwtTokenRepository.existsByUserEmailAndType(email, JwtTokenType.REFRESH)) {
             log.info("Tokens for email = {} have been found.", email);
         } else {
             log.warn("Tokens for email = {} haven't been found.", email);
             throw new EntityNotFoundException("Tokens not found!");
         }
-        deleteJwtTokenByEmail(email, JwtTokenType.ACCESS);
-        deleteJwtTokenByEmail(email, JwtTokenType.REFRESH);
+        jwtTokenRepository.markAsDeletedByUserEmailAndType(email, JwtTokenType.ACCESS);
+        jwtTokenRepository.markAsDeletedByUserEmailAndType(email, JwtTokenType.REFRESH);
         log.info("Tokens for email = {} have been deleted.", email);
-    }
-
-    private void deleteJwtTokenByEmail(final String email, final JwtTokenType type) {
-        jwtTokenRepository.markAsDeletedByUserEmailAndType(email, type);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.dataart.dancestudio.model.dto;
 
-import com.dataart.dancestudio.annotation.DatetimeValid;
+import com.dataart.dancestudio.annotation.LessonStartDatetimeValid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.*;
@@ -10,7 +10,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-@DatetimeValid
+@LessonStartDatetimeValid
 @Getter
 @Builder
 @ToString

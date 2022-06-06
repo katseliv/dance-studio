@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -302,8 +301,8 @@ public class LessonServiceTest {
         final String trainerName = "";
         final String danceStyleName = "";
         final String date = "";
-        final List<LessonViewDto> lessonViewDtoListExpected = new ArrayList<>();
-        final Page<LessonEntity> lessonEntities = new PageImpl<>(new ArrayList<>());
+        final List<LessonViewDto> lessonViewDtoListExpected = List.of();
+        final Page<LessonEntity> lessonEntities = new PageImpl<>(List.of());
         final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         when(lessonRepositoryMock.findAll((Specification<LessonEntity>) any(), eq(pageable))).thenReturn(lessonEntities);
@@ -363,8 +362,8 @@ public class LessonServiceTest {
         final int pageNumber = 1;
         final int pageSize = 5;
 
-        final List<LessonViewDto> lessonViewDtoListExpected = new ArrayList<>();
-        final List<LessonEntity> lessonEntities = new ArrayList<>();
+        final List<LessonViewDto> lessonViewDtoListExpected = List.of();
+        final List<LessonEntity> lessonEntities = List.of();
         final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         final int userId = 1;

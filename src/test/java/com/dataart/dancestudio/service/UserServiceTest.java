@@ -26,7 +26,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -626,8 +625,8 @@ public class UserServiceTest {
         final int pageNumber = 1;
         final int pageSize = 5;
 
-        final List<UserForListDto> userViewDtoListExpected = new ArrayList<>();
-        final List<UserEntity> userEntities = new ArrayList<>();
+        final List<UserForListDto> userViewDtoListExpected = List.of();
+        final List<UserEntity> userEntities = List.of();
         final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         when(userRepositoryMock.findAllByRole(Role.TRAINER, pageable)).thenReturn(userEntities);
@@ -686,8 +685,8 @@ public class UserServiceTest {
         final int pageNumber = 1;
         final int pageSize = 5;
 
-        final List<UserForListDto> userViewDtoListExpected = new ArrayList<>();
-        final Page<UserEntity> userEntities = new PageImpl<>(new ArrayList<>());
+        final List<UserForListDto> userViewDtoListExpected = List.of();
+        final Page<UserEntity> userEntities = new PageImpl<>(List.of());
         final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         when(userRepositoryMock.findAll(pageable)).thenReturn(userEntities);

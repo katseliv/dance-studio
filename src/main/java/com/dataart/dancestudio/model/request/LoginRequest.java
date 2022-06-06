@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.*;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -17,6 +18,7 @@ public class LoginRequest {
 
     @NotNull(message = "Email is null.")
     @NotBlank(message = "Email is blank.")
+    @Email(message = "Email invalid.")
     private String email;
 
     @NotNull(message = "Password is null.")
