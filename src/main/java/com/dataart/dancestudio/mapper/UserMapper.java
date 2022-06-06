@@ -36,6 +36,7 @@ public interface UserMapper {
         return List.of(role);
     }
 
+    @Mapping(target = "password", source = "password")
     UserEntity userRegistrationDtoToUserEntityWithPassword(UserRegistrationDto dto, String password);
 
     @Mapping(target = "image", source = "base64StringImage", qualifiedByName = "base64StringImage")

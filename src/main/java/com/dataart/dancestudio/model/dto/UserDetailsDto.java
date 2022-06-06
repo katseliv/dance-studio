@@ -25,10 +25,6 @@ public class UserDetailsDto implements UserDetails {
     private final List<Role> roles;
     private final String password;
 
-    public static UserDetailsDtoBuilder builder() {
-        return new UserDetailsDtoBuilder();
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return getRoles();
