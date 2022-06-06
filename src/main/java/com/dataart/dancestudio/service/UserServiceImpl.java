@@ -49,21 +49,18 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
     @Transactional
     public int createUser(final UserRegistrationDto userRegistrationDto) {
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isPresent()) {
-            log.warn("User hasn't been created.");
+            log.warn("User with email = {} hasn't been created. Such user already exists!", userRegistrationDto.getEmail());
             throw new EntityAlreadyExistsException("User already exists in the database!");
         }
+        final String password = passwordEncoder.encode(userRegistrationDto.getPassword());
         final UserEntity userEntity = Optional.of(userRegistrationDto)
-                .map(user -> {
-                    final String password = passwordEncoder.encode(userRegistrationDto.getPassword());
-                    return userMapper.userRegistrationDtoToUserEntityWithPassword(user, password);
-                })
+                .map(user -> userMapper.userRegistrationDtoToUserEntityWithPassword(user, password))
                 .map(user -> {
                     user.setImage(new byte[0]);
                     user.setRole(Role.USER);
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new EntityCreationException("User not created!"));
-
         log.info("User with id = {} has been created.", userEntity.getId());
         return userEntity.getId();
     }
@@ -138,35 +135,11 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
                     throw new EntityNotFoundException("User not found!");
                 });
         if (lessonService.numberOfUserLessons(id) > 0) {
-            log.warn("User with id = {} hasn't been deleted.", id);
+            log.warn("User with id = {} hasn't been deleted. User has lessons!", id);
             throw new UserCanNotBeDeletedException("User has lessons!");
         }
         userRepository.markAsDeletedById(id);
         log.info("User with id = {} has been deleted.", id);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<UserForListDto> listTrainers(final Pageable pageable) {
-        final List<UserEntity> userEntities = userRepository.findAllByRole(Role.TRAINER, pageable);
-        log.info("There have been found {} trainers.", userEntities.size());
-        return userMapper.userEntitiesToUserViewDtoList(userEntities);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<UserForListDto> listUsers(final Pageable pageable) {
-        final List<UserEntity> userEntities = userRepository.findAll(pageable).getContent();
-        log.info("There have been found {} users.", userEntities.size());
-        return userMapper.userEntitiesToUserViewDtoList(userEntities);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public int numberOfUsers() {
-        final long numberOfUsers = userRepository.count();
-        log.info("There have been found {} users.", numberOfUsers);
-        return (int) numberOfUsers;
     }
 
     @Override
@@ -180,6 +153,28 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
         final int totalAmount = numberOfUsers();
 
         return getViewListPage(totalAmount, pageSize, pageNumber, listBookings);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserForListDto> listTrainers(final Pageable pageable) {
+        final List<UserEntity> userEntities = userRepository.findAllByRole(Role.TRAINER, pageable);
+        log.info("There have been found {} trainers.", userEntities.size());
+        return userMapper.userEntitiesToUserViewDtoList(userEntities);
+    }
+
+    @Override
+    public List<UserForListDto> listUsers(final Pageable pageable) {
+        final List<UserEntity> userEntities = userRepository.findAll(pageable).getContent();
+        log.info("There have been found {} users.", userEntities.size());
+        return userMapper.userEntitiesToUserViewDtoList(userEntities);
+    }
+
+    @Override
+    public int numberOfUsers() {
+        final long numberOfUsers = userRepository.count();
+        log.info("There have been found {} users.", numberOfUsers);
+        return (int) numberOfUsers;
     }
 
     @Override

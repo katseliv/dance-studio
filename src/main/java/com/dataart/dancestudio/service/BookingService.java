@@ -17,6 +17,10 @@ public interface BookingService {
 
     void deleteBookingById(int id);
 
+    ViewListPage<BookingViewDto> getViewListPage(String page, String size);
+
+    ViewListPage<BookingViewDto> getUserViewListPage(int id, String page, String size);
+
     List<BookingViewDto> listBookings(Pageable pageable);
 
     int numberOfBookings();
@@ -24,9 +28,5 @@ public interface BookingService {
     List<BookingViewDto> listUserBookings(int userId, Pageable pageable);
 
     int numberOfUserBookings(int userId);
-
-    ViewListPage<BookingViewDto> getViewListPage(String page, String size);
-
-    ViewListPage<BookingViewDto> getUserViewListPage(int id, String page, String size);
 
 }

@@ -122,46 +122,6 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingViewDto> listBookings(final Pageable pageable) {
-        final List<BookingEntity> bookingEntities = bookingRepository.findAll(pageable).getContent();
-        log.info("There have been found {} bookings.", bookingEntities.size());
-        return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public int numberOfBookings() {
-        final long numberOfBookings = bookingRepository.count();
-        log.info("There have been found {} bookings.", numberOfBookings);
-        return (int) numberOfBookings;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<BookingViewDto> listUserBookings(final int userId, final Pageable pageable) {
-        final Optional<UserEntity> userEntity = userRepository.findById(userId);
-        userEntity.ifPresentOrElse(
-                (booking) -> log.info("User with id = {} has been found.", userId),
-                () -> {
-                    log.warn("User with id = {} hasn't been found.", userId);
-                    throw new EntityNotFoundException("User not found!");
-                });
-
-        final List<BookingEntity> bookingEntities = bookingRepository.findAllByUserId(userId, pageable);
-        log.info("There have been found {} bookings for userId {}.", bookingEntities.size(), userId);
-        return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public int numberOfUserBookings(final int userId) {
-        final int numberOfUserBookings = bookingRepository.countAllByUserId(userId);
-        log.info("There have been found {} bookings.", numberOfUserBookings);
-        return numberOfUserBookings;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public ViewListPage<BookingViewDto> getViewListPage(final String page, final String size) {
         final int pageNumber = Optional.ofNullable(page).map(ParseUtils::parsePositiveInteger).orElse(defaultPageNumber);
         final int pageSize = Optional.ofNullable(size).map(ParseUtils::parsePositiveInteger).orElse(defaultPageSize);
@@ -184,6 +144,42 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
         final int totalAmount = numberOfUserBookings(id);
 
         return getViewListPage(totalAmount, pageSize, pageNumber, listUserBookings);
+    }
+
+    @Override
+    public List<BookingViewDto> listBookings(final Pageable pageable) {
+        final List<BookingEntity> bookingEntities = bookingRepository.findAll(pageable).getContent();
+        log.info("There have been found {} bookings.", bookingEntities.size());
+        return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
+    }
+
+    @Override
+    public int numberOfBookings() {
+        final long numberOfBookings = bookingRepository.count();
+        log.info("There have been found {} bookings.", numberOfBookings);
+        return (int) numberOfBookings;
+    }
+
+    @Override
+    public List<BookingViewDto> listUserBookings(final int userId, final Pageable pageable) {
+        final Optional<UserEntity> userEntity = userRepository.findById(userId);
+        userEntity.ifPresentOrElse(
+                (booking) -> log.info("User with id = {} has been found.", userId),
+                () -> {
+                    log.warn("User with id = {} hasn't been found.", userId);
+                    throw new EntityNotFoundException("User not found!");
+                });
+
+        final List<BookingEntity> bookingEntities = bookingRepository.findAllByUserId(userId, pageable);
+        log.info("There have been found {} bookings for userId {}.", bookingEntities.size(), userId);
+        return bookingMapper.bookingEntitiesToBookingViewDtoList(bookingEntities);
+    }
+
+    @Override
+    public int numberOfUserBookings(final int userId) {
+        final int numberOfUserBookings = bookingRepository.countAllByUserId(userId);
+        log.info("There have been found {} bookings.", numberOfUserBookings);
+        return numberOfUserBookings;
     }
 
     @Override

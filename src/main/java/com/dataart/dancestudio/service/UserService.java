@@ -27,12 +27,12 @@ public interface UserService {
 
     void deleteUserById(int id) throws UserCanNotBeDeletedException;
 
+    ViewListPage<UserForListDto> getViewListPage(String page, String size);
+
     List<UserForListDto> listTrainers(Pageable pageable);
 
     List<UserForListDto> listUsers(Pageable pageable);
 
     int numberOfUsers();
-
-    ViewListPage<UserForListDto> getViewListPage(String page, String size);
 
 }

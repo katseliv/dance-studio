@@ -25,7 +25,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -283,8 +282,8 @@ public class BookingServiceTest {
         final int pageNumber = 1;
         final int pageSize = 5;
 
-        final List<BookingViewDto> bookingViewDtoListExpected = new ArrayList<>();
-        final Page<BookingEntity> bookingEntities = new PageImpl<>(new ArrayList<>());
+        final List<BookingViewDto> bookingViewDtoListExpected = List.of();
+        final Page<BookingEntity> bookingEntities = new PageImpl<>(List.of());
         final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         when(bookingRepositoryMock.findAll(eq(pageable))).thenReturn(bookingEntities);
@@ -343,8 +342,8 @@ public class BookingServiceTest {
         final int pageNumber = 1;
         final int pageSize = 5;
 
-        final List<BookingViewDto> bookingViewDtoListExpected = new ArrayList<>();
-        final List<BookingEntity> bookingEntities = new ArrayList<>();
+        final List<BookingViewDto> bookingViewDtoListExpected = List.of();
+        final List<BookingEntity> bookingEntities = List.of();
         final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         final int userId = 1;

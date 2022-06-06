@@ -22,6 +22,10 @@ public class UsernameValidator implements ConstraintValidator<UsernameValid, Str
         if (userRepository.existsByUsername(username)) {
             messages.add("Username exists.");
         }
+        final String messageTemplate = String.join(", ", messages);
+        context.buildConstraintViolationWithTemplate(messageTemplate)
+                .addConstraintViolation()
+                .disableDefaultConstraintViolation();
         return messages.size() == 0;
     }
 

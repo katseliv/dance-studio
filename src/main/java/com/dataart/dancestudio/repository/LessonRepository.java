@@ -1,6 +1,7 @@
 package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.LessonEntity;
+import com.dataart.dancestudio.utils.ParseUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,7 +34,7 @@ public interface LessonRepository extends JpaRepository<LessonEntity, Integer>, 
                                                                               final String danceStyleName,
                                                                               final String date) {
         return (root, query, criteriaBuilder) -> {
-            final Predicate trainerNamePredicate = trainerName.isBlank() ? null : criteriaBuilder.or(
+            final Predicate trainerNamePredicate = trainerName == null || trainerName.isBlank() ? null : criteriaBuilder.or(
                     criteriaBuilder.like(
                             root.join("userTrainer", JoinType.LEFT)
                                     .get("firstName"), "%" + trainerName + "%"),
@@ -41,11 +42,11 @@ public interface LessonRepository extends JpaRepository<LessonEntity, Integer>, 
                             root.join("userTrainer", JoinType.LEFT)
                                     .get("lastName"), "%" + trainerName + "%"));
 
-            final Predicate danceStyleNamePredicate = danceStyleName.isBlank() ? null : criteriaBuilder.like(
+            final Predicate danceStyleNamePredicate = danceStyleName == null || danceStyleName.isBlank() ? null : criteriaBuilder.like(
                     root.join("danceStyle", JoinType.LEFT)
                             .get("name"), "%" + danceStyleName + "%");
 
-            final Predicate startDatetimePredicate = date.isBlank() ? null : criteriaBuilder.equal(
+            final Predicate startDatetimePredicate = date == null || date.isBlank() || !ParseUtils.isDateStringParsed(date) ? null : criteriaBuilder.equal(
                     root.get("startDatetime").as(LocalDate.class), LocalDate.parse(date));
 
             final Predicate[] objects = Stream.of(trainerNamePredicate, danceStyleNamePredicate, startDatetimePredicate)

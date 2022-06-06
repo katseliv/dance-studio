@@ -15,7 +15,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -74,8 +73,8 @@ public class DanceStyleServiceTest {
         final int pageNumber = 1;
         final int pageSize = 5;
 
-        final List<DanceStyleViewDto> danceStyleViewDtoListExpected = new ArrayList<>();
-        final Page<DanceStyleEntity> danceStyleEntities = new PageImpl<>(new ArrayList<>());
+        final List<DanceStyleViewDto> danceStyleViewDtoListExpected = List.of();
+        final Page<DanceStyleEntity> danceStyleEntities = new PageImpl<>(List.of());
         final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         when(danceStyleRepositoryMock.findAll(eq(pageable))).thenReturn(danceStyleEntities);

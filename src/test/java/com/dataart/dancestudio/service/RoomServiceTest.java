@@ -16,7 +16,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,8 +82,8 @@ public class RoomServiceTest {
         final int pageNumber = 1;
         final int pageSize = 5;
 
-        final List<RoomViewDto> roomViewDtoListExpected = new ArrayList<>();
-        final Page<RoomEntity> roomEntities = new PageImpl<>(new ArrayList<>());
+        final List<RoomViewDto> roomViewDtoListExpected = List.of();
+        final Page<RoomEntity> roomEntities = new PageImpl<>(List.of());
         final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 
         when(roomRepositoryMock.findAll(eq(pageable))).thenReturn(roomEntities);

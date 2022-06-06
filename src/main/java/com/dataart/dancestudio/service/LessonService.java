@@ -20,6 +20,11 @@ public interface LessonService {
 
     void deleteLessonById(int id);
 
+    FilteredViewListPage<LessonViewDto> getFilteredLessonViewListPage(String page, String size, String trainerName,
+                                                                      String styleName, String date);
+
+    ViewListPage<LessonViewDto> getUserViewListPage(int id, String page, String size);
+
     List<LessonViewDto> listLessons(String trainerName, String danceStyleName, String date, Pageable pageable);
 
     int numberOfFilteredLessons(String trainerName, String danceStyleName, String date);
@@ -27,10 +32,5 @@ public interface LessonService {
     List<LessonViewDto> listUserLessons(int userId, Pageable pageable);
 
     int numberOfUserLessons(int userId);
-
-    ViewListPage<LessonViewDto> getUserViewListPage(int id, String page, String size);
-
-    FilteredViewListPage<LessonViewDto> getFilteredLessonViewListPage(String page, String size, String trainerName,
-                                                                      String styleName, String date);
 
 }
