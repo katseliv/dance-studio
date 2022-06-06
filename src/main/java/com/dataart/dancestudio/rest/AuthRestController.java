@@ -1,6 +1,8 @@
 package com.dataart.dancestudio.rest;
 
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
+import com.dataart.dancestudio.model.dto.UserRegistrationDto;
+import com.dataart.dancestudio.model.entity.Provider;
 import com.dataart.dancestudio.model.request.JwtRequest;
 import com.dataart.dancestudio.model.request.LoginRequest;
 import com.dataart.dancestudio.model.response.GoogleUserInfoResponse;
@@ -18,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.message.AuthException;
@@ -49,13 +50,25 @@ public class AuthRestController {
     public ResponseEntity<LoginResponse> authGoogleResponse(@RequestParam final String code) {
         final String accessToken = googleHttpService.getAccessToken(code);
         final GoogleUserInfoResponse googleUserInfoResponse = googleHttpService.getUserInfo(accessToken);
+        final String firstName = googleUserInfoResponse.getGivenName();
+        final String lastName = googleUserInfoResponse.getFamilyName();
         final String email = googleUserInfoResponse.getEmail();
-        try {
+        if (userService.existsByUserEmail(email)) {
             final UserDetailsDto userDetailsDto = userService.getUserByEmail(email);
             final LoginResponse loginResponse = authService.login(userDetailsDto);
             return new ResponseEntity<>(loginResponse, HttpStatus.OK);
-        } catch (final UsernameNotFoundException exception) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            final UserRegistrationDto userRegistrationDto = UserRegistrationDto.builder()
+                    .username(email)
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(email)
+                    .password("password")
+                    .build();
+            userService.createUser(userRegistrationDto, Provider.GOOGLE);
+            final UserDetailsDto userDetailsDto = userService.getUserByEmail(email);
+            final LoginResponse loginResponse = authService.login(userDetailsDto);
+            return new ResponseEntity<>(loginResponse, HttpStatus.CREATED);
         }
     }
 

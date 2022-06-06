@@ -8,13 +8,14 @@ import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
+import com.dataart.dancestudio.model.entity.Provider;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface UserService {
 
-    int createUser(UserRegistrationDto userRegistrationDto) throws EntityAlreadyExistsException;
+    int createUser(UserRegistrationDto userRegistrationDto, Provider provider) throws EntityAlreadyExistsException;
 
     UserDto getUserById(int id);
 
@@ -22,7 +23,9 @@ public interface UserService {
 
     int getUserIdByEmail(String email);
 
-    UserDetailsDto getUserByEmail(final String email);
+    UserDetailsDto getUserByEmail(String email);
+
+    boolean existsByUserEmail(String email);
 
     void updateUserById(UserDto userDto, int id);
 

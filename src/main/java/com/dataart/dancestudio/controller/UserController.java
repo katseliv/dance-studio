@@ -7,6 +7,7 @@ import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
+import com.dataart.dancestudio.model.entity.Provider;
 import com.dataart.dancestudio.service.BookingService;
 import com.dataart.dancestudio.service.UserService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
@@ -55,7 +56,7 @@ public class UserController {
             model.addAttribute("error", "Password wasn't confirmed");
             return "registration";
         }
-        final int id = userService.createUser(userRegistrationDto);
+        final int id = userService.createUser(userRegistrationDto, Provider.LOCAL);
         final UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(userRegistrationDto.getEmail(), userRegistrationDto.getPassword());
         final Authentication auth = authenticationManager.authenticate(token);
@@ -80,7 +81,7 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "forms/user_form";
         }
-        final int id = userService.createUser(userRegistrationDto);
+        final int id = userService.createUser(userRegistrationDto, Provider.LOCAL);
         return "redirect:/users/" + id;
     }
 

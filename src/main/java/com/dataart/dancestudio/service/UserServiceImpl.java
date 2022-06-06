@@ -11,6 +11,7 @@ import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
+import com.dataart.dancestudio.model.entity.Provider;
 import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
@@ -47,7 +48,7 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
 
     @Override
     @Transactional
-    public int createUser(final UserRegistrationDto userRegistrationDto) {
+    public int createUser(final UserRegistrationDto userRegistrationDto, final Provider provider) {
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isPresent()) {
             log.warn("User with email = {} hasn't been created. Such user already exists!", userRegistrationDto.getEmail());
             throw new EntityAlreadyExistsException("User already exists in the database!");
@@ -58,6 +59,7 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
                 .map(user -> {
                     user.setImage(new byte[0]);
                     user.setRole(Role.USER);
+                    user.setProvider(provider);
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new EntityCreationException("User not created!"));
@@ -106,6 +108,17 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
                 () -> log.warn("User for email = {} hasn't been found.", email));
         return userMapper.userEntityToUserDetailsDto(userEntity.orElseThrow(
                 () -> new UsernameNotFoundException("No such user in the database!")));
+    }
+
+    @Override
+    public boolean existsByUserEmail(final String email) {
+        if (userRepository.existsByEmail(email)) {
+            log.info("User with email = {} exists.", email);
+            return true;
+        } else {
+            log.warn("User with email = {} doesn't exist.", email);
+            return false;
+        }
     }
 
     @Override

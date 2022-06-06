@@ -10,6 +10,7 @@ import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
+import com.dataart.dancestudio.model.entity.Provider;
 import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
@@ -104,7 +105,7 @@ public class UserServiceTest {
         when(userRepositoryMock.save(userEntity)).thenReturn(userEntity);
 
         // when
-        final int userId = userServiceImpl.createUser(userRegistrationDto);
+        final int userId = userServiceImpl.createUser(userRegistrationDto, Provider.LOCAL);
 
         // then
         verify(userRepositoryMock, times(1)).save(userEntity);
@@ -145,7 +146,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.of(userEntity));
 
         // when
-        assertThrows(EntityAlreadyExistsException.class, () -> userServiceImpl.createUser(userRegistrationDto));
+        assertThrows(EntityAlreadyExistsException.class, () -> userServiceImpl.createUser(userRegistrationDto, Provider.LOCAL));
 
         // then
         verify(userMapperImpl, never()).userRegistrationDtoToUserEntityWithPassword(
@@ -191,7 +192,7 @@ public class UserServiceTest {
 
         // when then
         final var actualException = assertThrowsExactly(EntityCreationException.class,
-                () -> userServiceImpl.createUser(userRegistrationDto));
+                () -> userServiceImpl.createUser(userRegistrationDto, Provider.LOCAL));
         verify(userMapperImpl, times(1)).userRegistrationDtoToUserEntityWithPassword(
                 userRegistrationDto, userEntity.getPassword());
         verify(userRepositoryMock, times(1)).save(userEntity);
