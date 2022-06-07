@@ -28,8 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -138,7 +137,7 @@ public class LessonServiceTest {
         when(userRepositoryMock.findById(lessonDto.getUserTrainerId())).thenReturn(Optional.empty());
 
         // when
-        assertThrows(EntityCreationException.class, () -> lessonServiceImpl.createLesson(lessonDto));
+        assertThrows(EntityNotFoundException.class, () -> lessonServiceImpl.createLesson(lessonDto));
 
         // then
         verify(lessonMapperImpl, never()).lessonDtoToLessonEntity(lessonDto);
@@ -223,6 +222,7 @@ public class LessonServiceTest {
     public void updateLessonById() {
         // given
         when(lessonMapperImpl.lessonDtoToLessonEntity(newLessonDto)).thenReturn(newLessonEntity);
+        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(lessonEntity));
         when(lessonRepositoryMock.save(newLessonEntity)).thenReturn(newLessonEntity);
 
         // when
@@ -233,8 +233,21 @@ public class LessonServiceTest {
     }
 
     @Test
+    public void updateLessonByIdWhenLessonDoesNotExist() {
+        // given
+        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.empty());
+
+        // when
+        assertThrows(EntityNotFoundException.class, () -> lessonServiceImpl.updateLessonById(newLessonDto, id));
+
+        // then
+        verify(lessonRepositoryMock, never()).save(newLessonEntity);
+    }
+
+    @Test
     public void deleteLessonById() {
         // given
+        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(lessonEntity));
         doNothing().when(lessonRepositoryMock).markAsDeletedById(id);
 
         // when
@@ -242,6 +255,18 @@ public class LessonServiceTest {
 
         // then
         verify(lessonRepositoryMock, times(1)).markAsDeletedById(id);
+    }
+
+    @Test
+    public void deleteLessonByIdWhenLessonDoesNotExist() {
+        // given
+        when(lessonRepositoryMock.findById(id)).thenReturn(Optional.empty());
+
+        // when
+        assertThrows(EntityNotFoundException.class, () -> lessonServiceImpl.deleteLessonById(id));
+
+        // then
+        verify(lessonRepositoryMock, never()).markAsDeletedById(id);
     }
 
     @Test
@@ -268,6 +293,29 @@ public class LessonServiceTest {
     }
 
     @Test
+    public void emptyListLessons() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
+        final String trainerName = "";
+        final String danceStyleName = "";
+        final String date = "";
+        final List<LessonViewDto> lessonViewDtoListExpected = List.of();
+        final Page<LessonEntity> lessonEntities = new PageImpl<>(List.of());
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(lessonRepositoryMock.findAll((Specification<LessonEntity>) any(), eq(pageable))).thenReturn(lessonEntities);
+
+        // when
+        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listLessons(trainerName, danceStyleName, date, pageable);
+
+        // then
+        verify(lessonRepositoryMock, times(1)).findAll((Specification<LessonEntity>) any(), eq(pageable));
+        assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
+    }
+
+    @Test
     public void listUserLessons() {
         // given
         final int pageNumber = 1;
@@ -280,6 +328,48 @@ public class LessonServiceTest {
         final int userId = 1;
 
         when(lessonMapperImpl.lessonEntitiesToLessonViewDtoList(lessonEntities)).thenReturn(lessonViewDtoListExpected);
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.ofNullable(UserEntity.builder().build()));
+        when(lessonRepositoryMock.findAllByUserTrainerId(userId, pageable)).thenReturn(lessonEntities);
+
+        // when
+        final List<LessonViewDto> lessonViewDtoListActual = lessonServiceImpl.listUserLessons(userId, pageable);
+
+        // then
+        verify(lessonRepositoryMock, times(1)).findAllByUserTrainerId(userId, pageable);
+        assertEquals(lessonViewDtoListExpected, lessonViewDtoListActual);
+    }
+
+    @Test
+    public void listUserLessonsWhenUserDoesNotExist() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        final int userId = 1;
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.empty());
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityNotFoundException.class,
+                () -> lessonServiceImpl.listUserLessons(userId, pageable));
+        verify(bookingRepositoryMock, never()).findAllByUserId(userId, pageable);
+        assertEquals(actualException.getMessage(), "User not found!");
+    }
+
+    @Test
+    public void emptyListUserLessons() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
+        final List<LessonViewDto> lessonViewDtoListExpected = List.of();
+        final List<LessonEntity> lessonEntities = List.of();
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        final int userId = 1;
+
+        when(lessonMapperImpl.lessonEntitiesToLessonViewDtoList(lessonEntities)).thenReturn(lessonViewDtoListExpected);
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.ofNullable(UserEntity.builder().build()));
         when(lessonRepositoryMock.findAllByUserTrainerId(userId, pageable)).thenReturn(lessonEntities);
 
         // when
@@ -310,12 +400,49 @@ public class LessonServiceTest {
     }
 
     @Test
+    public void zeroNumberOfFilteredLessons() {
+        // given
+        final String trainerName = "";
+        final String danceStyleName = "";
+        final String date = "";
+        final int numberOfFilteredLessons = 0;
+        final int numberOfFilteredLessonsExpected = 0;
+
+        when(lessonRepositoryMock.count((Specification<LessonEntity>) any())).thenReturn((long) numberOfFilteredLessons);
+
+        // when
+        final int numberOfFilteredLessonsActual = lessonServiceImpl.numberOfFilteredLessons(trainerName, danceStyleName, date);
+
+        // then
+        verify(lessonRepositoryMock, times(1)).count((Specification<LessonEntity>) any());
+        assertEquals(numberOfFilteredLessonsExpected, numberOfFilteredLessonsActual);
+    }
+
+    @Test
     public void numberOfUserLessons() {
         final int userId = 1;
 
         // given
         final int numberOfUserLessons = 5;
         final int numberOfUserLessonsExpected = 5;
+
+        when(lessonRepositoryMock.countAllByUserTrainerId(userId)).thenReturn(numberOfUserLessons);
+
+        // when
+        final int numberOfFilteredLessonsActual = lessonServiceImpl.numberOfUserLessons(userId);
+
+        // then
+        verify(lessonRepositoryMock, times(1)).countAllByUserTrainerId(userId);
+        assertEquals(numberOfUserLessonsExpected, numberOfFilteredLessonsActual);
+    }
+
+    @Test
+    public void zeroNumberOfUserLessons() {
+        final int userId = 1;
+
+        // given
+        final int numberOfUserLessons = 0;
+        final int numberOfUserLessonsExpected = 0;
 
         when(lessonRepositoryMock.countAllByUserTrainerId(userId)).thenReturn(numberOfUserLessons);
 

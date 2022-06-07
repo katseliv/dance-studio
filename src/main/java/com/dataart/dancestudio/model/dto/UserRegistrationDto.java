@@ -2,123 +2,69 @@ package com.dataart.dancestudio.model.dto;
 
 import com.dataart.dancestudio.annotation.PasswordMatch;
 import com.dataart.dancestudio.annotation.PasswordValid;
+import com.dataart.dancestudio.annotation.TimeZoneValid;
+import com.dataart.dancestudio.annotation.UsernameValid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @PasswordMatch
 @Getter
+@Builder
+@ToString
 @EqualsAndHashCode
 @AllArgsConstructor
 @JsonDeserialize(builder = UserRegistrationDto.UserRegistrationDtoBuilder.class)
 public class UserRegistrationDto {
 
+    @NotNull(message = "Username is null.")
     @NotBlank(message = "Username is blank.")
+    @UsernameValid
+    @Pattern(regexp = ".*([A-Z]|[a-z]).*", message = "Username must contain a letter.")
     private final String username;
 
+    @NotNull(message = "First Name is null.")
     @NotBlank(message = "First Name is blank.")
+    @Pattern(regexp = "^([A-Z]|[a-z])+$", message = "First Name mustn't contain a number.")
     private final String firstName;
 
+    @NotNull(message = "Last Name is null.")
     @NotBlank(message = "Last Name is blank.")
+    @Pattern(regexp = "^([A-Z]|[a-z])+$", message = "Last Name mustn't contain a number.")
     private final String lastName;
 
+    @NotNull(message = "Email is null.")
     @NotBlank(message = "Email is blank.")
     @Email(message = "Email invalid.")
     private final String email;
 
+    @NotNull(message = "Phone Number is null.")
     @NotBlank(message = "Phone Number is blank.")
+    @Pattern(regexp = "^([0-9])+$", message = "Phone Number mustn't contain a letter.")
     @Size(min = 7, max = 11, message = "Phone Number is out of range {7, 11}.")
     private final String phoneNumber;
 
+    @NotNull(message = "Password is null.")
+    @NotBlank(message = "Password is blank.")
     @PasswordValid
     private final String password;
 
+    @NotNull(message = "Password Confirmation is null.")
+    @NotBlank(message = "Password Confirmation is blank.")
     @PasswordValid
     private final String passwordConfirmation;
-    private final Integer roleId;
-    private final String timeZone;
 
-    public static UserRegistrationDtoBuilder builder() {
-        return new UserRegistrationDtoBuilder();
-    }
+    @NotNull(message = "Role Id is null.")
+    @Positive(message = "Role Id is negative ot zero.")
+    private final Integer roleId;
+
+    @TimeZoneValid
+    private final String timeZone;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class UserRegistrationDtoBuilder {
-
-        private String username;
-        private String firstName;
-        private String lastName;
-        private String email;
-        private String phoneNumber;
-        private String password;
-        private String passwordConfirmation;
-        private Integer roleId;
-        private String timeZone;
-
-        private boolean isUsed;
-
-        public UserRegistrationDtoBuilder() {
-        }
-
-        public UserRegistrationDtoBuilder username(final String username) {
-            this.username = username;
-            return this;
-        }
-
-        public UserRegistrationDtoBuilder firstName(final String firstName) {
-            this.firstName = firstName;
-            return this;
-        }
-
-        public UserRegistrationDtoBuilder lastName(final String lastName) {
-            this.lastName = lastName;
-            return this;
-        }
-
-        public UserRegistrationDtoBuilder email(final String email) {
-            this.email = email;
-            return this;
-        }
-
-        public UserRegistrationDtoBuilder phoneNumber(final String phoneNumber) {
-            this.phoneNumber = phoneNumber;
-            return this;
-        }
-
-        public UserRegistrationDtoBuilder password(final String password) {
-            this.password = password;
-            return this;
-        }
-
-        public UserRegistrationDtoBuilder passwordConfirmation(final String passwordConfirmation) {
-            this.passwordConfirmation = passwordConfirmation;
-            return this;
-        }
-
-        public UserRegistrationDtoBuilder roleId(final Integer roleId) {
-            this.roleId = roleId;
-            return this;
-        }
-
-        public UserRegistrationDtoBuilder timeZone(final String timeZone) {
-            this.timeZone = timeZone;
-            return this;
-        }
-
-        public UserRegistrationDto build() {
-            if (!isUsed) {
-                isUsed = true;
-                return new UserRegistrationDto(username, firstName, lastName, email, phoneNumber, password,
-                        passwordConfirmation, roleId, timeZone);
-            }
-            throw new RuntimeException("Builder already built");
-        }
 
     }
 

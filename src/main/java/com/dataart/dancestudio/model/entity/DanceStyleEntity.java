@@ -6,12 +6,12 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@ToString
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "dance_styles", schema = "dancestudio")
 @Entity(name = "dance_styles")
+@Table(name = "dance_styles")
 public class DanceStyleEntity {
 
     @Id

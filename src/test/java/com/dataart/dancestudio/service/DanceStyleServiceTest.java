@@ -10,6 +10,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -46,18 +50,71 @@ public class DanceStyleServiceTest {
     @Test
     public void listDanceStyles() {
         // given
-        final List<DanceStyleViewDto> danceStyleViewDtoListExpected = List.of(danceStyleViewDto);
-        final List<DanceStyleEntity> danceStyleEntities = List.of(danceStyleEntity);
+        final int pageNumber = 1;
+        final int pageSize = 5;
 
-        when(danceStyleMapperImpl.danceStyleEntitiesToDanceStyleViewDtoList(danceStyleEntities)).thenReturn(danceStyleViewDtoListExpected);
-        when(danceStyleRepositoryMock.findAll()).thenReturn(danceStyleEntities);
+        final List<DanceStyleViewDto> danceStyleViewDtoListExpected = List.of(danceStyleViewDto);
+        final Page<DanceStyleEntity> danceStyleEntities = new PageImpl<>(List.of(danceStyleEntity));
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(danceStyleRepositoryMock.findAll(eq(pageable))).thenReturn(danceStyleEntities);
 
         // when
-        final List<DanceStyleViewDto> bookingViewDtoListActual = danceStyleServiceImpl.listDanceStyleViews();
+        final List<DanceStyleViewDto> danceStyleViewDtoListActual = danceStyleServiceImpl.listDanceStyles(pageable);
 
         // then
-        verify(danceStyleRepositoryMock, times(1)).findAll();
-        assertEquals(danceStyleViewDtoListExpected, bookingViewDtoListActual);
+        verify(danceStyleRepositoryMock, times(1)).findAll(eq(pageable));
+        assertEquals(danceStyleViewDtoListExpected, danceStyleViewDtoListActual);
+    }
+
+    @Test
+    public void emptyListDanceStyles() {
+        // given
+        final int pageNumber = 1;
+        final int pageSize = 5;
+
+        final List<DanceStyleViewDto> danceStyleViewDtoListExpected = List.of();
+        final Page<DanceStyleEntity> danceStyleEntities = new PageImpl<>(List.of());
+        final Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(danceStyleRepositoryMock.findAll(eq(pageable))).thenReturn(danceStyleEntities);
+
+        // when
+        final List<DanceStyleViewDto> danceStyleViewDtoListActual = danceStyleServiceImpl.listDanceStyles(pageable);
+
+        // then
+        verify(danceStyleRepositoryMock, times(1)).findAll(eq(pageable));
+        assertEquals(danceStyleViewDtoListExpected, danceStyleViewDtoListActual);
+    }
+
+    @Test
+    public void numberOfEntities() {
+        // given
+        final int amountExpected = 5;
+
+        when(danceStyleRepositoryMock.count()).thenReturn((long) amountExpected);
+
+        // when
+        final int amountActual = danceStyleServiceImpl.numberOfDanceStyles();
+
+        // then
+        verify(danceStyleRepositoryMock, times(1)).count();
+        assertEquals(amountExpected, amountActual);
+    }
+
+    @Test
+    public void zeroNumberOfEntities() {
+        // given
+        final int amountExpected = 0;
+
+        when(danceStyleRepositoryMock.count()).thenReturn((long) amountExpected);
+
+        // when
+        final int amountActual = danceStyleServiceImpl.numberOfDanceStyles();
+
+        // then
+        verify(danceStyleRepositoryMock, times(1)).count();
+        assertEquals(amountExpected, amountActual);
     }
 
 }

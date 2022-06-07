@@ -7,7 +7,7 @@ import com.dataart.dancestudio.model.response.JwtResponse;
 import com.dataart.dancestudio.model.response.LoginResponse;
 import com.dataart.dancestudio.service.AuthService;
 import com.dataart.dancestudio.utils.SecurityContextFacade;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.security.auth.message.AuthException;
+import javax.validation.Valid;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
 public class AuthRestController {
@@ -28,16 +30,8 @@ public class AuthRestController {
     private final SecurityContextFacade securityContextFacade;
     protected AuthenticationManager authenticationManager;
 
-    @Autowired
-    public AuthRestController(final AuthService authService, final SecurityContextFacade securityContextFacade,
-                              final AuthenticationManager authenticationManager) {
-        this.authService = authService;
-        this.securityContextFacade = securityContextFacade;
-        this.authenticationManager = authenticationManager;
-    }
-
     @PostMapping("/accessToken")
-    public ResponseEntity<LoginResponse> accessToken(@RequestBody final LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> accessToken(@RequestBody @Valid final LoginRequest loginRequest) {
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         securityContextFacade.getContext().setAuthentication(authentication);
@@ -48,7 +42,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/newAccessToken")
-    public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody final JwtRequest jwtRequest) throws AuthException {
+    public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody @Valid final JwtRequest jwtRequest) throws AuthException {
         final JwtResponse jwtResponse = authService.getNewAccessToken(jwtRequest.getRefreshToken());
         return new ResponseEntity<>(jwtResponse, HttpStatus.CREATED);
     }

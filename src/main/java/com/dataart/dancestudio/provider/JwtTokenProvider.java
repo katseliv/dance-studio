@@ -5,7 +5,6 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.entity.Role;
@@ -93,10 +92,8 @@ public class JwtTokenProvider implements Serializable {
             final JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret)).build();
             verifier.verify(token);
             return true;
-        } catch (final TokenExpiredException exception) {
-            return false;
         } catch (final JWTVerificationException exception) {
-            throw new JWTVerificationException("Token Invalid!");
+            return false;
         }
     }
 

@@ -1,24 +1,23 @@
 package com.dataart.dancestudio.controller;
 
 import com.dataart.dancestudio.model.dto.BookingDto;
+import com.dataart.dancestudio.model.dto.view.BookingViewDto;
+import com.dataart.dancestudio.model.dto.view.ViewListPage;
 import com.dataart.dancestudio.service.BookingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
+@RequiredArgsConstructor
 @Controller
 @RequestMapping("/bookings")
 public class BookingController {
 
     private final BookingService bookingService;
-
-    @Autowired
-    public BookingController(final BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
 
     @PostMapping("/create")
     public String createBooking(@ModelAttribute("booking") final BookingDto bookingDto) {
@@ -27,20 +26,22 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
-    public String getBooking(final Model model, @PathVariable final int id) {
+    public String getBooking(@PathVariable final int id, final Model model) {
         model.addAttribute("booking_view", bookingService.getBookingViewById(id));
         return "infos/booking_info";
     }
 
     @DeleteMapping("/{id}")
-    public String deleteBooking(final HttpSession session, @PathVariable final int id) {
+    public String deleteBooking(@PathVariable final int id, final HttpSession session) {
         bookingService.deleteBookingById(id);
         return "redirect:/users/" + session.getAttribute("userId") + "/bookings";
     }
 
     @GetMapping
-    public String getBookings(final Model model) {
-        model.addAttribute("bookings", bookingService.listBookings());
+    public String getBookings(@RequestParam(required = false) final Map<String, String> allParams, final Model model) {
+        final ViewListPage<BookingViewDto> bookingViewListPage = bookingService
+                .getViewListPage(allParams.get("page"), allParams.get("size"));
+        model.addAttribute("bookings", bookingViewListPage.getViewDtoList());
         return "lists/booking_list";
     }
 

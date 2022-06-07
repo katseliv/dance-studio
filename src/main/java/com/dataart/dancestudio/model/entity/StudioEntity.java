@@ -7,12 +7,12 @@ import java.time.LocalTime;
 
 @Getter
 @Setter
-@ToString
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "studios")
-@Table(name = "studios", schema = "dancestudio")
+@Table(name = "studios")
 public class StudioEntity {
 
     @Id

@@ -3,6 +3,7 @@ package com.dataart.dancestudio.mapper;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
+import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
@@ -35,6 +36,7 @@ public interface UserMapper {
         return List.of(role);
     }
 
+    @Mapping(target = "password", source = "password")
     UserEntity userRegistrationDtoToUserEntityWithPassword(UserRegistrationDto dto, String password);
 
     @Mapping(target = "image", source = "base64StringImage", qualifiedByName = "base64StringImage")
@@ -47,6 +49,6 @@ public interface UserMapper {
 
     void mergeUserEntityAndUserDtoWithoutPicture(@MappingTarget UserEntity entity, UserDto dto);
 
-    List<UserViewDto> userEntitiesToUserViewDtoList(Iterable<UserEntity> entities);
+    List<UserForListDto> userEntitiesToUserViewDtoList(Iterable<UserEntity> entities);
 
 }

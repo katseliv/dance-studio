@@ -11,12 +11,12 @@ spring:
   liquibase:
     change-log: classpath:db.migration.v1/changelog.yaml
   jpa:
-    open-in-view: on
     hibernate:
       ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
+        default_schema: dancestudio
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
   servlet:
     multipart:
@@ -27,3 +27,6 @@ spring:
         enabled: true
     pathmatch:
       matching-strategy: ant-path-matcher
+logging:
+  level:
+    org.springframework.web: DEBUG

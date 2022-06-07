@@ -3,38 +3,35 @@ package com.dataart.dancestudio.service;
 import com.dataart.dancestudio.mapper.RoomMapper;
 import com.dataart.dancestudio.model.dto.view.RoomViewDto;
 import com.dataart.dancestudio.model.entity.RoomEntity;
-import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.RoomRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Slf4j
-@Transactional
+@RequiredArgsConstructor
 @Service
 public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomMapper roomMapper;
 
-    @Autowired
-    public RoomServiceImpl(final RoomRepository roomRepository, final RoomMapper mapper) {
-        this.roomRepository = roomRepository;
-        this.roomMapper = mapper;
+    @Transactional(readOnly = true)
+    public List<RoomViewDto> listRooms(final Pageable pageable) {
+        final List<RoomEntity> roomEntities = roomRepository.findAll(pageable).getContent();
+        log.info("There have been found {} rooms.", roomEntities.size());
+        return roomMapper.roomEntitiesToRoomViewDtoList(roomEntities);
     }
 
-    @Override
-    public List<RoomViewDto> listRooms() {
-        final List<RoomEntity> roomEntities = roomRepository.findAll();
-        if (roomEntities.size() != 0) {
-            log.info("Rooms have been found.");
-        } else {
-            log.info("There haven't been rooms.");
-        }
-        return roomMapper.roomEntitiesToRoomViewDtoList(roomEntities);
+    @Transactional(readOnly = true)
+    public int numberOfRooms() {
+        final long numberOfRooms = roomRepository.count();
+        log.info("There have been found {} rooms.", numberOfRooms);
+        return (int) numberOfRooms;
     }
 
 }

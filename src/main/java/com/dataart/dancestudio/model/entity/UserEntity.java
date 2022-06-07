@@ -9,13 +9,13 @@ import java.util.Objects;
 
 @Getter
 @Setter
-@ToString
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity(name = "users")
 @Where(clause = "is_deleted = false")
-@Table(name = "users", schema = "dancestudio")
+@Entity(name = "users")
+@Table(name = "users")
 public class UserEntity {
 
     @Id

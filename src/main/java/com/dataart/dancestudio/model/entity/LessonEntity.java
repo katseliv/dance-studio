@@ -8,13 +8,13 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity(name = "lessons")
 @Where(clause = "is_deleted = false")
-@Table(name = "lessons", schema = "dancestudio")
+@Entity(name = "lessons")
+@Table(name = "lessons")
 public class LessonEntity {
 
     @Id

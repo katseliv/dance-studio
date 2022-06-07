@@ -2,6 +2,8 @@ package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.model.dto.BookingDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
+import com.dataart.dancestudio.model.dto.view.ViewListPage;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -15,8 +17,16 @@ public interface BookingService {
 
     void deleteBookingById(int id);
 
-    List<BookingViewDto> listBookings();
+    ViewListPage<BookingViewDto> getViewListPage(String page, String size);
 
-    List<BookingViewDto> listUserBookings(int userId);
+    ViewListPage<BookingViewDto> getUserViewListPage(int id, String page, String size);
+
+    List<BookingViewDto> listBookings(Pageable pageable);
+
+    int numberOfBookings();
+
+    List<BookingViewDto> listUserBookings(int userId, Pageable pageable);
+
+    int numberOfUserBookings(int userId);
 
 }

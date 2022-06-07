@@ -4,7 +4,7 @@ import com.dataart.dancestudio.filter.JwtTokenFilter;
 import com.dataart.dancestudio.mapper.UserMapper;
 import com.dataart.dancestudio.repository.UserRepository;
 import com.dataart.dancestudio.service.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -30,14 +31,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final JwtTokenFilter jwtTokenFilter;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-
-    @Autowired
-    public WebSecurityConfiguration(final JwtTokenFilter jwtTokenFilter, final UserRepository userRepository,
-                                    final UserMapper userMapper) {
-        this.jwtTokenFilter = jwtTokenFilter;
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
 
     @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {

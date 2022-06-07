@@ -7,13 +7,13 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@ToString
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity(name = "bookings")
 @Where(clause = "is_deleted = false")
-@Table(name = "bookings", schema = "dancestudio")
+@Entity(name = "bookings")
+@Table(name = "bookings")
 public class BookingEntity {
 
     @Id
