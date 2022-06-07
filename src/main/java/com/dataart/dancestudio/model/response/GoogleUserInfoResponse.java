@@ -1,6 +1,8 @@
 package com.dataart.dancestudio.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.*;
 
 @Getter
@@ -8,6 +10,7 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode
 @AllArgsConstructor
+@JsonDeserialize(builder = GoogleUserInfoResponse.GoogleUserInfoResponseBuilder.class)
 public class GoogleUserInfoResponse {
 
     private String sub;
@@ -21,5 +24,10 @@ public class GoogleUserInfoResponse {
     @JsonProperty("email_verified")
     private Boolean emailVerified;
     private String local;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class GoogleUserInfoResponseBuilder {
+
+    }
 
 }

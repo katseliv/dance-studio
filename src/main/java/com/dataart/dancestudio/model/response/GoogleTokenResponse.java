@@ -1,6 +1,8 @@
 package com.dataart.dancestudio.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.*;
 
 @Getter
@@ -8,6 +10,7 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode
 @AllArgsConstructor
+@JsonDeserialize(builder = GoogleTokenResponse.GoogleTokenResponseBuilder.class)
 public class GoogleTokenResponse {
 
     @JsonProperty("id_token")
@@ -22,5 +25,10 @@ public class GoogleTokenResponse {
     private final String scope;
     @JsonProperty("token_type")
     private final String tokenType;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class GoogleTokenResponseBuilder {
+
+    }
 
 }
