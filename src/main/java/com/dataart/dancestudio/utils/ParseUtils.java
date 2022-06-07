@@ -25,10 +25,9 @@ public class ParseUtils {
         return intValue;
     }
 
-    public static boolean isDateStringParsed(final String value) {
+    public static LocalDate parseDateString(final String value) {
         try {
-            LocalDate.parse(value);
-            return true;
+            return LocalDate.parse(value);
         } catch (final DateTimeParseException exception) {
             log.error("Can't parse input value {}", value);
             throw new ParseInputException("Invalid input string. Can't parse to date.");

@@ -46,8 +46,8 @@ public interface LessonRepository extends JpaRepository<LessonEntity, Integer>, 
                     root.join("danceStyle", JoinType.LEFT)
                             .get("name"), "%" + danceStyleName + "%");
 
-            final Predicate startDatetimePredicate = date == null || date.isBlank() || !ParseUtils.isDateStringParsed(date) ? null : criteriaBuilder.equal(
-                    root.get("startDatetime").as(LocalDate.class), LocalDate.parse(date));
+            final Predicate startDatetimePredicate = date == null || date.isBlank() ? null : criteriaBuilder.equal(
+                    root.get("startDatetime").as(LocalDate.class), ParseUtils.parseDateString(date));
 
             final Predicate[] objects = Stream.of(trainerNamePredicate, danceStyleNamePredicate, startDatetimePredicate)
                     .filter(Objects::nonNull)

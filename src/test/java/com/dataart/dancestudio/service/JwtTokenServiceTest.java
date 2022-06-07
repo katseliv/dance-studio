@@ -12,9 +12,8 @@ import com.dataart.dancestudio.repository.JwtTokenRepository;
 import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
+import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -225,14 +224,17 @@ public class JwtTokenServiceTest {
     @Test
     public void updateJwtToken() {
         // given
+        final ArgumentCaptor<JwtTokenEntity> jwtTokenEntityArgumentCaptor = ArgumentCaptor.forClass(JwtTokenEntity.class);
         when(jwtTokenRepositoryMock.findByUserEmailAndType(email, JwtTokenType.ACCESS)).thenReturn(Optional.ofNullable(jwtTokenEntity));
-        when(jwtTokenRepositoryMock.save(newJwtTokenEntity)).thenReturn(newJwtTokenEntity);
+        when(jwtTokenRepositoryMock.save(any(JwtTokenEntity.class))).thenReturn(newJwtTokenEntity);
 
         // when
         jwtTokenServiceImpl.updateJwtToken(newJwtTokenDto);
 
         // then
-        verify(jwtTokenRepositoryMock, times(1)).save(newJwtTokenEntity);
+        verify(jwtTokenRepositoryMock, times(1)).save(jwtTokenEntityArgumentCaptor.capture());
+        final JwtTokenEntity newJwtTokenEntityActual = jwtTokenEntityArgumentCaptor.getValue();
+        assertTrue(new ReflectionEquals(newJwtTokenEntity).matches(newJwtTokenEntityActual));
     }
 
     @Test
