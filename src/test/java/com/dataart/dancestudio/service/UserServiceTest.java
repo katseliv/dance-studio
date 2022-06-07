@@ -15,7 +15,10 @@ import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -35,9 +38,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
-
-    @Captor
-    ArgumentCaptor<UserEntity> userEntityArgumentCaptor;
 
     @Spy
     private UserMapperImpl userMapperImpl;
@@ -385,6 +385,7 @@ public class UserServiceTest {
     @Test
     public void updateUserByIdWithChangedFieldAndImage() {
         // given
+        final ArgumentCaptor<UserEntity> userEntityArgumentCaptor = ArgumentCaptor.forClass(UserEntity.class);
         final UserEntity userEntity = UserEntity.builder()
                 .username(username)
                 .firstName(firstName)
@@ -433,6 +434,7 @@ public class UserServiceTest {
     @Test
     public void updateUserByIdWithChangedFieldAndEmptyImage() throws IOException {
         // given
+        final ArgumentCaptor<UserEntity> userEntityArgumentCaptor = ArgumentCaptor.forClass(UserEntity.class);
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity newUserEntity = UserEntity.builder()

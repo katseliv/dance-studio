@@ -24,9 +24,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class JwtTokenServiceTest {
 
-    @Captor
-    ArgumentCaptor<JwtTokenEntity> jwtTokenEntityArgumentCaptor;
-
     @Spy
     private JwtTokenMapperImpl jwtTokenMapperImpl;
 
@@ -227,6 +224,7 @@ public class JwtTokenServiceTest {
     @Test
     public void updateJwtToken() {
         // given
+        final ArgumentCaptor<JwtTokenEntity> jwtTokenEntityArgumentCaptor = ArgumentCaptor.forClass(JwtTokenEntity.class);
         when(jwtTokenRepositoryMock.findByUserEmailAndType(email, JwtTokenType.ACCESS)).thenReturn(Optional.ofNullable(jwtTokenEntity));
         when(jwtTokenRepositoryMock.save(any(JwtTokenEntity.class))).thenReturn(newJwtTokenEntity);
 
