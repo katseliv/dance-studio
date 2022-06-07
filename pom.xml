@@ -227,7 +227,7 @@
                         <configuration>
                             <rules>
                                 <rule>
-                                    <!-- When code coverage is 90% and no class missed then consider for successful build -->
+                                    <!-- When code coverage is 80% and no class missed then consider for successful build -->
                                     <element>PACKAGE</element>
                                     <includes>
                                         <include>com.dataart.dancestudio.service</include>
@@ -236,7 +236,12 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.5</minimum>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

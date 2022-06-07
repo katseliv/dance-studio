@@ -15,9 +15,8 @@ import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
+import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,6 +35,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
+
+    @Captor
+    ArgumentCaptor<UserEntity> userEntityArgumentCaptor;
 
     @Spy
     private UserMapperImpl userMapperImpl;
@@ -417,13 +419,15 @@ public class UserServiceTest {
                 .build();
 
         when(userRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(userEntity));
-        when(userRepositoryMock.save(newUserEntityWithUpdatedImage)).thenReturn(newUserEntityWithUpdatedImage);
+        when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(newUserEntityWithUpdatedImage);
 
         // when
         userServiceImpl.updateUserById(newUserDto, id);
 
         // then
-        verify(userRepositoryMock, times(1)).save(newUserEntityWithUpdatedImage);
+        verify(userRepositoryMock, times(1)).save(userEntityArgumentCaptor.capture());
+        final UserEntity newUserEntityActual = userEntityArgumentCaptor.getValue();
+        assertTrue(new ReflectionEquals(newUserEntityWithUpdatedImage).matches(newUserEntityActual));
     }
 
     @Test
@@ -470,7 +474,9 @@ public class UserServiceTest {
         userServiceImpl.updateUserById(newUserDto, id);
 
         // then
-        verify(userRepositoryMock, times(1)).save(newUserEntity);
+        verify(userRepositoryMock, times(1)).save(userEntityArgumentCaptor.capture());
+        final UserEntity newUserEntityActual = userEntityArgumentCaptor.getValue();
+        assertTrue(new ReflectionEquals(newUserEntity).matches(newUserEntityActual));
     }
 
     @Test

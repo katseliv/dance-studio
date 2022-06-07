@@ -168,7 +168,7 @@ public class LessonServiceTest {
         final var actualException = assertThrowsExactly(EntityCreationException.class,
                 () -> lessonServiceImpl.createLesson(lessonDto));
         verify(lessonRepositoryMock, times(1)).save(lessonEntity);
-        assertEquals(actualException.getMessage(), "Lesson hasn't been created!");
+        assertEquals(actualException.getMessage(), "Lesson not created!");
     }
 
     @Test
