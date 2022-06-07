@@ -1,6 +1,7 @@
 package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.exception.EntityAlreadyExistsException;
+import com.dataart.dancestudio.exception.EntityCreationException;
 import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.mapper.UserMapperImpl;
@@ -14,9 +15,11 @@ import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,8 +33,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -151,6 +153,51 @@ public class UserServiceTest {
         verify(userMapperImpl, never()).userRegistrationDtoToUserEntityWithPassword(
                 userRegistrationDto, userEntity.getPassword());
         verify(userRepositoryMock, never()).save(userEntity);
+    }
+
+    @Test
+    public void createUserWhenUserIsNull() throws IOException {
+        // given
+        final String password = "45";
+        final String encodePassword = bCryptPasswordEncoder.encode(password);
+
+        when(bCryptPasswordEncoder.encode(password)).thenReturn(encodePassword);
+        when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
+
+        final UserEntity userEntity = UserEntity.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .image(multipartFile.getBytes())
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .password(encodePassword)
+                .role(Role.USER)
+                .timeZone(timeZone)
+                .deleted(deleted)
+                .build();
+        final UserRegistrationDto userRegistrationDto = UserRegistrationDto.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .password(password)
+                .roleId(Role.USER.getId())
+                .timeZone(timeZone)
+                .build();
+
+        doReturn(userEntity).when(userMapperImpl).userRegistrationDtoToUserEntityWithPassword(userRegistrationDto, userEntity.getPassword());
+        when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.empty());
+        when(userRepositoryMock.save(userEntity)).thenReturn(null);
+
+        // when then
+        final var actualException = assertThrowsExactly(EntityCreationException.class,
+                () -> userServiceImpl.createUser(userRegistrationDto));
+        verify(userMapperImpl, times(1)).userRegistrationDtoToUserEntityWithPassword(
+                userRegistrationDto, userEntity.getPassword());
+        verify(userRepositoryMock, times(1)).save(userEntity);
+        assertEquals(actualException.getMessage(), "User not created!");
     }
 
     @Test
@@ -338,6 +385,7 @@ public class UserServiceTest {
     @Test
     public void updateUserByIdWithChangedFieldAndImage() {
         // given
+        final ArgumentCaptor<UserEntity> userEntityArgumentCaptor = ArgumentCaptor.forClass(UserEntity.class);
         final UserEntity userEntity = UserEntity.builder()
                 .username(username)
                 .firstName(firstName)
@@ -372,18 +420,21 @@ public class UserServiceTest {
                 .build();
 
         when(userRepositoryMock.findById(id)).thenReturn(Optional.ofNullable(userEntity));
-        when(userRepositoryMock.save(newUserEntityWithUpdatedImage)).thenReturn(newUserEntityWithUpdatedImage);
+        when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(newUserEntityWithUpdatedImage);
 
         // when
         userServiceImpl.updateUserById(newUserDto, id);
 
         // then
-        verify(userRepositoryMock, times(1)).save(newUserEntityWithUpdatedImage);
+        verify(userRepositoryMock, times(1)).save(userEntityArgumentCaptor.capture());
+        final UserEntity newUserEntityActual = userEntityArgumentCaptor.getValue();
+        assertTrue(new ReflectionEquals(newUserEntityWithUpdatedImage).matches(newUserEntityActual));
     }
 
     @Test
     public void updateUserByIdWithChangedFieldAndEmptyImage() throws IOException {
         // given
+        final ArgumentCaptor<UserEntity> userEntityArgumentCaptor = ArgumentCaptor.forClass(UserEntity.class);
         when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
 
         final UserEntity newUserEntity = UserEntity.builder()
@@ -425,7 +476,9 @@ public class UserServiceTest {
         userServiceImpl.updateUserById(newUserDto, id);
 
         // then
-        verify(userRepositoryMock, times(1)).save(newUserEntity);
+        verify(userRepositoryMock, times(1)).save(userEntityArgumentCaptor.capture());
+        final UserEntity newUserEntityActual = userEntityArgumentCaptor.getValue();
+        assertTrue(new ReflectionEquals(newUserEntity).matches(newUserEntityActual));
     }
 
     @Test

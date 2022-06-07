@@ -51,7 +51,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     @Transactional(readOnly = true)
-    public String getJwtTokenByEmail(final String email, final JwtTokenType type) {
+    public String getJwtTokenByEmailAndType(final String email, final JwtTokenType type) {
         final Optional<JwtTokenEntity> jwtTokenEntity = jwtTokenRepository.findByUserEmailAndType(email, type);
         jwtTokenEntity.ifPresentOrElse(
                 (token) -> log.info("Token with type = {} for email = {} with id = {} has been found.", type, email, token.getId()),

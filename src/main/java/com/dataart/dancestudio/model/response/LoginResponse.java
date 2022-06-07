@@ -1,13 +1,11 @@
 package com.dataart.dancestudio.model.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Builder
 @ToString
+@EqualsAndHashCode
 @AllArgsConstructor
 public class LoginResponse {
 

@@ -7,7 +7,7 @@ public interface JwtTokenService {
 
     void createJwtToken(JwtTokenDto jwtTokenDto);
 
-    String getJwtTokenByEmail(String email, JwtTokenType type);
+    String getJwtTokenByEmailAndType(String email, JwtTokenType type);
 
     boolean existsByToken(String token);
 

@@ -13,6 +13,7 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <jacoco.skip>false</jacoco.skip>
     </properties>
 
     <dependencies>
@@ -141,6 +142,11 @@
             <version>4.5.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.8</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -161,6 +167,88 @@
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-engine</artifactId>
+                        <version>5.5.2</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.8</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <!-- Attached to Maven test phase -->
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <!-- Default target/site/jacoco/* you can define your directory for code coverage report -->
+                        <configuration>
+                            <outputDirectory>target/jacoco-report</outputDirectory>
+                            <excludes>
+                                <exclude>com/dataart/dancestudio/DanceStudioApplication.class</exclude>
+                                <exclude>com/dataart/dancestudio/configuration/**</exclude>
+                                <exclude>com/dataart/dancestudio/controller/**</exclude>
+                                <exclude>com/dataart/dancestudio/converter/**</exclude>
+                                <exclude>com/dataart/dancestudio/exception/**</exclude>
+                                <exclude>com/dataart/dancestudio/filter/**</exclude>
+                                <exclude>com/dataart/dancestudio/handler/**</exclude>
+                                <exclude>com/dataart/dancestudio/mapper/**</exclude>
+                                <exclude>com/dataart/dancestudio/model/**</exclude>
+                                <exclude>com/dataart/dancestudio/provider/**</exclude>
+                                <exclude>com/dataart/dancestudio/repository/**</exclude>
+                                <exclude>com/dataart/dancestudio/utils/**</exclude>
+                                <exclude>com/dataart/dancestudio/validator/**</exclude>
+                            </excludes>
+                            <skip>${jacoco.skip}</skip>
+                        </configuration>
+                    </execution>
+                    <!-- Define rule for successful build based on code coverage criteria -->
+                    <execution>
+                        <id>jacoco-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <!-- When code coverage is 80% and no class missed then consider for successful build -->
+                                    <element>PACKAGE</element>
+                                    <includes>
+                                        <include>com.dataart.dancestudio.service</include>
+                                    </includes>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
