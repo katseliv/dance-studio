@@ -1,15 +1,14 @@
 package com.dataart.dancestudio.service;
 
-import com.dataart.dancestudio.exception.EmptyHttpEntityBodyException;
+import com.dataart.dancestudio.exception.EmptyHttpResponseException;
+import com.dataart.dancestudio.exception.GoogleResponseException;
 import com.dataart.dancestudio.model.request.GoogleTokenRequest;
 import com.dataart.dancestudio.model.response.GoogleTokenResponse;
 import com.dataart.dancestudio.model.response.GoogleUserInfoResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -47,9 +46,16 @@ public class GoogleHttpServiceImpl implements GoogleHttpService {
     @Value("${spring.security.oauth2.client.registration.google.scope}")
     private String scope;
 
+    private RestTemplate restTemplate;
+
+    @Autowired
+    public void setRestTemplate(final RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Override
     public String buildAuthorizationEndpointUrl() {
+        log.info("Building authorization endpoint url...");
         return UriComponentsBuilder.fromHttpUrl(location)
                 .queryParam("response_type", responseType)
                 .queryParam("client_id", clientId)
@@ -69,37 +75,46 @@ public class GoogleHttpServiceImpl implements GoogleHttpService {
                 .grantType(grantType)
                 .build();
         log.info("Get Access Token Request = {}", googleTokenRequest);
-        final RestTemplate restTemplate = new RestTemplate();
         final HttpEntity<GoogleTokenRequest> googleTokenRequestHttpEntity = new HttpEntity<>(googleTokenRequest);
-        final Optional<GoogleTokenResponse> googleTokenResponseOptional = Optional.ofNullable(restTemplate.postForObject(
-                tokenEndpoint, googleTokenRequestHttpEntity, GoogleTokenResponse.class));
-        final GoogleTokenResponse googleTokenResponse = googleTokenResponseOptional
+        final ResponseEntity<GoogleTokenResponse> googleTokenResponseEntity = restTemplate.exchange(
+                tokenEndpoint, HttpMethod.POST, googleTokenRequestHttpEntity, GoogleTokenResponse.class);
+
+        if (googleTokenResponseEntity.getStatusCode() != HttpStatus.OK) {
+            log.error("Response status = {} doesn't equal to 200 OK.", googleTokenResponseEntity.getStatusCode());
+            throw new GoogleResponseException("Response status is bad!");
+        } else {
+            log.info("Response status is 200 OK.");
+        }
+
+        return Optional.ofNullable(googleTokenResponseEntity.getBody())
+                .map(GoogleTokenResponse::getAccessToken)
                 .orElseThrow(() -> {
-                    log.warn("Google Token Response to the POST request for the access token was empty.");
-                    throw new EmptyHttpEntityBodyException("Google Token Response is empty!");
+                    log.error("Google Token Response to the POST request for the access token was empty.");
+                    throw new EmptyHttpResponseException("Google Token Response is empty!");
                 });
-        log.info("Get Access Token Response = {}", googleTokenResponse);
-        return googleTokenResponse.getAccessToken();
     }
 
     @Override
     public GoogleUserInfoResponse getUserInfo(final String accessToken) {
         log.info("Get User Info Request = {}", accessToken);
-        final RestTemplate restTemplate = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         final HttpEntity<String> request = new HttpEntity<>(headers);
         final ResponseEntity<GoogleUserInfoResponse> googleUserInfoResponseEntity = restTemplate.exchange(
                 userInfoEndpoint, HttpMethod.GET, request, GoogleUserInfoResponse.class);
-        final Optional<GoogleUserInfoResponse> googleUserInfoResponseOptional = Optional.ofNullable(
-                googleUserInfoResponseEntity.getBody());
-        final GoogleUserInfoResponse googleUserInfoResponse = googleUserInfoResponseOptional
+
+        if (googleUserInfoResponseEntity.getStatusCode() != HttpStatus.OK) {
+            log.error("Response status = {} doesn't equal to 200 OK.", googleUserInfoResponseEntity.getStatusCode());
+            throw new GoogleResponseException("Response status is bad!");
+        } else {
+            log.info("Response status is 200 OK.");
+        }
+
+        return Optional.ofNullable(googleUserInfoResponseEntity.getBody())
                 .orElseThrow(() -> {
-                    log.warn("Google User Info Response to the POST request for the user info was empty.");
-                    throw new EmptyHttpEntityBodyException("Google User Info Response is empty!");
+                    log.error("Google User Info Response to the POST request for the user info was empty.");
+                    throw new EmptyHttpResponseException("Google User Info Response is empty!");
                 });
-        log.info("Get User Info Response = {}", googleUserInfoResponse);
-        return googleUserInfoResponse;
     }
 
 }

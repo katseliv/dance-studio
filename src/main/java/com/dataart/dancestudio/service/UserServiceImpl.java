@@ -90,6 +90,16 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
     }
 
     @Override
+    public UserDetailsDto getUserDetailsById(final int id) {
+        final Optional<UserEntity> userEntity = userRepository.findById(id);
+        userEntity.ifPresentOrElse(
+                (user) -> log.info("User with id = {} has been found.", user.getId()),
+                () -> log.warn("User with id = {} hasn't been found.", id));
+        return userEntity.map(userMapper::userEntityToUserDetailsDto)
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public int getUserIdByEmail(final String email) {
         final Optional<UserEntity> userEntity = userRepository.findByEmail(email);

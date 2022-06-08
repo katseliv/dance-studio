@@ -21,6 +21,8 @@ public interface UserService {
 
     UserViewDto getUserViewById(int id);
 
+    UserDetailsDto getUserDetailsById(int id);
+
     int getUserIdByEmail(String email);
 
     UserDetailsDto getUserByEmail(String email);
@@ -38,5 +40,4 @@ public interface UserService {
     List<UserForListDto> listUsers(Pageable pageable);
 
     int numberOfUsers();
-
 }

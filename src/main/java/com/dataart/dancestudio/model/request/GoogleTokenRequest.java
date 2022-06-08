@@ -5,6 +5,7 @@ import lombok.*;
 @Getter
 @Builder
 @ToString
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class GoogleTokenRequest {

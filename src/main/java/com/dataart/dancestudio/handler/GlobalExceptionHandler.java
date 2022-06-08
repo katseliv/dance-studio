@@ -61,6 +61,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(apiErrorDto, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value = {GoogleResponseException.class, EmptyHttpResponseException.class})
+    public ResponseEntity<ApiErrorDto> googleHttpException(final Exception exception) {
+        final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
+                .status(String.valueOf(HttpStatus.BAD_GATEWAY.value()))
+                .error(HttpStatus.BAD_GATEWAY.getReasonPhrase())
+                .messages(List.of("Oops... Something went wrong!"))
+                .build();
+        log.error(exception.getMessage(), exception);
+        return new ResponseEntity<>(apiErrorDto, HttpStatus.BAD_GATEWAY);
+    }
+
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ApiErrorDto> backendException(final Exception exception) {
         final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
