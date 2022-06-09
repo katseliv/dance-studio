@@ -34,8 +34,6 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
     private int defaultPageNumber;
     @Value("${pagination.defaultPageSize}")
     private int defaultPageSize;
-    @Value("${pagination.buttonLimit}")
-    private int buttonLimit;
 
     private final BookingRepository bookingRepository;
     private final LessonRepository lessonRepository;
@@ -180,11 +178,6 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
         final int numberOfUserBookings = bookingRepository.countAllByUserId(userId);
         log.info("There have been found {} bookings.", numberOfUserBookings);
         return numberOfUserBookings;
-    }
-
-    @Override
-    public int getButtonLimit() {
-        return buttonLimit;
     }
 
 }

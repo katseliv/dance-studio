@@ -38,8 +38,6 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
     private int defaultPageNumber;
     @Value("${pagination.defaultPageSize}")
     private int defaultPageSize;
-    @Value("${pagination.buttonLimit}")
-    private int buttonLimit;
 
     private final LessonService lessonService;
     private final PasswordEncoder passwordEncoder;
@@ -198,11 +196,6 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
         final long numberOfUsers = userRepository.count();
         log.info("There have been found {} users.", numberOfUsers);
         return (int) numberOfUsers;
-    }
-
-    @Override
-    public int getButtonLimit() {
-        return buttonLimit;
     }
 
 }
