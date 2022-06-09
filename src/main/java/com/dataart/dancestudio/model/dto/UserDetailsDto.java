@@ -1,6 +1,6 @@
 package com.dataart.dancestudio.model.dto;
 
-import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.Role;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.*;

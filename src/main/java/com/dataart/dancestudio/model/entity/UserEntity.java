@@ -1,5 +1,7 @@
 package com.dataart.dancestudio.model.entity;
 
+import com.dataart.dancestudio.model.Provider;
+import com.dataart.dancestudio.model.Role;
 import lombok.*;
 import org.hibernate.annotations.Where;
 

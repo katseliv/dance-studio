@@ -13,17 +13,17 @@ import lombok.*;
 @JsonDeserialize(builder = GoogleUserInfoResponse.GoogleUserInfoResponseBuilder.class)
 public class GoogleUserInfoResponse {
 
-    private String sub;
-    private String name;
+    private final String sub;
+    private final String name;
     @JsonProperty("given_name")
-    private String givenName;
+    private final String givenName;
     @JsonProperty("family_name")
-    private String familyName;
-    private String picture;
-    private String email;
+    private final String familyName;
+    private final String picture;
+    private final String email;
     @JsonProperty("email_verified")
-    private Boolean emailVerified;
-    private String local;
+    private final Boolean emailVerified;
+    private final String local;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class GoogleUserInfoResponseBuilder {

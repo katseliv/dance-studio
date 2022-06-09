@@ -1,4 +1,4 @@
-package com.dataart.dancestudio.model.entity;
+package com.dataart.dancestudio.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

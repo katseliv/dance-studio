@@ -3,7 +3,7 @@ package com.dataart.dancestudio.service;
 import com.dataart.dancestudio.exception.EntityAlreadyExistsException;
 import com.dataart.dancestudio.mapper.UserMapperImpl;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
-import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;

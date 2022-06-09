@@ -8,7 +8,7 @@ import com.dataart.dancestudio.model.dto.view.FilteredViewListPage;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
 import com.dataart.dancestudio.model.entity.LessonEntity;
-import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
 import com.dataart.dancestudio.repository.LessonRepository;

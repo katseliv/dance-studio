@@ -1,7 +1,7 @@
 package com.dataart.dancestudio.repository;
 
 import com.dataart.dancestudio.model.entity.JwtTokenEntity;
-import com.dataart.dancestudio.model.entity.JwtTokenType;
+import com.dataart.dancestudio.model.JwtTokenType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

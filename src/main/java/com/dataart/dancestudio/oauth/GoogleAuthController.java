@@ -2,7 +2,7 @@ package com.dataart.dancestudio.oauth;
 
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
-import com.dataart.dancestudio.model.entity.Provider;
+import com.dataart.dancestudio.model.Provider;
 import com.dataart.dancestudio.model.response.GoogleUserInfoResponse;
 import com.dataart.dancestudio.model.response.LoginResponse;
 import com.dataart.dancestudio.service.AuthService;

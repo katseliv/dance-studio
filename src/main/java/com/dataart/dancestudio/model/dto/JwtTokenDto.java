@@ -1,6 +1,6 @@
 package com.dataart.dancestudio.model.dto;
 
-import com.dataart.dancestudio.model.entity.JwtTokenType;
+import com.dataart.dancestudio.model.JwtTokenType;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.*;
