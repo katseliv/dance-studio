@@ -79,12 +79,7 @@ public class GoogleHttpServiceImpl implements GoogleHttpService {
         final ResponseEntity<GoogleTokenResponse> googleTokenResponseEntity = restTemplate.exchange(
                 tokenEndpoint, HttpMethod.POST, googleTokenRequestHttpEntity, GoogleTokenResponse.class);
 
-        if (googleTokenResponseEntity.getStatusCode() != HttpStatus.OK) {
-            log.error("Response status = {} doesn't equal to 200 OK.", googleTokenResponseEntity.getStatusCode());
-            throw new GoogleResponseException("Response status is bad!");
-        } else {
-            log.info("Response status is 200 OK.");
-        }
+        checkResponseStatusCode(googleTokenResponseEntity.getStatusCode());
 
         return Optional.ofNullable(googleTokenResponseEntity.getBody())
                 .map(GoogleTokenResponse::getAccessToken)
@@ -103,18 +98,22 @@ public class GoogleHttpServiceImpl implements GoogleHttpService {
         final ResponseEntity<GoogleUserInfoResponse> googleUserInfoResponseEntity = restTemplate.exchange(
                 userInfoEndpoint, HttpMethod.GET, request, GoogleUserInfoResponse.class);
 
-        if (googleUserInfoResponseEntity.getStatusCode() != HttpStatus.OK) {
-            log.error("Response status = {} doesn't equal to 200 OK.", googleUserInfoResponseEntity.getStatusCode());
-            throw new GoogleResponseException("Response status is bad!");
-        } else {
-            log.info("Response status is 200 OK.");
-        }
+        checkResponseStatusCode(googleUserInfoResponseEntity.getStatusCode());
 
         return Optional.ofNullable(googleUserInfoResponseEntity.getBody())
                 .orElseThrow(() -> {
                     log.error("Google User Info Response to the POST request for the user info was empty.");
                     throw new EmptyHttpResponseException("Google User Info Response is empty!");
                 });
+    }
+
+    private void checkResponseStatusCode(final HttpStatus statusCode) {
+        if (statusCode != HttpStatus.OK) {
+            log.error("Response status = {} doesn't equal to 200 OK.", statusCode);
+            throw new GoogleResponseException("Response status is bad!");
+        } else {
+            log.info("Response status is 200 OK.");
+        }
     }
 
 }
