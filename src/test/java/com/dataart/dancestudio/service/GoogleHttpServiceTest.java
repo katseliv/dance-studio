@@ -1,6 +1,5 @@
 package com.dataart.dancestudio.service;
 
-import com.dataart.dancestudio.exception.EmptyHttpResponseException;
 import com.dataart.dancestudio.exception.GoogleResponseException;
 import com.dataart.dancestudio.model.request.GoogleTokenRequest;
 import com.dataart.dancestudio.model.response.GoogleTokenResponse;
@@ -109,12 +108,26 @@ public class GoogleHttpServiceTest {
     }
 
     @Test
-    public void getAccessTokenWhenStatusCodeIsBad() {
+    public void getAccessTokenWhenStatusCodeIsNotFound() {
         // given
         final HttpEntity<GoogleTokenRequest> googleTokenRequestHttpEntity = new HttpEntity<>(googleTokenRequest);
         final String tokenEndpoint = "https://oauth2.googleapis.com/token";
         when(restTemplate.exchange(tokenEndpoint, HttpMethod.POST, googleTokenRequestHttpEntity, GoogleTokenResponse.class))
-                .thenReturn(new ResponseEntity<>(HttpStatus.BAD_GATEWAY));
+                .thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+        // when then
+        final var actualException = assertThrowsExactly(GoogleResponseException.class,
+                () -> googleHttpService.getAccessToken(code));
+        assertEquals(actualException.getMessage(), "Response status is bad!");
+    }
+
+    @Test
+    public void getAccessTokenWhenStatusCodeIsBadRequest() {
+        // given
+        final HttpEntity<GoogleTokenRequest> googleTokenRequestHttpEntity = new HttpEntity<>(googleTokenRequest);
+        final String tokenEndpoint = "https://oauth2.googleapis.com/token";
+        when(restTemplate.exchange(tokenEndpoint, HttpMethod.POST, googleTokenRequestHttpEntity, GoogleTokenResponse.class))
+                .thenReturn(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
 
         // when then
         final var actualException = assertThrowsExactly(GoogleResponseException.class,
@@ -138,7 +151,7 @@ public class GoogleHttpServiceTest {
                 .thenReturn(ResponseEntity.of(Optional.of(googleTokenResponse)));
 
         // when then
-        final var actualException = assertThrowsExactly(EmptyHttpResponseException.class,
+        final var actualException = assertThrowsExactly(GoogleResponseException.class,
                 () -> googleHttpService.getAccessToken(code));
         assertEquals(actualException.getMessage(), "Google Token Response is empty!");
     }
@@ -161,14 +174,30 @@ public class GoogleHttpServiceTest {
     }
 
     @Test
-    public void getUserInfoWhenStatusCodeIsBad() {
+    public void getUserInfoWhenStatusCodeIsNotFound() {
         // given
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
         final HttpEntity<String> request = new HttpEntity<>(headers);
         final String userInfoEndpoint = "https://openidconnect.googleapis.com/v1/userinfo";
         when(restTemplate.exchange(userInfoEndpoint, HttpMethod.GET, request, GoogleUserInfoResponse.class))
-                .thenReturn(new ResponseEntity<>(HttpStatus.BAD_GATEWAY));
+                .thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+        // when then
+        final var actualException = assertThrowsExactly(GoogleResponseException.class,
+                () -> googleHttpService.getUserInfo(accessToken));
+        assertEquals(actualException.getMessage(), "Response status is bad!");
+    }
+
+    @Test
+    public void getUserInfoWhenStatusCodeIsBadRequest() {
+        // given
+        final HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        final HttpEntity<String> request = new HttpEntity<>(headers);
+        final String userInfoEndpoint = "https://openidconnect.googleapis.com/v1/userinfo";
+        when(restTemplate.exchange(userInfoEndpoint, HttpMethod.GET, request, GoogleUserInfoResponse.class))
+                .thenReturn(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
 
         // when then
         final var actualException = assertThrowsExactly(GoogleResponseException.class,
@@ -187,7 +216,7 @@ public class GoogleHttpServiceTest {
                 .thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
         // when then
-        final var actualException = assertThrowsExactly(EmptyHttpResponseException.class,
+        final var actualException = assertThrowsExactly(GoogleResponseException.class,
                 () -> googleHttpService.getUserInfo(accessToken));
         assertEquals(actualException.getMessage(), "Google User Info Response is empty!");
     }

@@ -61,7 +61,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(apiErrorDto, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = {GoogleResponseException.class, EmptyHttpResponseException.class})
+    @ExceptionHandler(value = GoogleResponseException.class)
     public ResponseEntity<ApiErrorDto> googleHttpException(final Exception exception) {
         final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
                 .status(String.valueOf(HttpStatus.BAD_GATEWAY.value()))

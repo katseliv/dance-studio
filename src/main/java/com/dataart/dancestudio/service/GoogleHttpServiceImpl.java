@@ -1,6 +1,5 @@
 package com.dataart.dancestudio.service;
 
-import com.dataart.dancestudio.exception.EmptyHttpResponseException;
 import com.dataart.dancestudio.exception.GoogleResponseException;
 import com.dataart.dancestudio.model.request.GoogleTokenRequest;
 import com.dataart.dancestudio.model.response.GoogleTokenResponse;
@@ -85,7 +84,7 @@ public class GoogleHttpServiceImpl implements GoogleHttpService {
                 .map(GoogleTokenResponse::getAccessToken)
                 .orElseThrow(() -> {
                     log.error("Google Token Response to the POST request for the access token was empty.");
-                    throw new EmptyHttpResponseException("Google Token Response is empty!");
+                    throw new GoogleResponseException("Google Token Response is empty!");
                 });
     }
 
@@ -103,7 +102,7 @@ public class GoogleHttpServiceImpl implements GoogleHttpService {
         return Optional.ofNullable(googleUserInfoResponseEntity.getBody())
                 .orElseThrow(() -> {
                     log.error("Google User Info Response to the POST request for the user info was empty.");
-                    throw new EmptyHttpResponseException("Google User Info Response is empty!");
+                    throw new GoogleResponseException("Google User Info Response is empty!");
                 });
     }
 
