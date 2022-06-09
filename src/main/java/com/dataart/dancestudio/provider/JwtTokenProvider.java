@@ -4,10 +4,13 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.dataart.dancestudio.model.dto.UserDetailsDto;
+import com.dataart.dancestudio.exception.DecodeJwtTokenException;
 import com.dataart.dancestudio.model.Role;
+import com.dataart.dancestudio.model.dto.UserDetailsDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtTokenProvider implements Serializable {
 
@@ -40,6 +44,7 @@ public class JwtTokenProvider implements Serializable {
                 .toInstant();
         final Date accessExpiration = Date.from(accessExpirationInstant);
 
+        log.info("Access Jwt Token for email = {} has been generated.", userDetailsDto.getEmail());
         return JWT.create()
                 .withIssuer("Dance Studio")
                 .withIssuedAt(new Date())
@@ -57,6 +62,7 @@ public class JwtTokenProvider implements Serializable {
                 .toInstant();
         final Date refreshExpiration = Date.from(refreshExpirationInstant);
 
+        log.info("Refresh Jwt Token for email = {} has been generated.", userDetailsDto.getEmail());
         return JWT.create()
                 .withIssuer("Dance Studio")
                 .withIssuedAt(new Date())
@@ -70,6 +76,7 @@ public class JwtTokenProvider implements Serializable {
         final DecodedJWT jwt = JWT.decode(oldRefreshToken);
         final Date oldRefreshExpiration = jwt.getExpiresAt();
 
+        log.info("Jwt Token's \"Issued At\" for email = {} has been updated.", userDetailsDto.getEmail());
         return JWT.create()
                 .withIssuer("Dance Studio")
                 .withIssuedAt(new Date())
@@ -91,15 +98,24 @@ public class JwtTokenProvider implements Serializable {
         try {
             final JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret)).build();
             verifier.verify(token);
+            log.info("Jwt Token is valid.");
             return true;
         } catch (final JWTVerificationException exception) {
+            log.warn("Jwt Token is invalid!");
             return false;
         }
     }
 
     public String getEmail(final String token) {
-        final DecodedJWT jwt = JWT.decode(token);
-        return jwt.getClaim("email").asString();
+        try {
+            final DecodedJWT jwt = JWT.decode(token);
+            final String email = jwt.getClaim("email").asString();
+            log.info("Jwt Token is valid. Email = {} has been received.", email);
+            return email;
+        } catch (final JWTDecodeException exception) {
+            log.warn("Jwt Token is invalid! Can't get email!");
+            throw new DecodeJwtTokenException("Jwt Token is invalid!");
+        }
     }
 
 }

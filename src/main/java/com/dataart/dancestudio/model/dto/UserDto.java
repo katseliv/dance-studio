@@ -19,7 +19,6 @@ public class UserDto {
 
     @NotNull(message = "Username is null.")
     @NotBlank(message = "Username is blank.")
-    @UsernameValid
     @Pattern(regexp = ".*([A-Z]|[a-z]).*", message = "Username must contain a letter.")
     private final String username;
 

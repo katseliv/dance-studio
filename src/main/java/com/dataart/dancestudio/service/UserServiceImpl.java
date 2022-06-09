@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -134,6 +135,19 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
     public void updateUserById(final UserDto userDto, final int id) {
         final UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+
+        final String username = userDto.getUsername();
+        if (!Objects.equals(username, userEntity.getUsername()) && userRepository.existsByUsername(username)) {
+            log.warn("User with username = {} hasn't been updated. Such username already exists in the database!", username);
+            throw new EntityAlreadyExistsException("Such username already exists!");
+        }
+
+        final String email = userDto.getEmail();
+        if (!Objects.equals(email, userEntity.getEmail()) && userRepository.existsByEmail(email)) {
+            log.warn("User with email = {} hasn't been updated. Such email already exists in the database!", email);
+            throw new EntityAlreadyExistsException("Such email already exists!");
+        }
+
         if (userDto.getBase64StringImage().isEmpty()) {
             userMapper.mergeUserEntityAndUserDtoWithoutPicture(userEntity, userDto);
             userRepository.save(userEntity);
