@@ -22,17 +22,17 @@ public class UserRegistrationDto {
     @NotNull(message = "Username is null.")
     @NotBlank(message = "Username is blank.")
     @UsernameValid
-    @Pattern(regexp = ".*([A-Z]|[a-z]).*", message = "Username must contain a letter.")
+    @Pattern(regexp = ".*([A-Z]|[a-z]|[А-Я]|[а-я]).*", message = "Username must contain a letter.")
     private final String username;
 
     @NotNull(message = "First Name is null.")
     @NotBlank(message = "First Name is blank.")
-    @Pattern(regexp = "^([A-Z]|[a-z])+$", message = "First Name mustn't contain a number.")
+    @Pattern(regexp = "^([A-Z]|[a-z]|[А-Я]|[а-я])+$", message = "First Name mustn't contain a number.")
     private final String firstName;
 
     @NotNull(message = "Last Name is null.")
     @NotBlank(message = "Last Name is blank.")
-    @Pattern(regexp = "^([A-Z]|[a-z])+$", message = "Last Name mustn't contain a number.")
+    @Pattern(regexp = "^([A-Z]|[a-z]|[А-Я]|[а-я])+$", message = "Last Name mustn't contain a number.")
     private final String lastName;
 
     @NotNull(message = "Email is null.")

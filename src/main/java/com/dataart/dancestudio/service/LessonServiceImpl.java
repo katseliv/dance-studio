@@ -8,7 +8,7 @@ import com.dataart.dancestudio.model.dto.view.FilteredViewListPage;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
 import com.dataart.dancestudio.model.entity.LessonEntity;
-import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
 import com.dataart.dancestudio.repository.LessonRepository;
@@ -37,8 +37,6 @@ public class LessonServiceImpl implements LessonService, PaginationService<Lesso
     private int defaultPageNumber;
     @Value("${pagination.defaultPageSize}")
     private int defaultPageSize;
-    @Value("${pagination.buttonLimit}")
-    private int buttonLimit;
 
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
@@ -138,9 +136,6 @@ public class LessonServiceImpl implements LessonService, PaginationService<Lesso
         final int totalAmount = numberOfFilteredLessons(trainerName, danceStyleName, date);
 
         final int totalPages = (int) Math.ceil((double) totalAmount / pageSize);
-        final int startPageNumber = getStartPageNumber(totalPages, pageNumber);
-        final int endPageNumber = Math.max(Math.min(pageNumber + buttonLimit / 2, totalPages), buttonLimit);
-        final int additive = (pageNumber - 1) * pageSize + 1;
 
         final Map<String, String> filterParameters = new HashMap<>();
         filterParameters.put("trainerName", trainerName);
@@ -150,10 +145,7 @@ public class LessonServiceImpl implements LessonService, PaginationService<Lesso
                 .filerParameters(filterParameters)
                 .pageSize(pageSize)
                 .totalPages(totalPages)
-                .additive(additive)
-                .startPageNumber(startPageNumber)
-                .currentPageNumber(pageNumber)
-                .endPageNumber(endPageNumber)
+                .pageNumber(pageNumber)
                 .viewDtoList(lessonViewDtoList)
                 .build();
     }
@@ -210,11 +202,6 @@ public class LessonServiceImpl implements LessonService, PaginationService<Lesso
         final int numberOfUserLessons = lessonRepository.countAllByUserTrainerId(userId);
         log.info("There have been found {} lessons for userId {}.", numberOfUserLessons, userId);
         return numberOfUserLessons;
-    }
-
-    @Override
-    public int getButtonLimit() {
-        return buttonLimit;
     }
 
 }

@@ -5,7 +5,7 @@ import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.mapper.JwtTokenMapper;
 import com.dataart.dancestudio.model.dto.JwtTokenDto;
 import com.dataart.dancestudio.model.entity.JwtTokenEntity;
-import com.dataart.dancestudio.model.entity.JwtTokenType;
+import com.dataart.dancestudio.model.JwtTokenType;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.JwtTokenRepository;
 import com.dataart.dancestudio.repository.UserRepository;

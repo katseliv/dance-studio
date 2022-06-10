@@ -10,7 +10,8 @@ import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
-import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.Provider;
+import com.dataart.dancestudio.model.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -106,7 +108,7 @@ public class UserServiceTest {
         when(userRepositoryMock.save(userEntity)).thenReturn(userEntity);
 
         // when
-        final int userId = userServiceImpl.createUser(userRegistrationDto);
+        final int userId = userServiceImpl.createUser(userRegistrationDto, Provider.LOCAL);
 
         // then
         verify(userRepositoryMock, times(1)).save(userEntity);
@@ -147,7 +149,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findByEmail(userRegistrationDto.getEmail())).thenReturn(Optional.of(userEntity));
 
         // when
-        assertThrows(EntityAlreadyExistsException.class, () -> userServiceImpl.createUser(userRegistrationDto));
+        assertThrows(EntityAlreadyExistsException.class, () -> userServiceImpl.createUser(userRegistrationDto, Provider.LOCAL));
 
         // then
         verify(userMapperImpl, never()).userRegistrationDtoToUserEntityWithPassword(
@@ -193,7 +195,7 @@ public class UserServiceTest {
 
         // when then
         final var actualException = assertThrowsExactly(EntityCreationException.class,
-                () -> userServiceImpl.createUser(userRegistrationDto));
+                () -> userServiceImpl.createUser(userRegistrationDto, Provider.LOCAL));
         verify(userMapperImpl, times(1)).userRegistrationDtoToUserEntityWithPassword(
                 userRegistrationDto, userEntity.getPassword());
         verify(userRepositoryMock, times(1)).save(userEntity);
@@ -221,7 +223,6 @@ public class UserServiceTest {
                 .username(username)
                 .firstName(firstName)
                 .lastName(lastName)
-                .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
@@ -329,6 +330,65 @@ public class UserServiceTest {
     }
 
     @Test
+    public void getUserDetailsById() throws IOException {
+        // given
+        when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
+
+        final UserEntity userEntity = UserEntity.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .image(multipartFile.getBytes())
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .role(Role.USER)
+                .timeZone(timeZone)
+                .deleted(deleted)
+                .build();
+        final UserDetailsDto userDetailsDto = UserDetailsDto.builder()
+                .email(email)
+                .roles(List.of(Role.USER))
+                .build();
+
+        when(userRepositoryMock.findById(id)).thenReturn(Optional.of(userEntity));
+
+        // when
+        final UserDetailsDto userDetailsDtoActual = userServiceImpl.getUserDetailsById(id);
+
+        // then
+        verify(userMapperImpl, times(1)).userEntityToUserDetailsDto(userEntity);
+        verify(userRepositoryMock, times(1)).findById(id);
+        assertEquals(userDetailsDto, userDetailsDtoActual);
+    }
+
+    @Test
+    public void getUserDetailsByIdWhenOptionalNull() throws IOException {
+        // given
+        when(multipartFile.getBytes()).thenReturn(new byte[]{1, 2, 5, 7});
+
+        final UserEntity userEntity = UserEntity.builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .image(multipartFile.getBytes())
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .role(Role.USER)
+                .timeZone(timeZone)
+                .deleted(deleted)
+                .build();
+
+        when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
+
+        // when
+        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.getUserViewById(id));
+
+        // then
+        verify(userMapperImpl, never()).userEntityToUserDetailsDto(userEntity);
+        verify(userRepositoryMock, times(1)).findById(id);
+    }
+
+    @Test
     public void getUserIdByEmail() {
         // given
         final String password = "45";
@@ -381,6 +441,59 @@ public class UserServiceTest {
         verify(userRepositoryMock, times(1)).findByEmail(email);
     }
 
+    @Test
+    public void getUserByEmail() {
+        // given
+        final String password = "45";
+        final String encodePassword = bCryptPasswordEncoder.encode(password);
+
+        final UserEntity userEntity = UserEntity.builder()
+                .id(id)
+                .email(email)
+                .role(Role.USER)
+                .password(encodePassword)
+                .build();
+        final UserDetailsDto userDetailsDto = UserDetailsDto.builder()
+                .id(id)
+                .email(email)
+                .roles(List.of(Role.USER))
+                .password(encodePassword)
+                .build();
+
+        when(userRepositoryMock.findByEmail(email)).thenReturn(Optional.of(userEntity));
+
+        // when
+        final UserDetailsDto userDetailsDtoActual = userServiceImpl.getUserByEmail(email);
+
+        // then
+        verify(userMapperImpl, times(1)).userEntityToUserDetailsDto(userEntity);
+        verify(userRepositoryMock, times(1)).findByEmail(email);
+        assertEquals(userDetailsDto, userDetailsDtoActual);
+    }
+
+    @Test
+    public void getUserByEmailWhenOptionalNull() {
+        // given
+        final String password = "45";
+        final String encodePassword = bCryptPasswordEncoder.encode(password);
+
+        final UserEntity userEntity = UserEntity.builder()
+                .id(id)
+                .email(email)
+                .role(Role.USER)
+                .password(encodePassword)
+                .build();
+
+        when(userRepositoryMock.findByEmail(email)).thenReturn(Optional.empty());
+
+        // when
+        assertThrows(UsernameNotFoundException.class, () -> userServiceImpl.getUserByEmail(email));
+
+        // then
+        verify(userMapperImpl, never()).userEntityToUserDetailsDto(userEntity);
+        verify(userRepositoryMock, times(1)).findByEmail(email);
+    }
+
 
     @Test
     public void updateUserByIdWithChangedFieldAndImage() {
@@ -413,7 +526,6 @@ public class UserServiceTest {
                 .firstName(firstName)
                 .lastName(newLastName)
                 .base64StringImage(Base64.getEncoder().encodeToString(new byte[]{1, 20, 30, 40}))
-                .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
@@ -464,7 +576,6 @@ public class UserServiceTest {
                 .firstName(firstName)
                 .lastName(newLastName)
                 .base64StringImage(Base64.getEncoder().encodeToString(new byte[0]))
-                .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
@@ -502,7 +613,6 @@ public class UserServiceTest {
                 .firstName(firstName)
                 .lastName(newLastName)
                 .base64StringImage(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
-                .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
@@ -537,7 +647,6 @@ public class UserServiceTest {
                 .firstName(firstName)
                 .lastName(lastName)
                 .base64StringImage(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
-                .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)
@@ -573,7 +682,6 @@ public class UserServiceTest {
                 .firstName(firstName)
                 .lastName(lastName)
                 .base64StringImage(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
-                .email(email)
                 .phoneNumber(phoneNumber)
                 .roleId(Role.USER.getId())
                 .timeZone(timeZone)

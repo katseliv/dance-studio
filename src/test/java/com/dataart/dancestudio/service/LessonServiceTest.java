@@ -3,6 +3,7 @@ package com.dataart.dancestudio.service;
 import com.dataart.dancestudio.exception.EntityCreationException;
 import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.mapper.LessonMapperImpl;
+import com.dataart.dancestudio.model.Role;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
 import com.dataart.dancestudio.model.entity.*;

@@ -1,6 +1,6 @@
 package com.dataart.dancestudio.converter;
 
-import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.Role;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

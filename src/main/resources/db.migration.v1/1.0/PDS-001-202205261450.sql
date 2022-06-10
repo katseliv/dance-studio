@@ -1,0 +1,2 @@
+ALTER TABLE dancestudio.users
+    ADD COLUMN provider VARCHAR(20) NOT NULL DEFAULT 'LOCAL';

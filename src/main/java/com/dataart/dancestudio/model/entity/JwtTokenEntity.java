@@ -1,5 +1,6 @@
 package com.dataart.dancestudio.model.entity;
 
+import com.dataart.dancestudio.model.JwtTokenType;
 import lombok.*;
 import org.hibernate.annotations.Where;
 

@@ -1,7 +1,7 @@
 package com.dataart.dancestudio.service;
 
 import com.dataart.dancestudio.model.dto.JwtTokenDto;
-import com.dataart.dancestudio.model.entity.JwtTokenType;
+import com.dataart.dancestudio.model.JwtTokenType;
 
 public interface JwtTokenService {
 

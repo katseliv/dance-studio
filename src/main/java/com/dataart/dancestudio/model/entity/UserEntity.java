@@ -1,5 +1,7 @@
 package com.dataart.dancestudio.model.entity;
 
+import com.dataart.dancestudio.model.Provider;
+import com.dataart.dancestudio.model.Role;
 import lombok.*;
 import org.hibernate.annotations.Where;
 
@@ -44,6 +46,9 @@ public class UserEntity {
 
     @Column(name = "role_id")
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
 
     @Column(name = "time_zone")
     private String timeZone;

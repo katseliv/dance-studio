@@ -1,6 +1,6 @@
 package com.dataart.dancestudio.repository;
 
-import com.dataart.dancestudio.model.entity.Role;
+import com.dataart.dancestudio.model.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,5 +23,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     List<UserEntity> findAllByRole(Role role, Pageable pageable);
 
     boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
 
 }

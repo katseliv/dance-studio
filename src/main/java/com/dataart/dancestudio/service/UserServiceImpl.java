@@ -5,12 +5,14 @@ import com.dataart.dancestudio.exception.EntityCreationException;
 import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.mapper.UserMapper;
+import com.dataart.dancestudio.model.Provider;
+import com.dataart.dancestudio.model.Role;
+import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
-import com.dataart.dancestudio.model.entity.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
 import com.dataart.dancestudio.utils.ParseUtils;
@@ -19,11 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -35,8 +39,6 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
     private int defaultPageNumber;
     @Value("${pagination.defaultPageSize}")
     private int defaultPageSize;
-    @Value("${pagination.buttonLimit}")
-    private int buttonLimit;
 
     private final LessonService lessonService;
     private final PasswordEncoder passwordEncoder;
@@ -45,7 +47,7 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
 
     @Override
     @Transactional
-    public int createUser(final UserRegistrationDto userRegistrationDto) {
+    public int createUser(final UserRegistrationDto userRegistrationDto, final Provider provider) {
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isPresent()) {
             log.warn("User with email = {} hasn't been created. Such user already exists!", userRegistrationDto.getEmail());
             throw new EntityAlreadyExistsException("User already exists in the database!");
@@ -56,6 +58,7 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
                 .map(user -> {
                     user.setImage(new byte[0]);
                     user.setRole(Role.USER);
+                    user.setProvider(provider);
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new EntityCreationException("User not created!"));
@@ -86,6 +89,16 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
     }
 
     @Override
+    public UserDetailsDto getUserDetailsById(final int id) {
+        final Optional<UserEntity> userEntity = userRepository.findById(id);
+        userEntity.ifPresentOrElse(
+                (user) -> log.info("User with id = {} has been found.", user.getId()),
+                () -> log.warn("User with id = {} hasn't been found.", id));
+        return userEntity.map(userMapper::userEntityToUserDetailsDto)
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public int getUserIdByEmail(final String email) {
         final Optional<UserEntity> userEntity = userRepository.findByEmail(email);
@@ -97,10 +110,38 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
     }
 
     @Override
+    public UserDetailsDto getUserByEmail(final String email) {
+        final Optional<UserEntity> userEntity = userRepository.findByEmail(email);
+        userEntity.ifPresentOrElse(
+                (user) -> log.info("User for email = {} with id = {} has been found.", email, user.getId()),
+                () -> log.warn("User for email = {} hasn't been found.", email));
+        return userMapper.userEntityToUserDetailsDto(userEntity.orElseThrow(
+                () -> new UsernameNotFoundException("No such user in the database!")));
+    }
+
+    @Override
+    public boolean existsByUserEmail(final String email) {
+        if (userRepository.existsByEmail(email)) {
+            log.info("User with email = {} exists.", email);
+            return true;
+        } else {
+            log.warn("User with email = {} doesn't exist.", email);
+            return false;
+        }
+    }
+
+    @Override
     @Transactional
     public void updateUserById(final UserDto userDto, final int id) {
         final UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+
+        final String username = userDto.getUsername();
+        if (!Objects.equals(username, userEntity.getUsername()) && userRepository.existsByUsername(username)) {
+            log.warn("User with username = {} hasn't been updated. Such username already exists in the database!", username);
+            throw new EntityAlreadyExistsException("Such username already exists!");
+        }
+
         if (userDto.getBase64StringImage().isEmpty()) {
             userMapper.mergeUserEntityAndUserDtoWithoutPicture(userEntity, userDto);
             userRepository.save(userEntity);
@@ -163,11 +204,6 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
         final long numberOfUsers = userRepository.count();
         log.info("There have been found {} users.", numberOfUsers);
         return (int) numberOfUsers;
-    }
-
-    @Override
-    public int getButtonLimit() {
-        return buttonLimit;
     }
 
 }

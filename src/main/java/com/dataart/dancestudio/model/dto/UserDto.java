@@ -2,7 +2,6 @@ package com.dataart.dancestudio.model.dto;
 
 import com.dataart.dancestudio.annotation.ImageValid;
 import com.dataart.dancestudio.annotation.TimeZoneValid;
-import com.dataart.dancestudio.annotation.UsernameValid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.*;
@@ -19,7 +18,6 @@ public class UserDto {
 
     @NotNull(message = "Username is null.")
     @NotBlank(message = "Username is blank.")
-    @UsernameValid
     @Pattern(regexp = ".*([A-Z]|[a-z]).*", message = "Username must contain a letter.")
     private final String username;
 
@@ -37,11 +35,6 @@ public class UserDto {
     @NotBlank(message = "Image is blank.")
     @ImageValid
     private final String base64StringImage;
-
-    @NotNull(message = "Email is null.")
-    @NotBlank(message = "Email is blank.")
-    @Email(message = "Email invalid.")
-    private final String email;
 
     @NotNull(message = "Phone Number is null.")
     @NotBlank(message = "Phone Number is blank.")

@@ -3,7 +3,7 @@ package com.dataart.dancestudio.service;
 import com.dataart.dancestudio.exception.EntityCreationException;
 import com.dataart.dancestudio.model.dto.JwtTokenDto;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
-import com.dataart.dancestudio.model.entity.JwtTokenType;
+import com.dataart.dancestudio.model.JwtTokenType;
 import com.dataart.dancestudio.model.response.JwtResponse;
 import com.dataart.dancestudio.model.response.LoginResponse;
 import com.dataart.dancestudio.provider.JwtTokenProvider;

@@ -34,3 +34,27 @@ databaseChangeLog:
         - sqlFile:
             path: PDS-001-202204291730.sql
             relativeToChangelogFile: true
+  - changeSet:
+      id: PDS-001-202205261450
+      author: EkaterinaSelivanova
+      comment: Add Provider Column
+      changes:
+        - sqlFile:
+            path: PDS-001-202205261450.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: PDS-001-202205271325
+      author: EkaterinaSelivanova
+      comment: Alter User Table
+      changes:
+        - sqlFile:
+            path: PDS-001-202205271325.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: PDS-001-202205271830
+      author: EkaterinaSelivanova
+      comment: Drop Unnecessary Tables
+      changes:
+        - sqlFile:
+            path: PDS-001-202205271830.sql
+            relativeToChangelogFile: true

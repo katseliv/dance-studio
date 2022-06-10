@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,13 +39,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {
             EntityCreationException.class, EntityAlreadyExistsException.class, UserCanNotBeDeletedException.class,
-            ParseInputException.class
+            ParseInputException.class, DecodeJwtTokenException.class
     })
     public ResponseEntity<ApiErrorDto> badRequestException(final RuntimeException runtimeException) {
         final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
                 .status(String.valueOf(HttpStatus.BAD_REQUEST.value()))
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .messages(List.of(runtimeException.getMessage()))
+                .build();
+        log.error(runtimeException.getMessage(), runtimeException);
+        return new ResponseEntity<>(apiErrorDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = BadCredentialsException.class)
+    public ResponseEntity<ApiErrorDto> badCredentialsException(final RuntimeException runtimeException) {
+        final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
+                .status(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .messages(List.of("Invalid email or password!"))
                 .build();
         log.error(runtimeException.getMessage(), runtimeException);
         return new ResponseEntity<>(apiErrorDto, HttpStatus.BAD_REQUEST);
@@ -59,6 +71,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
         log.error(runtimeException.getMessage(), runtimeException);
         return new ResponseEntity<>(apiErrorDto, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = GoogleResponseException.class)
+    public ResponseEntity<ApiErrorDto> googleHttpException(final Exception exception) {
+        final ApiErrorDto apiErrorDto = ApiErrorDto.builder()
+                .status(String.valueOf(HttpStatus.BAD_GATEWAY.value()))
+                .error(HttpStatus.BAD_GATEWAY.getReasonPhrase())
+                .messages(List.of("Oops... Something went wrong!"))
+                .build();
+        log.error(exception.getMessage(), exception);
+        return new ResponseEntity<>(apiErrorDto, HttpStatus.BAD_GATEWAY);
     }
 
     @ExceptionHandler(value = Exception.class)

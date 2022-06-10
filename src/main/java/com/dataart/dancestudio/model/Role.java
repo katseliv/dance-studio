@@ -1,12 +1,14 @@
-package com.dataart.dancestudio.model.entity;
+package com.dataart.dancestudio.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Optional;
 
 @Getter
+@ToString
 @AllArgsConstructor
 public enum Role implements GrantedAuthority {
 

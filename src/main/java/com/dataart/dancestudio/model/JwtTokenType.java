@@ -1,4 +1,4 @@
-package com.dataart.dancestudio.model.entity;
+package com.dataart.dancestudio.model;
 
 public enum JwtTokenType {
 
