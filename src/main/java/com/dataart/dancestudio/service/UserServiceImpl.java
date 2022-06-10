@@ -5,14 +5,14 @@ import com.dataart.dancestudio.exception.EntityCreationException;
 import com.dataart.dancestudio.exception.EntityNotFoundException;
 import com.dataart.dancestudio.exception.UserCanNotBeDeletedException;
 import com.dataart.dancestudio.mapper.UserMapper;
+import com.dataart.dancestudio.model.Provider;
+import com.dataart.dancestudio.model.Role;
 import com.dataart.dancestudio.model.dto.UserDetailsDto;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
-import com.dataart.dancestudio.model.Provider;
-import com.dataart.dancestudio.model.Role;
 import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.UserRepository;
 import com.dataart.dancestudio.utils.ParseUtils;
@@ -140,12 +140,6 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
         if (!Objects.equals(username, userEntity.getUsername()) && userRepository.existsByUsername(username)) {
             log.warn("User with username = {} hasn't been updated. Such username already exists in the database!", username);
             throw new EntityAlreadyExistsException("Such username already exists!");
-        }
-
-        final String email = userDto.getEmail();
-        if (!Objects.equals(email, userEntity.getEmail()) && userRepository.existsByEmail(email)) {
-            log.warn("User with email = {} hasn't been updated. Such email already exists in the database!", email);
-            throw new EntityAlreadyExistsException("Such email already exists!");
         }
 
         if (userDto.getBase64StringImage().isEmpty()) {

@@ -101,7 +101,7 @@ public class JwtTokenProvider implements Serializable {
             log.info("Jwt Token is valid.");
             return true;
         } catch (final JWTVerificationException exception) {
-            log.warn("Jwt Token is invalid!");
+            log.warn("Jwt Token is invalid!", exception);
             return false;
         }
     }
@@ -114,7 +114,7 @@ public class JwtTokenProvider implements Serializable {
             return email;
         } catch (final JWTDecodeException exception) {
             log.warn("Jwt Token is invalid! Can't get email!");
-            throw new DecodeJwtTokenException("Jwt Token is invalid!");
+            throw new DecodeJwtTokenException("Jwt Token is invalid!", exception);
         }
     }
 

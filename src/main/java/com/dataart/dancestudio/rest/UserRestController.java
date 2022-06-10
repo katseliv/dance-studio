@@ -1,12 +1,12 @@
 package com.dataart.dancestudio.rest;
 
+import com.dataart.dancestudio.model.Provider;
 import com.dataart.dancestudio.model.dto.UserDto;
 import com.dataart.dancestudio.model.dto.UserRegistrationDto;
 import com.dataart.dancestudio.model.dto.view.BookingViewDto;
 import com.dataart.dancestudio.model.dto.view.UserForListDto;
 import com.dataart.dancestudio.model.dto.view.UserViewDto;
 import com.dataart.dancestudio.model.dto.view.ViewListPage;
-import com.dataart.dancestudio.model.Provider;
 import com.dataart.dancestudio.service.BookingService;
 import com.dataart.dancestudio.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +24,6 @@ public class UserRestController {
 
     private final UserService userService;
     private final BookingService bookingService;
-
-    @PostMapping("/register")
-    public ResponseEntity<Integer> register(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) {
-        final int id = userService.createUser(userRegistrationDto, Provider.LOCAL);
-        return new ResponseEntity<>(id, HttpStatus.CREATED);
-    }
 
     @PostMapping
     public ResponseEntity<Integer> createUser(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) {
