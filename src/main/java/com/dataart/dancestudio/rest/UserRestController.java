@@ -25,6 +25,12 @@ public class UserRestController {
     private final UserService userService;
     private final BookingService bookingService;
 
+    @PostMapping("/register")
+    public ResponseEntity<Integer> register(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) {
+        final int id = userService.createUser(userRegistrationDto, Provider.LOCAL);
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
+    }
+
     @PostMapping
     public ResponseEntity<Integer> createUser(@RequestBody @Valid final UserRegistrationDto userRegistrationDto) {
         final int id = userService.createUser(userRegistrationDto, Provider.LOCAL);
