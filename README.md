@@ -1,1 +1,1 @@
-# dance-studio
+# Dance Studio
