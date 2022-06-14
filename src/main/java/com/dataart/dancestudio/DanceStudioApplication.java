@@ -3,8 +3,10 @@ package com.dataart.dancestudio;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @PropertySource("classpath:constants.properties")
+@EnableScheduling
 @SpringBootApplication
 public class DanceStudioApplication {
 

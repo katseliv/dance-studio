@@ -27,6 +27,17 @@ spring:
         enabled: true
     pathmatch:
       matching-strategy: ant-path-matcher
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ekaterina.selivanova.work@gmail.com
+    password: pnfovgfnbdmfugtu
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 logging:
   level:
     org.springframework.web: DEBUG

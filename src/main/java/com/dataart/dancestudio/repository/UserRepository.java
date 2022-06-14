@@ -20,6 +20,14 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     Optional<UserEntity> findByEmail(String email);
 
+    @Modifying
+    @Query("SELECT DISTINCT u.email " +
+            "FROM users u " +
+            "LEFT JOIN bookings b ON u.id = b.user.id " +
+            "LEFT JOIN lessons l ON b.lesson.id = l.id " +
+            "WHERE l.id = ?1")
+    List<String> findAllEmailsByLessonId(int lessonId);
+
     List<UserEntity> findAllByRole(Role role, Pageable pageable);
 
     boolean existsByUsername(String username);

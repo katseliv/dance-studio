@@ -29,4 +29,6 @@ public interface BookingService {
 
     int numberOfUserBookings(int userId);
 
+    void findAndNotifyByStartingInHours(int hours);
+
 }

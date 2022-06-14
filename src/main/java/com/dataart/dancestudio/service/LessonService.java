@@ -16,7 +16,7 @@ public interface LessonService {
 
     LessonViewDto getLessonViewById(int id);
 
-    void updateLessonById(LessonDto lessonDto, int id);
+    void updateLessonById(int id, LessonDto lessonDto);
 
     void deleteLessonById(int id);
 

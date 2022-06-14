@@ -6,7 +6,10 @@ import com.dataart.dancestudio.mapper.LessonMapperImpl;
 import com.dataart.dancestudio.model.Role;
 import com.dataart.dancestudio.model.dto.LessonDto;
 import com.dataart.dancestudio.model.dto.view.LessonViewDto;
-import com.dataart.dancestudio.model.entity.*;
+import com.dataart.dancestudio.model.entity.DanceStyleEntity;
+import com.dataart.dancestudio.model.entity.LessonEntity;
+import com.dataart.dancestudio.model.entity.RoomEntity;
+import com.dataart.dancestudio.model.entity.UserEntity;
 import com.dataart.dancestudio.repository.BookingRepository;
 import com.dataart.dancestudio.repository.LessonRepository;
 import com.dataart.dancestudio.repository.UserRepository;
@@ -37,6 +40,9 @@ public class LessonServiceTest {
 
     @Spy
     private LessonMapperImpl lessonMapperImpl;
+
+    @Mock
+    private EmailServiceImpl emailServiceImpl;
 
     @Mock
     private LessonRepository lessonRepositoryMock;
@@ -242,7 +248,7 @@ public class LessonServiceTest {
         when(lessonRepositoryMock.save(newLessonEntity)).thenReturn(newLessonEntity);
 
         // when
-        lessonServiceImpl.updateLessonById(newLessonDto, id);
+        lessonServiceImpl.updateLessonById(id, newLessonDto);
 
         // then
         verify(lessonRepositoryMock, times(1)).save(newLessonEntity);
@@ -254,7 +260,7 @@ public class LessonServiceTest {
         when(lessonRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(EntityNotFoundException.class, () -> lessonServiceImpl.updateLessonById(newLessonDto, id));
+        assertThrows(EntityNotFoundException.class, () -> lessonServiceImpl.updateLessonById(id, newLessonDto));
 
         // then
         verify(lessonRepositoryMock, never()).save(newLessonEntity);

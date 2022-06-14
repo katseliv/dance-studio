@@ -23,7 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,6 +42,7 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
     private final LessonRepository lessonRepository;
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -178,6 +182,21 @@ public class BookingServiceImpl implements BookingService, PaginationService<Boo
         final int numberOfUserBookings = bookingRepository.countAllByUserId(userId);
         log.info("There have been found {} bookings.", numberOfUserBookings);
         return numberOfUserBookings;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void findAndNotifyByStartingInHours(final int hours) {
+        final List<BookingEntity> listBookings = bookingRepository.findAllByLessonDatetime(hours);
+        final List<BookingViewDto> bookingViewDtoList = bookingMapper.bookingEntitiesToBookingViewDtoList(listBookings);
+        final Map<String, List<BookingViewDto>> emailAndBookings = bookingViewDtoList.stream()
+                .collect(groupingBy(BookingViewDto::getEmail));
+        if (emailAndBookings.isEmpty()) {
+            log.info("No matching coming lessons found.");
+        } else {
+            emailService.sendEmailAboutStartingLesson(emailAndBookings);
+            log.info("Letter was sent to {} addresses.", emailAndBookings.size());
+        }
     }
 
 }

@@ -29,7 +29,7 @@ public interface UserService {
 
     boolean existsByUserEmail(String email);
 
-    void updateUserById(UserDto userDto, int id);
+    void updateUserById(int id, UserDto userDto);
 
     void deleteUserById(int id) throws UserCanNotBeDeletedException;
 

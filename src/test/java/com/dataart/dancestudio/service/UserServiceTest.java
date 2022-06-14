@@ -535,7 +535,7 @@ public class UserServiceTest {
         when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(newUserEntityWithUpdatedImage);
 
         // when
-        userServiceImpl.updateUserById(newUserDto, id);
+        userServiceImpl.updateUserById(id, newUserDto);
 
         // then
         verify(userRepositoryMock, times(1)).save(userEntityArgumentCaptor.capture());
@@ -584,7 +584,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(id)).thenReturn(Optional.of(userEntity));
 
         // when
-        userServiceImpl.updateUserById(newUserDto, id);
+        userServiceImpl.updateUserById(id, newUserDto);
 
         // then
         verify(userRepositoryMock, times(1)).save(userEntityArgumentCaptor.capture());
@@ -621,7 +621,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.updateUserById(newUserDto, id));
+        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.updateUserById(id, newUserDto));
 
         // then
         verify(userRepositoryMock, never()).save(newUserEntity);
@@ -666,7 +666,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(id)).thenReturn(Optional.of(userEntity));
 
         // when
-        userServiceImpl.updateUserById(userDto, id);
+        userServiceImpl.updateUserById(id, userDto);
 
         // then
         verify(userRepositoryMock, never()).save(newUserEntity);
@@ -701,7 +701,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.updateUserById(userDto, id));
+        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.updateUserById(id, userDto));
 
         // then
         verify(userRepositoryMock, never()).save(newUserEntity);

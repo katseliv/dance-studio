@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService, PaginationService<UserForLi
 
     @Override
     @Transactional
-    public void updateUserById(final UserDto userDto, final int id) {
+    public void updateUserById(final int id, final UserDto userDto) {
         final UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found!"));
 

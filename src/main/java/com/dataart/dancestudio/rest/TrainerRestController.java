@@ -16,8 +16,8 @@ public class TrainerRestController {
     private final LessonService lessonService;
 
     @GetMapping(path = "/{id}/lessons")
-    public ViewListPage<LessonViewDto> getTrainerLessons(@RequestParam(required = false) final Map<String, String> allParams,
-                                                         @PathVariable final int id) {
+    public ViewListPage<LessonViewDto> getTrainerLessons(@PathVariable final int id,
+                                                         @RequestParam(required = false) final Map<String, String> allParams) {
         return lessonService.getUserViewListPage(id, allParams.get("page"), allParams.get("size"));
     }
 

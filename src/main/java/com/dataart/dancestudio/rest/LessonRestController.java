@@ -31,8 +31,8 @@ public class LessonRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateLesson(@RequestBody @Valid final LessonDto lessonDto, @PathVariable final int id) {
-        lessonService.updateLessonById(lessonDto, id);
+    public ResponseEntity<String> updateLesson(@PathVariable final int id, @RequestBody @Valid final LessonDto lessonDto) {
+        lessonService.updateLessonById(id, lessonDto);
         return new ResponseEntity<>("Lesson was updated!", HttpStatus.OK);
     }
 

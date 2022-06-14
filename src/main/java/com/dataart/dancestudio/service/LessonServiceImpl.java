@@ -42,6 +42,7 @@ public class LessonServiceImpl implements LessonService, PaginationService<Lesso
     private final BookingRepository bookingRepository;
     private final LessonRepository lessonRepository;
     private final LessonMapper lessonMapper;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -92,7 +93,7 @@ public class LessonServiceImpl implements LessonService, PaginationService<Lesso
 
     @Override
     @Transactional
-    public void updateLessonById(final LessonDto lessonDto, final int id) {
+    public void updateLessonById(final int id, final LessonDto lessonDto) {
         final Optional<LessonEntity> lessonEntity = lessonRepository.findById(id);
         lessonEntity.ifPresentOrElse(
                 (lesson) -> log.info("Lesson with id = {} has been found.", lesson.getId()),
@@ -100,13 +101,14 @@ public class LessonServiceImpl implements LessonService, PaginationService<Lesso
                     log.warn("Lesson hasn't been found.");
                     throw new EntityNotFoundException("Lesson not found!");
                 });
-        Optional.of(lessonDto)
-                .map(lessonMapper::lessonDtoToLessonEntity)
-                .map((lesson) -> {
-                    lesson.setId(id);
-                    return lessonRepository.save(lesson);
-                });
+        final LessonEntity lessonEntityResult = lessonMapper.lessonDtoToLessonEntity(lessonDto);
+        lessonEntityResult.setId(id);
+        lessonRepository.save(lessonEntityResult);
         log.info("Lesson with id = {} has been updated.", id);
+
+        final LessonViewDto lessonViewDto = lessonMapper.lessonEntityToLessonViewDto(
+                lessonEntity.orElseThrow(() -> new EntityNotFoundException("Lesson not found!")));
+        emailService.sendEmailAboutChangingLesson(lessonViewDto);
     }
 
     @Override
@@ -122,6 +124,10 @@ public class LessonServiceImpl implements LessonService, PaginationService<Lesso
         lessonRepository.markAsDeletedById(id);
         bookingRepository.markAsDeletedByLessonId(id);
         log.info("Lesson with id = {} has been deleted.", id);
+
+        final LessonViewDto lessonViewDto = lessonMapper.lessonEntityToLessonViewDto(
+                lessonEntity.orElseThrow(() -> new EntityNotFoundException("Lesson not found!")));
+        emailService.sendEmailAboutCancelingLesson(lessonViewDto);
     }
 
     @Override

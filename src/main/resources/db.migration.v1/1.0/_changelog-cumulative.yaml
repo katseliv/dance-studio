@@ -50,11 +50,3 @@ databaseChangeLog:
         - sqlFile:
             path: PDS-001-202205271325.sql
             relativeToChangelogFile: true
-  - changeSet:
-      id: PDS-001-202205271830
-      author: EkaterinaSelivanova
-      comment: Drop Unnecessary Tables
-      changes:
-        - sqlFile:
-            path: PDS-001-202205271830.sql
-            relativeToChangelogFile: true

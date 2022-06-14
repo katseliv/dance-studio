@@ -43,8 +43,8 @@ public class UserRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@RequestBody @Valid final UserDto userDto, @PathVariable final int id) {
-        userService.updateUserById(userDto, id);
+    public ResponseEntity<String> updateUser(@PathVariable final int id, @RequestBody @Valid final UserDto userDto) {
+        userService.updateUserById(id, userDto);
         return new ResponseEntity<>("User was updated!", HttpStatus.OK);
     }
 
@@ -54,8 +54,8 @@ public class UserRestController {
     }
 
     @GetMapping("/{id}/bookings")
-    public ViewListPage<BookingViewDto> getUserBookings(@RequestParam(required = false) final Map<String, String> allParams,
-                                                        @PathVariable final int id) {
+    public ViewListPage<BookingViewDto> getUserBookings(@PathVariable final int id,
+                                                        @RequestParam(required = false) final Map<String, String> allParams) {
         return bookingService.getUserViewListPage(id, allParams.get("page"), allParams.get("size"));
     }
 

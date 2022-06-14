@@ -17,6 +17,7 @@ public interface BookingMapper {
 
     @Mapping(target = "firstName", source = "user.firstName")
     @Mapping(target = "lastName", source = "user.lastName")
+    @Mapping(target = "email", source = "user.email")
     @Mapping(target = "danceStyle", source = "lesson.danceStyle.name")
     @Mapping(target = "startDatetime", source = "lesson.startDatetime")
     BookingViewDto bookingEntityToBookingViewDto(BookingEntity entity);
