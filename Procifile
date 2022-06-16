@@ -1,0 +1,1 @@
+web: java -jar target/dance-studio-1.0-SNAPSHOT.jar
