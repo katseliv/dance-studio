@@ -172,7 +172,7 @@ public class LessonServiceTest {
         when(lessonRepositoryMock.save(lessonEntity)).thenReturn(null);
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> lessonServiceImpl.createLesson(lessonDto));
         verify(lessonRepositoryMock, times(1)).save(lessonEntity);
         assertEquals(actualException.getMessage(), "Lesson not created!");
@@ -372,7 +372,7 @@ public class LessonServiceTest {
         when(userRepositoryMock.findById(userId)).thenReturn(Optional.empty());
 
         // when then
-        final var actualException = assertThrowsExactly(EntityNotFoundException.class,
+        final var actualException = assertThrows(EntityNotFoundException.class,
                 () -> lessonServiceImpl.listUserLessons(userId, pageable));
         verify(bookingRepositoryMock, never()).findAllByUserId(userId, pageable);
         assertEquals(actualException.getMessage(), "User not found!");

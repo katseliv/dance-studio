@@ -194,7 +194,7 @@ public class UserServiceTest {
         when(userRepositoryMock.save(userEntity)).thenReturn(null);
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> userServiceImpl.createUser(userRegistrationDto, Provider.LOCAL));
         verify(userMapperImpl, times(1)).userRegistrationDtoToUserEntityWithPassword(
                 userRegistrationDto, userEntity.getPassword());

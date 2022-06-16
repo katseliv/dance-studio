@@ -106,7 +106,7 @@ public class JwtTokenServiceTest {
         when(userRepositoryMock.findByEmail(jwtTokenDto.getEmail())).thenReturn(Optional.empty());
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> jwtTokenServiceImpl.createJwtToken(jwtTokenDto));
         verify(jwtTokenRepositoryMock, never()).save(jwtTokenEntity);
         assertEquals(actualException.getMessage(), "Token not created!");
@@ -120,7 +120,7 @@ public class JwtTokenServiceTest {
         when(jwtTokenRepositoryMock.save(jwtTokenEntity)).thenReturn(null);
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> jwtTokenServiceImpl.createJwtToken(jwtTokenDto));
         verify(jwtTokenRepositoryMock, times(1)).save(jwtTokenEntity);
         assertEquals(actualException.getMessage(), "Token not created!");
@@ -145,7 +145,7 @@ public class JwtTokenServiceTest {
         when(jwtTokenRepositoryMock.findByUserEmailAndType(email, JwtTokenType.ACCESS)).thenReturn(Optional.empty());
 
         // when then
-        final var actualException = assertThrowsExactly(EntityNotFoundException.class,
+        final var actualException = assertThrows(EntityNotFoundException.class,
                 () -> jwtTokenServiceImpl.getJwtTokenByEmailAndType(email, JwtTokenType.ACCESS));
         verify(jwtTokenRepositoryMock, times(1)).findByUserEmailAndType(email, JwtTokenType.ACCESS);
         assertEquals(actualException.getMessage(), "Token not found!");
@@ -243,7 +243,7 @@ public class JwtTokenServiceTest {
         when(jwtTokenRepositoryMock.findByUserEmailAndType(email, JwtTokenType.ACCESS)).thenReturn(Optional.empty());
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> jwtTokenServiceImpl.updateJwtToken(newJwtTokenDto));
         verify(jwtTokenRepositoryMock, never()).save(newJwtTokenEntity);
         assertEquals(actualException.getMessage(), "New access token hasn't been created!");
@@ -269,7 +269,7 @@ public class JwtTokenServiceTest {
         when(jwtTokenRepositoryMock.existsByUserEmailAndType(email, JwtTokenType.ACCESS)).thenReturn(false);
 
         // when then
-        final var actualException = assertThrowsExactly(EntityNotFoundException.class,
+        final var actualException = assertThrows(EntityNotFoundException.class,
                 () -> jwtTokenServiceImpl.deleteJwtTokensByEmail(email));
         verify(jwtTokenRepositoryMock, never()).markAsDeletedByUserEmailAndType(email, JwtTokenType.ACCESS);
         verify(jwtTokenRepositoryMock, never()).markAsDeletedByUserEmailAndType(email, JwtTokenType.REFRESH);
@@ -283,7 +283,7 @@ public class JwtTokenServiceTest {
         when(jwtTokenRepositoryMock.existsByUserEmailAndType(email, JwtTokenType.REFRESH)).thenReturn(false);
 
         // when then
-        final var actualException = assertThrowsExactly(EntityNotFoundException.class,
+        final var actualException = assertThrows(EntityNotFoundException.class,
                 () -> jwtTokenServiceImpl.deleteJwtTokensByEmail(jwtTokenDto.getEmail()));
         verify(jwtTokenRepositoryMock, never()).markAsDeletedByUserEmailAndType(email, JwtTokenType.ACCESS);
         verify(jwtTokenRepositoryMock, never()).markAsDeletedByUserEmailAndType(email, JwtTokenType.REFRESH);

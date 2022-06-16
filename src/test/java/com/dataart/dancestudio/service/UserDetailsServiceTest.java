@@ -19,7 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,7 +91,7 @@ public class UserDetailsServiceTest {
         when(userRepositoryMock.findByEmail(userDetailsDtoExpected.getEmail())).thenReturn(Optional.empty());
 
         // when then
-        final var actualException = assertThrowsExactly(UsernameNotFoundException.class,
+        final var actualException = assertThrows(UsernameNotFoundException.class,
                 () -> userDetailsServiceImpl.loadUserByUsername(userDetailsDtoExpected.getEmail()));
         verify(userRepositoryMock, times(1)).findByEmail(userDetailsDtoExpected.getEmail());
         assertEquals(actualException.getMessage(), "No such user in the database!");

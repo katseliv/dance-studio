@@ -116,7 +116,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.existsByUserIdAndLessonId(userId, lessonId)).thenReturn(true);
 
         // when then
-        final var actualException = assertThrowsExactly(EntityAlreadyExistsException.class,
+        final var actualException = assertThrows(EntityAlreadyExistsException.class,
                 () -> bookingServiceImpl.createBooking(bookingDto));
         verify(bookingRepositoryMock, never()).save(bookingEntity);
         assertEquals(actualException.getMessage(), "Booking already exists!");
@@ -128,7 +128,7 @@ public class BookingServiceTest {
         when(userRepositoryMock.findById(userId)).thenReturn(Optional.empty());
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> bookingServiceImpl.createBooking(bookingDto));
         verify(bookingRepositoryMock, never()).save(bookingEntity);
         assertEquals(actualException.getMessage(), "Invalid userId. Can't create a booking!");
@@ -141,7 +141,7 @@ public class BookingServiceTest {
         when(userRepositoryMock.findById(userId)).thenReturn(Optional.ofNullable(userEntity));
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> bookingServiceImpl.createBooking(bookingDto));
         verify(bookingRepositoryMock, never()).save(bookingEntity);
         assertEquals(actualException.getMessage(), "Invalid lessonId. Can't create a booking!");
@@ -157,7 +157,7 @@ public class BookingServiceTest {
         when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userEntity));
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> bookingServiceImpl.createBooking(bookingDto));
         verify(bookingRepositoryMock, never()).save(bookingEntity);
         assertEquals(actualException.getMessage(), "User can't sign up for a lesson with himself!");
@@ -172,7 +172,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.save(bookingEntity)).thenReturn(null);
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> bookingServiceImpl.createBooking(bookingDto));
         verify(bookingRepositoryMock, times(1)).save(bookingEntity);
         assertEquals(actualException.getMessage(), "Booking not created!");
@@ -250,7 +250,7 @@ public class BookingServiceTest {
         when(bookingRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
         // when then
-        final var actualException = assertThrowsExactly(EntityNotFoundException.class,
+        final var actualException = assertThrows(EntityNotFoundException.class,
                 () -> bookingServiceImpl.deleteBookingById(id));
         verify(bookingRepositoryMock, never()).markAsDeletedById(id);
         assertEquals(actualException.getMessage(), "Booking not found!");
@@ -330,7 +330,7 @@ public class BookingServiceTest {
         when(userRepositoryMock.findById(userId)).thenReturn(Optional.empty());
 
         // when then
-        final var actualException = assertThrowsExactly(EntityNotFoundException.class,
+        final var actualException = assertThrows(EntityNotFoundException.class,
                 () -> bookingServiceImpl.listUserBookings(userId, pageable));
         verify(bookingRepositoryMock, never()).findAllByUserId(userId, pageable);
         assertEquals(actualException.getMessage(), "User not found!");

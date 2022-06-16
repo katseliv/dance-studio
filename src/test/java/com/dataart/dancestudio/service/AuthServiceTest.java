@@ -18,7 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -134,7 +134,7 @@ public class AuthServiceTest {
         when(jwtTokenProviderMock.getEmail(refreshToken)).thenReturn(" ");
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> authServiceImpl.getNewAccessToken(refreshToken));
         verify(userDetailsServiceMock, never()).loadUserByUsername(email);
         verify(jwtTokenProviderMock, never()).generateAccessToken(userDetailsDto);
@@ -151,7 +151,7 @@ public class AuthServiceTest {
         when(jwtTokenProviderMock.validateRefreshToken(refreshToken)).thenReturn(false);
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> authServiceImpl.getNewAccessToken(refreshToken));
         verify(userDetailsServiceMock, never()).loadUserByUsername(email);
         verify(jwtTokenProviderMock, never()).generateAccessToken(userDetailsDto);
@@ -169,7 +169,7 @@ public class AuthServiceTest {
         when(jwtTokenServiceMock.getJwtTokenByEmailAndType(email, JwtTokenType.REFRESH)).thenReturn(newRefreshToken);
 
         // when then
-        final var actualException = assertThrowsExactly(EntityCreationException.class,
+        final var actualException = assertThrows(EntityCreationException.class,
                 () -> authServiceImpl.getNewAccessToken(refreshToken));
         verify(userDetailsServiceMock, never()).loadUserByUsername(email);
         verify(jwtTokenProviderMock, never()).generateAccessToken(userDetailsDto);

@@ -116,7 +116,7 @@ public class GoogleHttpServiceTest {
                 .thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
         // when then
-        final var actualException = assertThrowsExactly(GoogleResponseException.class,
+        final var actualException = assertThrows(GoogleResponseException.class,
                 () -> googleHttpService.getAccessToken(code));
         assertEquals(actualException.getMessage(), "Response status is bad!");
     }
@@ -130,7 +130,7 @@ public class GoogleHttpServiceTest {
                 .thenReturn(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
 
         // when then
-        final var actualException = assertThrowsExactly(GoogleResponseException.class,
+        final var actualException = assertThrows(GoogleResponseException.class,
                 () -> googleHttpService.getAccessToken(code));
         assertEquals(actualException.getMessage(), "Response status is bad!");
     }
@@ -151,7 +151,7 @@ public class GoogleHttpServiceTest {
                 .thenReturn(ResponseEntity.of(Optional.of(googleTokenResponse)));
 
         // when then
-        final var actualException = assertThrowsExactly(GoogleResponseException.class,
+        final var actualException = assertThrows(GoogleResponseException.class,
                 () -> googleHttpService.getAccessToken(code));
         assertEquals(actualException.getMessage(), "Google Token Response is empty!");
     }
@@ -184,7 +184,7 @@ public class GoogleHttpServiceTest {
                 .thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
         // when then
-        final var actualException = assertThrowsExactly(GoogleResponseException.class,
+        final var actualException = assertThrows(GoogleResponseException.class,
                 () -> googleHttpService.getUserInfo(accessToken));
         assertEquals(actualException.getMessage(), "Response status is bad!");
     }
@@ -200,7 +200,7 @@ public class GoogleHttpServiceTest {
                 .thenReturn(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
 
         // when then
-        final var actualException = assertThrowsExactly(GoogleResponseException.class,
+        final var actualException = assertThrows(GoogleResponseException.class,
                 () -> googleHttpService.getUserInfo(accessToken));
         assertEquals(actualException.getMessage(), "Response status is bad!");
     }
@@ -216,7 +216,7 @@ public class GoogleHttpServiceTest {
                 .thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
         // when then
-        final var actualException = assertThrowsExactly(GoogleResponseException.class,
+        final var actualException = assertThrows(GoogleResponseException.class,
                 () -> googleHttpService.getUserInfo(accessToken));
         assertEquals(actualException.getMessage(), "Google User Info Response is empty!");
     }
