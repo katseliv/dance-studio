@@ -1,1 +1,1 @@
-web: java -war target/dance-studio-1.0-SNAPSHOT.war
+web: java -jar target/dance-studio-1.0-SNAPSHOT.jar

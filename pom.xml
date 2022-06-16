@@ -7,7 +7,7 @@
     <groupId>com.dataart</groupId>
     <artifactId>dance-studio</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
