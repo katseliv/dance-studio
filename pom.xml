@@ -188,7 +188,6 @@
                             <mainClass>com.dataart.dancestudio.DanceStudioApplication</mainClass>
                         </manifest>
                     </archive>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
             <plugin>
